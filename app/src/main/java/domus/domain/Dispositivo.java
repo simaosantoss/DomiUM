@@ -56,13 +56,55 @@ public abstract class Dispositivo implements Serializable {
      * @param consumoPorHora consumo energético por hora
      */
     public Dispositivo(String identificador, String marca, String modelo, double consumoPorHora) {
+        this(identificador, marca, modelo, consumoPorHora, false, 0L, 0);
+    }
+
+    /**
+     * Cria um dispositivo com o estado herdado totalmente definido.
+     *
+     * Este construtor existe para apoiar subclasses que precisem de reconstruir
+     * explicitamente uma instância com todo o estado já conhecido, como acontece
+     * em operações de cópia manual.
+     *
+     * @param identificador identificador único do dispositivo
+     * @param marca marca do equipamento
+     * @param modelo modelo do equipamento
+     * @param consumoPorHora consumo energético por hora
+     * @param ligado estado atual do dispositivo
+     * @param tempoTotalLigado tempo total acumulado em que o dispositivo esteve
+     *                         ligado, em minutos
+     * @param numeroAtivacoes número de ativações registadas
+     */
+    protected Dispositivo(String identificador, String marca, String modelo, double consumoPorHora,
+                          boolean ligado, long tempoTotalLigado, int numeroAtivacoes) {
         this.identificador = identificador;
         this.marca = marca;
         this.modelo = modelo;
         this.consumoPorHora = consumoPorHora;
-        this.ligado = false;
-        this.tempoTotalLigado = 0L;
-        this.numeroAtivacoes = 0;
+        this.ligado = ligado;
+        this.tempoTotalLigado = tempoTotalLigado;
+        this.numeroAtivacoes = numeroAtivacoes;
+    }
+
+    /**
+     * Cria uma cópia do estado herdado de outro dispositivo.
+     *
+     * Este construtor simplifica a implementação de cópias manuais nas
+     * subclasses, garantindo que o estado comum é transferido de forma direta e
+     * sem reconstruções artificiais.
+     *
+     * @param outro dispositivo de origem
+     */
+    protected Dispositivo(Dispositivo outro) {
+        this(
+                outro.identificador,
+                outro.marca,
+                outro.modelo,
+                outro.consumoPorHora,
+                outro.ligado,
+                outro.tempoTotalLigado,
+                outro.numeroAtivacoes
+        );
     }
 
     /**
@@ -166,6 +208,24 @@ public abstract class Dispositivo implements Serializable {
     public abstract Dispositivo clone();
 
     /**
+     * Constrói a parte textual correspondente ao estado herdado do dispositivo.
+     *
+     * Este método permite que subclasses reutilizem a descrição base no seu
+     * próprio {@code toString()} sem depender de manipulação frágil de texto.
+     *
+     * @return descrição textual do estado comum do dispositivo
+     */
+    protected String getDescricaoEstadoBase() {
+        return "identificador='" + this.identificador + '\''
+                + ", marca='" + this.marca + '\''
+                + ", modelo='" + this.modelo + '\''
+                + ", consumoPorHora=" + this.consumoPorHora
+                + ", ligado=" + this.ligado
+                + ", tempoTotalLigado=" + this.tempoTotalLigado
+                + ", numeroAtivacoes=" + this.numeroAtivacoes;
+    }
+
+    /**
      * Compara este dispositivo com outro objeto com base no seu estado
      * relevante.
      *
@@ -198,13 +258,7 @@ public abstract class Dispositivo implements Serializable {
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "{"
-                + "identificador='" + this.identificador + '\''
-                + ", marca='" + this.marca + '\''
-                + ", modelo='" + this.modelo + '\''
-                + ", consumoPorHora=" + this.consumoPorHora
-                + ", ligado=" + this.ligado
-                + ", tempoTotalLigado=" + this.tempoTotalLigado
-                + ", numeroAtivacoes=" + this.numeroAtivacoes
+                + getDescricaoEstadoBase()
                 + '}';
     }
 }
