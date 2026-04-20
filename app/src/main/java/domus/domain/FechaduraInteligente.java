@@ -1,5 +1,7 @@
 package domus.domain;
 
+import java.util.Objects;
+
 /**
  * Representa uma fechadura inteligente no sistema DomusControl.
  *
@@ -112,6 +114,17 @@ public class FechaduraInteligente extends Dispositivo {
         }
         FechaduraInteligente that = (FechaduraInteligente) o;
         return this.trancada == that.trancada;
+    }
+
+    /**
+     * Calcula um código de dispersão coerente com o estado comparado em
+     * {@code equals()}.
+     *
+     * @return código de dispersão da fechadura
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.trancada);
     }
 
     /**

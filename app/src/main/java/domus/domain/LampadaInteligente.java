@@ -1,5 +1,7 @@
 package domus.domain;
 
+import java.util.Objects;
+
 /**
  * Representa uma lâmpada inteligente no sistema DomusControl.
  *
@@ -134,6 +136,17 @@ public class LampadaInteligente extends Dispositivo {
         LampadaInteligente that = (LampadaInteligente) o;
         return this.intensidade == that.intensidade
                 && this.corK == that.corK;
+    }
+
+    /**
+     * Calcula um código de dispersão coerente com o estado comparado em
+     * {@code equals()}.
+     *
+     * @return código de dispersão da lâmpada
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.intensidade, this.corK);
     }
 
     /**

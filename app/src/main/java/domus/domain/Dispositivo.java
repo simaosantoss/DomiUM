@@ -251,6 +251,25 @@ public abstract class Dispositivo implements Serializable {
     }
 
     /**
+     * Calcula um código de dispersão coerente com o estado comparado em
+     * {@code equals()}.
+     *
+     * @return código de dispersão do dispositivo
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                this.identificador,
+                this.marca,
+                this.modelo,
+                this.consumoPorHora,
+                this.ligado,
+                this.tempoTotalLigado,
+                this.numeroAtivacoes
+        );
+    }
+
+    /**
      * Produz uma representação textual legível do dispositivo.
      *
      * @return texto com os dados principais do dispositivo
