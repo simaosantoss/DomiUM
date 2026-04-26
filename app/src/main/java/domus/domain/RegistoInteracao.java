@@ -89,6 +89,17 @@ public final class RegistoInteracao implements Serializable {
     }
 
     /**
+     * Calcula um código de dispersão coerente com o estado comparado em
+     * {@code equals()}.
+     *
+     * @return código de dispersão do registo
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.dataHora, this.dispositivoId, this.acao);
+    }
+
+    /**
      * Produz uma representação textual útil para inspeção do histórico.
      *
      * @return texto com os dados principais do registo

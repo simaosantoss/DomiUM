@@ -157,6 +157,17 @@ public class Utilizador implements Serializable {
     }
 
     /**
+     * Calcula um código de dispersão coerente com o estado comparado em
+     * {@code equals()}.
+     *
+     * @return código de dispersão do utilizador
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id, this.nome, this.permissoes, this.historico);
+    }
+
+    /**
      * Produz uma representação textual legível do utilizador.
      *
      * @return texto com os dados mais relevantes do utilizador
