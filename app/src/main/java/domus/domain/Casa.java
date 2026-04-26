@@ -1,0 +1,193 @@
+package domus.domain;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Representa uma casa no sistema DomusControl.
+ *
+ * Nesta fase do projeto, a casa mantém apenas a sua identidade, o nome e o
+ * conjunto de divisões que lhe pertencem.
+ */
+public class Casa implements Serializable {
+
+    /**
+     * Identificador único da casa.
+     */
+    private final String id;
+
+    /**
+     * Nome da casa.
+     */
+    private final String nome;
+
+    /**
+     * Divisões associadas à casa, indexadas pelo respetivo nome.
+     */
+    private final Map<String, Divisao> divisoes;
+
+    /**
+     * Cria uma casa com identificador e nome.
+     *
+     * @param id identificador da casa
+     * @param nome nome da casa
+     */
+    public Casa(String id, String nome) {
+        this.id = id;
+        this.nome = nome;
+        this.divisoes = new HashMap<String, Divisao>();
+    }
+
+    /**
+     * Dá acesso ao identificador da casa.
+     *
+     * @return identificador da casa
+     */
+    public String getId() {
+        return this.id;
+    }
+
+    /**
+     * Dá acesso ao nome da casa.
+     *
+     * @return nome da casa
+     */
+    public String getNome() {
+        return this.nome;
+    }
+
+    /**
+     * Obtém uma divisão da casa a partir do seu nome.
+     *
+     * A divisão é devolvida por cópia, preservando o encapsulamento da
+     * coleção interna.
+     *
+     * @param nome nome da divisão
+     * @return cópia da divisão encontrada, ou {@code null} se não existir
+     */
+    public Divisao getDivisao(String nome) {
+        Divisao divisao = this.divisoes.get(nome);
+        if (divisao == null) {
+            return null;
+        }
+        return divisao.clone();
+    }
+
+    /**
+     * Disponibiliza um iterador sobre uma cópia protegida das divisões da casa.
+     *
+     * Cada divisão é copiada antes de ser exposta, evitando fugas de referência
+     * para a estrutura interna.
+     *
+     * @return iterador sobre uma cópia das divisões da casa
+     */
+    public Iterator<Divisao> getIteradorDivisoes() {
+        List<Divisao> copia = new ArrayList<Divisao>();
+        for (Divisao divisao : this.divisoes.values()) {
+            copia.add(divisao.clone());
+        }
+        return Collections.unmodifiableList(copia).iterator();
+    }
+
+    /**
+     * Associa uma divisão a esta casa.
+     *
+     * A divisão é guardada por cópia, respeitando a composição da casa sobre as
+     * suas divisões.
+     *
+     * @param divisao divisão a associar à casa
+     */
+    public void adicionarDivisao(Divisao divisao) {
+        if (divisao != null) {
+            this.divisoes.put(divisao.getNome(), divisao.clone());
+        }
+    }
+
+    /**
+     * Calcula o consumo total dos dispositivos existentes em todas as divisões
+     * da casa.
+     *
+     * @return consumo total da casa
+     */
+    public double getConsumoTotal() {
+        double total = 0.0;
+
+        for (Divisao divisao : this.divisoes.values()) {
+            Iterator<Dispositivo> iterador = divisao.getIteradorDispositivos();
+            while (iterador.hasNext()) {
+                total += iterador.next().getConsumo();
+            }
+        }
+
+        return total;
+    }
+
+    /**
+     * Compara esta casa com outro objeto com base no seu estado relevante.
+     *
+     * @param o objeto a comparar
+     * @return {@code true} se ambos representarem a mesma casa lógica
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        }
+        Casa casa = (Casa) o;
+        return Objects.equals(this.id, casa.id)
+                && Objects.equals(this.nome, casa.nome)
+                && Objects.equals(this.divisoes, casa.divisoes);
+    }
+
+    /**
+     * Calcula um código de dispersão coerente com o estado comparado em
+     * {@code equals()}.
+     *
+     * @return código de dispersão da casa
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id, this.nome, this.divisoes);
+    }
+
+    /**
+     * Produz uma representação textual legível da casa.
+     *
+     * @return texto descritivo da casa
+     */
+    @Override
+    public String toString() {
+        return "Casa{"
+                + "id='" + this.id + '\''
+                + ", nome='" + this.nome + '\''
+                + ", divisoes=" + this.divisoes
+                + '}';
+    }
+
+    /**
+     * Cria uma cópia profunda desta casa.
+     *
+     * As divisões são copiadas individualmente para garantir independência
+     * entre a cópia e o objeto original.
+     *
+     * @return nova casa com o mesmo estado lógico
+     */
+    public Casa clone() {
+        Casa copia = new Casa(this.id, this.nome);
+
+        for (Map.Entry<String, Divisao> entry : this.divisoes.entrySet()) {
+            copia.divisoes.put(entry.getKey(), entry.getValue().clone());
+        }
+
+        return copia;
+    }
+}
