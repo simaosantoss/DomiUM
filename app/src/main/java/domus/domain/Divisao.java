@@ -95,6 +95,54 @@ public class Divisao implements Serializable {
     }
 
     /**
+     * Verifica se a divisão contém um dispositivo com o identificador indicado.
+     *
+     * @param dispositivoId identificador do dispositivo
+     * @return {@code true} se o dispositivo existir na divisão
+     */
+    public boolean contemDispositivo(String dispositivoId) {
+        return dispositivoId != null && this.dispositivos.containsKey(dispositivoId);
+    }
+
+    /**
+     * Liga um dispositivo pertencente a esta divisão.
+     *
+     * A operação atua diretamente sobre o dispositivo armazenado internamente,
+     * sem expor referências mutáveis ao exterior.
+     *
+     * @param dispositivoId identificador do dispositivo a ligar
+     * @return {@code true} se o dispositivo existir e tiver sido processado
+     */
+    public boolean ligarDispositivo(String dispositivoId) {
+        Dispositivo dispositivo = this.dispositivos.get(dispositivoId);
+        if (dispositivo == null) {
+            return false;
+        }
+
+        dispositivo.ligar();
+        return true;
+    }
+
+    /**
+     * Desliga um dispositivo pertencente a esta divisão.
+     *
+     * A operação atua diretamente sobre o dispositivo armazenado internamente,
+     * sem expor referências mutáveis ao exterior.
+     *
+     * @param dispositivoId identificador do dispositivo a desligar
+     * @return {@code true} se o dispositivo existir e tiver sido processado
+     */
+    public boolean desligarDispositivo(String dispositivoId) {
+        Dispositivo dispositivo = this.dispositivos.get(dispositivoId);
+        if (dispositivo == null) {
+            return false;
+        }
+
+        dispositivo.desligar();
+        return true;
+    }
+
+    /**
      * Compara esta divisão com outro objeto com base no seu estado relevante.
      *
      * @param o objeto a comparar

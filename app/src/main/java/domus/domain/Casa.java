@@ -110,6 +110,101 @@ public class Casa implements Serializable {
     }
 
     /**
+     * Verifica se a casa contém uma divisão com o nome indicado.
+     *
+     * @param nome nome da divisão
+     * @return {@code true} se a divisão existir na casa
+     */
+    public boolean contemDivisao(String nome) {
+        return nome != null && this.divisoes.containsKey(nome);
+    }
+
+    /**
+     * Adiciona um dispositivo a uma divisão da casa.
+     *
+     * A operação delega na divisão de destino a gestão interna do dispositivo,
+     * preservando a organização do domínio por responsabilidades.
+     *
+     * @param divisaoNome nome da divisão de destino
+     * @param dispositivo dispositivo a adicionar
+     * @return {@code true} se o dispositivo tiver sido adicionado
+     */
+    public boolean adicionarDispositivoADivisao(String divisaoNome, Dispositivo dispositivo) {
+        Divisao divisao = this.divisoes.get(divisaoNome);
+        if (divisao == null || dispositivo == null || divisao.contemDispositivo(dispositivo.getIdentificador())) {
+            return false;
+        }
+
+        divisao.adicionarDispositivo(dispositivo);
+        return true;
+    }
+
+    /**
+     * Verifica se existe um dispositivo com o identificador indicado em alguma
+     * divisão da casa.
+     *
+     * @param dispositivoId identificador do dispositivo
+     * @return {@code true} se o dispositivo existir na casa
+     */
+    public boolean contemDispositivo(String dispositivoId) {
+        if (dispositivoId == null) {
+            return false;
+        }
+
+        for (Divisao divisao : this.divisoes.values()) {
+            if (divisao.contemDispositivo(dispositivoId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Liga um dispositivo existente numa das divisões da casa.
+     *
+     * A operação é delegada à divisão que contém o dispositivo.
+     *
+     * @param dispositivoId identificador do dispositivo a ligar
+     * @return {@code true} se o dispositivo tiver sido encontrado e processado
+     */
+    public boolean ligarDispositivo(String dispositivoId) {
+        if (dispositivoId == null) {
+            return false;
+        }
+
+        for (Divisao divisao : this.divisoes.values()) {
+            if (divisao.ligarDispositivo(dispositivoId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Desliga um dispositivo existente numa das divisões da casa.
+     *
+     * A operação é delegada à divisão que contém o dispositivo.
+     *
+     * @param dispositivoId identificador do dispositivo a desligar
+     * @return {@code true} se o dispositivo tiver sido encontrado e processado
+     */
+    public boolean desligarDispositivo(String dispositivoId) {
+        if (dispositivoId == null) {
+            return false;
+        }
+
+        for (Divisao divisao : this.divisoes.values()) {
+            if (divisao.desligarDispositivo(dispositivoId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Calcula o consumo total dos dispositivos existentes em todas as divisões
      * da casa.
      *
