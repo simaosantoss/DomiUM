@@ -4,6 +4,7 @@ import domus.domain.automation.Automacao;
 import domus.domain.commands.Command;
 import domus.domain.devices.Dispositivo;
 import domus.domain.devices.OperacaoDispositivo;
+import domus.domain.scheduling.Escalonamento;
 import domus.domain.scenarios.Cenario;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -48,6 +49,11 @@ public class Casa implements Serializable {
     private final Map<String, Automacao> automacoes;
 
     /**
+     * Escalonamentos associados à casa, indexados pelo respetivo identificador.
+     */
+    private final Map<String, Escalonamento> escalonamentos;
+
+    /**
      * Cria uma casa com identificador e nome.
      *
      * @param id identificador da casa
@@ -59,6 +65,7 @@ public class Casa implements Serializable {
         this.divisoes = new HashMap<String, Divisao>();
         this.cenarios = new HashMap<String, Cenario>();
         this.automacoes = new HashMap<String, Automacao>();
+        this.escalonamentos = new HashMap<String, Escalonamento>();
     }
 
     /**
@@ -179,6 +186,39 @@ public class Casa implements Serializable {
     }
 
     /**
+     * Obtém um escalonamento da casa a partir do seu identificador.
+     *
+     * O escalonamento é devolvido por cópia, preservando o encapsulamento da
+     * coleção interna.
+     *
+     * @param escalonamentoId identificador do escalonamento
+     * @return cópia do escalonamento encontrado, ou {@code null} se não existir
+     */
+    public Escalonamento getEscalonamento(String escalonamentoId) {
+        Escalonamento escalonamento = this.escalonamentos.get(escalonamentoId);
+        if (escalonamento == null) {
+            return null;
+        }
+        return escalonamento.clone();
+    }
+
+    /**
+     * Disponibiliza um iterador sobre uma cópia protegida dos escalonamentos da
+     * casa.
+     *
+     * Cada escalonamento é copiado antes de ser exposto.
+     *
+     * @return iterador sobre uma cópia dos escalonamentos da casa
+     */
+    public Iterator<Escalonamento> getIteradorEscalonamentos() {
+        List<Escalonamento> copia = new ArrayList<Escalonamento>();
+        for (Escalonamento escalonamento : this.escalonamentos.values()) {
+            copia.add(escalonamento.clone());
+        }
+        return Collections.unmodifiableList(copia).iterator();
+    }
+
+    /**
      * Associa uma divisão a esta casa.
      *
      * A divisão é guardada por cópia, respeitando a composição da casa sobre as
@@ -219,6 +259,21 @@ public class Casa implements Serializable {
     public void adicionarAutomacao(String automacaoId, Automacao automacao) {
         if (automacaoId != null && automacao != null) {
             this.automacoes.put(automacaoId, automacao.clone());
+        }
+    }
+
+    /**
+     * Associa um escalonamento a esta casa.
+     *
+     * O escalonamento é guardado por cópia, impedindo alterações externas ao
+     * estado interno da casa.
+     *
+     * @param escalonamentoId identificador do escalonamento
+     * @param escalonamento escalonamento a associar
+     */
+    public void adicionarEscalonamento(String escalonamentoId, Escalonamento escalonamento) {
+        if (escalonamentoId != null && escalonamento != null) {
+            this.escalonamentos.put(escalonamentoId, escalonamento.clone());
         }
     }
 
@@ -389,6 +444,48 @@ public class Casa implements Serializable {
     }
 
     /**
+     * Acrescenta uma ação de início a um escalonamento existente.
+     *
+     * @param escalonamentoId identificador do escalonamento
+     * @param cmd comando a acrescentar
+     * @return {@code true} se a ação tiver sido acrescentada
+     */
+    public boolean adicionarAcaoInicioAEscalonamento(String escalonamentoId, Command cmd) {
+        if (escalonamentoId == null || cmd == null) {
+            return false;
+        }
+
+        Escalonamento escalonamento = this.escalonamentos.get(escalonamentoId);
+        if (escalonamento == null) {
+            return false;
+        }
+
+        escalonamento.adicionarAcaoInicio(cmd);
+        return true;
+    }
+
+    /**
+     * Acrescenta uma ação de fim a um escalonamento existente.
+     *
+     * @param escalonamentoId identificador do escalonamento
+     * @param cmd comando a acrescentar
+     * @return {@code true} se a ação tiver sido acrescentada
+     */
+    public boolean adicionarAcaoFimAEscalonamento(String escalonamentoId, Command cmd) {
+        if (escalonamentoId == null || cmd == null) {
+            return false;
+        }
+
+        Escalonamento escalonamento = this.escalonamentos.get(escalonamentoId);
+        if (escalonamento == null) {
+            return false;
+        }
+
+        escalonamento.adicionarAcaoFim(cmd);
+        return true;
+    }
+
+    /**
      * Calcula o consumo total dos dispositivos existentes em todas as divisões
      * da casa.
      *
@@ -426,7 +523,8 @@ public class Casa implements Serializable {
                 && Objects.equals(this.nome, casa.nome)
                 && Objects.equals(this.divisoes, casa.divisoes)
                 && Objects.equals(this.cenarios, casa.cenarios)
-                && Objects.equals(this.automacoes, casa.automacoes);
+                && Objects.equals(this.automacoes, casa.automacoes)
+                && Objects.equals(this.escalonamentos, casa.escalonamentos);
     }
 
     /**
@@ -437,7 +535,8 @@ public class Casa implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.id, this.nome, this.divisoes, this.cenarios, this.automacoes);
+        return Objects.hash(this.id, this.nome, this.divisoes, this.cenarios,
+                this.automacoes, this.escalonamentos);
     }
 
     /**
@@ -453,6 +552,7 @@ public class Casa implements Serializable {
                 + ", divisoes=" + this.divisoes
                 + ", cenarios=" + this.cenarios
                 + ", automacoes=" + this.automacoes
+                + ", escalonamentos=" + this.escalonamentos
                 + '}';
     }
 
@@ -477,6 +577,10 @@ public class Casa implements Serializable {
 
         for (Map.Entry<String, Automacao> entry : this.automacoes.entrySet()) {
             copia.automacoes.put(entry.getKey(), entry.getValue().clone());
+        }
+
+        for (Map.Entry<String, Escalonamento> entry : this.escalonamentos.entrySet()) {
+            copia.escalonamentos.put(entry.getKey(), entry.getValue().clone());
         }
 
         return copia;

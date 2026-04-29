@@ -19,8 +19,12 @@ import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.devices.PortaoGaragemInteligente;
 import domus.domain.environment.AmbienteInterior;
 import domus.domain.factories.DispositivoRegistry;
+import domus.domain.scheduling.Escalonamento;
 import domus.domain.scenarios.Cenario;
+import domus.domain.time.RelogioSistema;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,6 +58,11 @@ public class DomiUM implements Serializable {
     private final DispositivoRegistry dispositivoRegistry;
 
     /**
+     * Relógio simulado do sistema.
+     */
+    private final RelogioSistema relogio;
+
+    /**
      * Cria uma instância vazia da DomiUM.
      *
      * Os mapas internos são inicializados com {@link HashMap} e o registry de
@@ -63,6 +72,7 @@ public class DomiUM implements Serializable {
         this.utilizadores = new HashMap<String, Utilizador>();
         this.casas = new HashMap<String, Casa>();
         this.dispositivoRegistry = new DispositivoRegistry();
+        this.relogio = new RelogioSistema();
     }
 
     /**
@@ -176,6 +186,15 @@ public class DomiUM implements Serializable {
             copia.add(casa.clone());
         }
         return Collections.unmodifiableList(copia).iterator();
+    }
+
+    /**
+     * Dá acesso à data e hora atuais do relógio simulado.
+     *
+     * @return data e hora atuais
+     */
+    public LocalDateTime getDataHoraAtual() {
+        return this.relogio.getDataHoraAtual();
     }
 
     /**
@@ -298,6 +317,36 @@ public class DomiUM implements Serializable {
         Casa casaAtualizada = casa.clone();
         if (casaAtualizada.desligarDispositivo(dispositivoId)) {
             this.casas.put(casaId, casaAtualizada);
+        }
+    }
+
+    /**
+     * Avança o relógio simulado e verifica os escalonamentos das casas.
+     *
+     * Os comandos executados pelos escalonamentos atuam sobre esta fachada, por
+     * isso as casas não são regravadas depois da execução.
+     *
+     * @param minutos minutos a avançar
+     */
+    public void avancarTempo(int minutos) {
+        if (minutos <= 0) {
+            return;
+        }
+
+        LocalTime horaAnterior = this.relogio.getHoraAtual();
+        this.relogio.avancarTempo(minutos);
+        LocalTime horaAtual = this.relogio.getHoraAtual();
+
+        List<Casa> copiaCasas = new ArrayList<Casa>();
+        for (Casa casa : this.casas.values()) {
+            copiaCasas.add(casa.clone());
+        }
+
+        for (Casa casa : copiaCasas) {
+            Iterator<Escalonamento> iteradorEscalonamentos = casa.getIteradorEscalonamentos();
+            while (iteradorEscalonamentos.hasNext()) {
+                iteradorEscalonamentos.next().verificarEExecutar(horaAnterior, horaAtual, this);
+            }
         }
     }
 
@@ -777,6 +826,101 @@ public class DomiUM implements Serializable {
     }
 
     /**
+     * Cria um novo escalonamento numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada e se ainda não existir escalonamento com o mesmo
+     * identificador.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param escalonamentoId identificador do escalonamento
+     * @param nome nome do escalonamento
+     * @param horaInicio hora de início
+     * @param horaFim hora de fim
+     */
+    public void criarEscalonamento(String utilizadorId, String casaId, String escalonamentoId,
+                                   String nome, LocalTime horaInicio, LocalTime horaFim) {
+        if (escalonamentoId == null || nome == null || horaInicio == null || horaFim == null
+                || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+            return;
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return;
+        }
+
+        Casa casaAtualizada = casa.clone();
+        if (casaAtualizada.getEscalonamento(escalonamentoId) != null) {
+            return;
+        }
+
+        casaAtualizada.adicionarEscalonamento(
+                escalonamentoId, new Escalonamento(nome, horaInicio, horaFim)
+        );
+        this.casas.put(casaId, casaAtualizada);
+    }
+
+    /**
+     * Acrescenta uma ação de início a um escalonamento existente numa casa.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param escalonamentoId identificador do escalonamento
+     * @param cmd comando a acrescentar como ação de início
+     */
+    public void adicionarAcaoInicioAEscalonamento(String utilizadorId, String casaId,
+                                                  String escalonamentoId, Command cmd) {
+        if (escalonamentoId == null || cmd == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+            return;
+        }
+
+        if (!comandoPertenceAoContexto(utilizadorId, casaId, cmd)) {
+            return;
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return;
+        }
+
+        Casa casaAtualizada = casa.clone();
+        if (casaAtualizada.adicionarAcaoInicioAEscalonamento(escalonamentoId, cmd)) {
+            this.casas.put(casaId, casaAtualizada);
+        }
+    }
+
+    /**
+     * Acrescenta uma ação de fim a um escalonamento existente numa casa.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param escalonamentoId identificador do escalonamento
+     * @param cmd comando a acrescentar como ação de fim
+     */
+    public void adicionarAcaoFimAEscalonamento(String utilizadorId, String casaId,
+                                               String escalonamentoId, Command cmd) {
+        if (escalonamentoId == null || cmd == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+            return;
+        }
+
+        if (!comandoPertenceAoContexto(utilizadorId, casaId, cmd)) {
+            return;
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return;
+        }
+
+        Casa casaAtualizada = casa.clone();
+        if (casaAtualizada.adicionarAcaoFimAEscalonamento(escalonamentoId, cmd)) {
+            this.casas.put(casaId, casaAtualizada);
+        }
+    }
+
+    /**
      * Verifica se um utilizador tem permissão de administração sobre uma casa.
      *
      * @param utilizadorId identificador do utilizador
@@ -889,7 +1033,8 @@ public class DomiUM implements Serializable {
         DomiUM domiUM = (DomiUM) o;
         return Objects.equals(this.utilizadores, domiUM.utilizadores)
                 && Objects.equals(this.casas, domiUM.casas)
-                && Objects.equals(this.dispositivoRegistry, domiUM.dispositivoRegistry);
+                && Objects.equals(this.dispositivoRegistry, domiUM.dispositivoRegistry)
+                && Objects.equals(this.relogio, domiUM.relogio);
     }
 
     /**
@@ -900,7 +1045,7 @@ public class DomiUM implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.utilizadores, this.casas, this.dispositivoRegistry);
+        return Objects.hash(this.utilizadores, this.casas, this.dispositivoRegistry, this.relogio);
     }
 
     /**
@@ -914,6 +1059,7 @@ public class DomiUM implements Serializable {
                 + "utilizadores=" + this.utilizadores
                 + ", casas=" + this.casas
                 + ", dispositivoRegistry=" + this.dispositivoRegistry
+                + ", relogio=" + this.relogio
                 + '}';
     }
 
@@ -926,7 +1072,8 @@ public class DomiUM implements Serializable {
      * @return nova DomiUM com o mesmo estado lógico
      */
     public DomiUM clone() {
-        return new DomiUM(this.utilizadores, this.casas, this.dispositivoRegistry.clone());
+        return new DomiUM(this.utilizadores, this.casas,
+                this.dispositivoRegistry.clone(), this.relogio.clone());
     }
 
     /**
@@ -937,12 +1084,14 @@ public class DomiUM implements Serializable {
      * @param utilizadores utilizadores a copiar
      * @param casas casas a copiar
      * @param dispositivoRegistry registry a associar
+     * @param relogio relógio a associar
      */
     private DomiUM(Map<String, Utilizador> utilizadores, Map<String, Casa> casas,
-                   DispositivoRegistry dispositivoRegistry) {
+                   DispositivoRegistry dispositivoRegistry, RelogioSistema relogio) {
         this.utilizadores = new HashMap<String, Utilizador>();
         this.casas = new HashMap<String, Casa>();
         this.dispositivoRegistry = dispositivoRegistry;
+        this.relogio = relogio;
 
         for (Map.Entry<String, Utilizador> entry : utilizadores.entrySet()) {
             this.utilizadores.put(entry.getKey(), entry.getValue().clone());
