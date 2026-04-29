@@ -1,7 +1,9 @@
 package domus.domain;
 
+import domus.domain.automation.Automacao;
 import domus.domain.commands.Command;
 import domus.domain.commands.ComandoDispositivo;
+import domus.domain.conditions.Condicao;
 import domus.domain.core.Casa;
 import domus.domain.core.Divisao;
 import domus.domain.core.TipoPermissao;
@@ -15,6 +17,7 @@ import domus.domain.devices.FechaduraInteligente;
 import domus.domain.devices.LampadaInteligente;
 import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.devices.PortaoGaragemInteligente;
+import domus.domain.environment.AmbienteInterior;
 import domus.domain.factories.DispositivoRegistry;
 import domus.domain.scenarios.Cenario;
 import java.io.Serializable;
@@ -649,6 +652,127 @@ public class DomiUM implements Serializable {
         Cenario cenario = casa.getCenario(cenarioId);
         if (cenario != null) {
             cenario.executar(this);
+        }
+    }
+
+    /**
+     * Atualiza o ambiente interior de uma divisão e verifica as automações
+     * associadas a essa divisão.
+     *
+     * A casa é primeiro atualizada e guardada no estado interno; só depois são
+     * verificadas as automações, para evitar sobrescrever alterações feitas por
+     * comandos executados durante a verificação.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param divisaoNome nome da divisão
+     * @param temperatura nova temperatura interior
+     * @param humidade nova humidade interior
+     * @param luminosidade nova luminosidade interior
+     */
+    public void atualizarAmbienteDivisao(String utilizadorId, String casaId, String divisaoNome,
+                                         double temperatura, double humidade, double luminosidade) {
+        if (divisaoNome == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+            return;
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return;
+        }
+
+        Casa casaAtualizada = casa.clone();
+        Divisao divisaoAtualizada = casaAtualizada.getDivisao(divisaoNome);
+        if (divisaoAtualizada == null) {
+            return;
+        }
+
+        divisaoAtualizada.atualizarAmbienteInterior(temperatura, humidade, luminosidade);
+        casaAtualizada.adicionarDivisao(divisaoAtualizada);
+        this.casas.put(casaId, casaAtualizada);
+
+        Casa casaGuardada = this.casas.get(casaId);
+        if (casaGuardada != null) {
+            Divisao divisaoGuardada = casaGuardada.getDivisao(divisaoNome);
+            if (divisaoGuardada == null) {
+                return;
+            }
+
+            AmbienteInterior ambiente = divisaoGuardada.getAmbienteInterior();
+            Iterator<Automacao> iteradorAutomacoes = casaGuardada.getIteradorAutomacoes();
+            while (iteradorAutomacoes.hasNext()) {
+                Automacao automacao = iteradorAutomacoes.next();
+                if (automacao.aplicaA(divisaoNome)) {
+                    automacao.verificarEExecutar(ambiente, this);
+                }
+            }
+        }
+    }
+
+    /**
+     * Cria uma nova automação numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização,
+     * se a divisão existir e se ainda não existir automação com o mesmo
+     * identificador.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param automacaoId identificador da automação
+     * @param nome nome da automação
+     * @param divisaoNome nome da divisão associada
+     * @param condicao condição que ativa a automação
+     */
+    public void criarAutomacao(String utilizadorId, String casaId, String automacaoId,
+                               String nome, String divisaoNome, Condicao condicao) {
+        if (automacaoId == null || nome == null || divisaoNome == null || condicao == null
+                || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+            return;
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return;
+        }
+
+        Casa casaAtualizada = casa.clone();
+        if (!casaAtualizada.contemDivisao(divisaoNome) || casaAtualizada.getAutomacao(automacaoId) != null) {
+            return;
+        }
+
+        casaAtualizada.adicionarAutomacao(automacaoId, new Automacao(nome, divisaoNome, condicao));
+        this.casas.put(casaId, casaAtualizada);
+    }
+
+    /**
+     * Acrescenta uma ação a uma automação existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada e se o comando pertencer ao mesmo contexto.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param automacaoId identificador da automação
+     * @param cmd comando a acrescentar como ação
+     */
+    public void adicionarAcaoAAutomacao(String utilizadorId, String casaId,
+                                        String automacaoId, Command cmd) {
+        if (automacaoId == null || cmd == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+            return;
+        }
+
+        if (!comandoPertenceAoContexto(utilizadorId, casaId, cmd)) {
+            return;
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return;
+        }
+
+        Casa casaAtualizada = casa.clone();
+        if (casaAtualizada.adicionarAcaoAAutomacao(automacaoId, cmd)) {
+            this.casas.put(casaId, casaAtualizada);
         }
     }
 

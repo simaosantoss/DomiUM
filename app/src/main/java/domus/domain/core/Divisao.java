@@ -2,6 +2,7 @@ package domus.domain.core;
 
 import domus.domain.devices.Dispositivo;
 import domus.domain.devices.OperacaoDispositivo;
+import domus.domain.environment.AmbienteInterior;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +31,11 @@ public class Divisao implements Serializable {
     private final Map<String, Dispositivo> dispositivos;
 
     /**
+     * Ambiente interior associado à divisão.
+     */
+    private final AmbienteInterior ambienteInterior;
+
+    /**
      * Cria uma divisão com o nome indicado.
      *
      * @param nome nome da divisão
@@ -37,6 +43,7 @@ public class Divisao implements Serializable {
     public Divisao(String nome) {
         this.nome = nome;
         this.dispositivos = new HashMap<String, Dispositivo>();
+        this.ambienteInterior = new AmbienteInterior();
     }
 
     /**
@@ -80,6 +87,17 @@ public class Divisao implements Serializable {
             copia.add(dispositivo.clone());
         }
         return Collections.unmodifiableList(copia).iterator();
+    }
+
+    /**
+     * Dá acesso ao ambiente interior da divisão.
+     *
+     * O ambiente é devolvido por cópia para preservar o encapsulamento.
+     *
+     * @return cópia do ambiente interior da divisão
+     */
+    public AmbienteInterior getAmbienteInterior() {
+        return this.ambienteInterior.clone();
     }
 
     /**
@@ -169,6 +187,17 @@ public class Divisao implements Serializable {
     }
 
     /**
+     * Atualiza o ambiente interior da divisão.
+     *
+     * @param temperatura nova temperatura interior
+     * @param humidade nova humidade interior
+     * @param luminosidade nova luminosidade interior
+     */
+    public void atualizarAmbienteInterior(double temperatura, double humidade, double luminosidade) {
+        this.ambienteInterior.setCondicoes(temperatura, humidade, luminosidade);
+    }
+
+    /**
      * Compara esta divisão com outro objeto com base no seu estado relevante.
      *
      * @param o objeto a comparar
@@ -184,7 +213,8 @@ public class Divisao implements Serializable {
         }
         Divisao divisao = (Divisao) o;
         return Objects.equals(this.nome, divisao.nome)
-                && Objects.equals(this.dispositivos, divisao.dispositivos);
+                && Objects.equals(this.dispositivos, divisao.dispositivos)
+                && Objects.equals(this.ambienteInterior, divisao.ambienteInterior);
     }
 
     /**
@@ -195,7 +225,7 @@ public class Divisao implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.nome, this.dispositivos);
+        return Objects.hash(this.nome, this.dispositivos, this.ambienteInterior);
     }
 
     /**
@@ -208,6 +238,7 @@ public class Divisao implements Serializable {
         return "Divisao{"
                 + "nome='" + this.nome + '\''
                 + ", dispositivos=" + this.dispositivos
+                + ", ambienteInterior=" + this.ambienteInterior
                 + '}';
     }
 
@@ -225,6 +256,12 @@ public class Divisao implements Serializable {
         for (Map.Entry<String, Dispositivo> entry : this.dispositivos.entrySet()) {
             copia.dispositivos.put(entry.getKey(), entry.getValue().clone());
         }
+
+        copia.ambienteInterior.setCondicoes(
+                this.ambienteInterior.getTemperatura(),
+                this.ambienteInterior.getHumidade(),
+                this.ambienteInterior.getLuminosidade()
+        );
 
         return copia;
     }

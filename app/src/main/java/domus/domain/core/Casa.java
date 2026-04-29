@@ -1,5 +1,6 @@
 package domus.domain.core;
 
+import domus.domain.automation.Automacao;
 import domus.domain.commands.Command;
 import domus.domain.devices.Dispositivo;
 import domus.domain.devices.OperacaoDispositivo;
@@ -42,6 +43,11 @@ public class Casa implements Serializable {
     private final Map<String, Cenario> cenarios;
 
     /**
+     * Automações associadas à casa, indexadas pelo respetivo identificador.
+     */
+    private final Map<String, Automacao> automacoes;
+
+    /**
      * Cria uma casa com identificador e nome.
      *
      * @param id identificador da casa
@@ -52,6 +58,7 @@ public class Casa implements Serializable {
         this.nome = nome;
         this.divisoes = new HashMap<String, Divisao>();
         this.cenarios = new HashMap<String, Cenario>();
+        this.automacoes = new HashMap<String, Automacao>();
     }
 
     /**
@@ -139,6 +146,39 @@ public class Casa implements Serializable {
     }
 
     /**
+     * Obtém uma automação da casa a partir do seu identificador.
+     *
+     * A automação é devolvida por cópia, preservando o encapsulamento da
+     * coleção interna.
+     *
+     * @param automacaoId identificador da automação
+     * @return cópia da automação encontrada, ou {@code null} se não existir
+     */
+    public Automacao getAutomacao(String automacaoId) {
+        Automacao automacao = this.automacoes.get(automacaoId);
+        if (automacao == null) {
+            return null;
+        }
+        return automacao.clone();
+    }
+
+    /**
+     * Disponibiliza um iterador sobre uma cópia protegida das automações da
+     * casa.
+     *
+     * Cada automação é copiada antes de ser exposta.
+     *
+     * @return iterador sobre uma cópia das automações da casa
+     */
+    public Iterator<Automacao> getIteradorAutomacoes() {
+        List<Automacao> copia = new ArrayList<Automacao>();
+        for (Automacao automacao : this.automacoes.values()) {
+            copia.add(automacao.clone());
+        }
+        return Collections.unmodifiableList(copia).iterator();
+    }
+
+    /**
      * Associa uma divisão a esta casa.
      *
      * A divisão é guardada por cópia, respeitando a composição da casa sobre as
@@ -164,6 +204,21 @@ public class Casa implements Serializable {
     public void adicionarCenario(String cenarioId, Cenario cenario) {
         if (cenarioId != null && cenario != null) {
             this.cenarios.put(cenarioId, cenario.clone());
+        }
+    }
+
+    /**
+     * Associa uma automação a esta casa.
+     *
+     * A automação é guardada por cópia, impedindo alterações externas ao estado
+     * interno da casa.
+     *
+     * @param automacaoId identificador da automação
+     * @param automacao automação a associar
+     */
+    public void adicionarAutomacao(String automacaoId, Automacao automacao) {
+        if (automacaoId != null && automacao != null) {
+            this.automacoes.put(automacaoId, automacao.clone());
         }
     }
 
@@ -311,6 +366,29 @@ public class Casa implements Serializable {
     }
 
     /**
+     * Acrescenta uma ação a uma automação existente.
+     *
+     * A operação é delegada à automação interna, que guarda a ação por cópia.
+     *
+     * @param automacaoId identificador da automação
+     * @param cmd comando a acrescentar como ação
+     * @return {@code true} se a ação tiver sido acrescentada
+     */
+    public boolean adicionarAcaoAAutomacao(String automacaoId, Command cmd) {
+        if (automacaoId == null || cmd == null) {
+            return false;
+        }
+
+        Automacao automacao = this.automacoes.get(automacaoId);
+        if (automacao == null) {
+            return false;
+        }
+
+        automacao.adicionarAcao(cmd);
+        return true;
+    }
+
+    /**
      * Calcula o consumo total dos dispositivos existentes em todas as divisões
      * da casa.
      *
@@ -347,7 +425,8 @@ public class Casa implements Serializable {
         return Objects.equals(this.id, casa.id)
                 && Objects.equals(this.nome, casa.nome)
                 && Objects.equals(this.divisoes, casa.divisoes)
-                && Objects.equals(this.cenarios, casa.cenarios);
+                && Objects.equals(this.cenarios, casa.cenarios)
+                && Objects.equals(this.automacoes, casa.automacoes);
     }
 
     /**
@@ -358,7 +437,7 @@ public class Casa implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.id, this.nome, this.divisoes, this.cenarios);
+        return Objects.hash(this.id, this.nome, this.divisoes, this.cenarios, this.automacoes);
     }
 
     /**
@@ -373,6 +452,7 @@ public class Casa implements Serializable {
                 + ", nome='" + this.nome + '\''
                 + ", divisoes=" + this.divisoes
                 + ", cenarios=" + this.cenarios
+                + ", automacoes=" + this.automacoes
                 + '}';
     }
 
@@ -393,6 +473,10 @@ public class Casa implements Serializable {
 
         for (Map.Entry<String, Cenario> entry : this.cenarios.entrySet()) {
             copia.cenarios.put(entry.getKey(), entry.getValue().clone());
+        }
+
+        for (Map.Entry<String, Automacao> entry : this.automacoes.entrySet()) {
+            copia.automacoes.put(entry.getKey(), entry.getValue().clone());
         }
 
         return copia;
