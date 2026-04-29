@@ -1,7 +1,6 @@
 package domus.domain.factories;
 
 import domus.domain.devices.Dispositivo;
-import java.io.Serializable;
 
 /**
  * Define o contrato de criação de dispositivos no sistema DomusControl.
@@ -9,7 +8,7 @@ import java.io.Serializable;
  * Cada implementação desta interface conhece a forma de instanciar um tipo
  * concreto de dispositivo a partir dos dados base comuns ao domínio.
  */
-public interface DispositivoFactory extends Serializable {
+public interface DispositivoFactory {
 
     /**
      * Cria um novo dispositivo com base nos dados fornecidos.
@@ -25,14 +24,4 @@ public interface DispositivoFactory extends Serializable {
      * @return novo dispositivo criado pela factory
      */
     Dispositivo criarDispositivo(String id, String marca, String modelo, double consumo);
-
-    /**
-     * Cria uma cópia lógica desta factory.
-     *
-     * Este método permite copiar factories de forma uniforme quando estas fazem
-     * parte do estado de outras estruturas do domínio.
-     *
-     * @return nova factory logicamente equivalente
-     */
-    DispositivoFactory clone();
 }

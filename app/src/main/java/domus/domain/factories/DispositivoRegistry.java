@@ -37,15 +37,14 @@ public class DispositivoRegistry implements Serializable {
     /**
      * Regista uma factory para um determinado tipo textual de dispositivo.
      *
-     * Se o tipo ou a factory forem {@code null}, o pedido é ignorado. Quando o
-     * registo é efetuado, a factory é guardada por cópia lógica.
+     * Se o tipo ou a factory forem {@code null}, o pedido é ignorado.
      *
      * @param tipo identificador textual do tipo
      * @param factory factory associada ao tipo
      */
     public void registarTipo(String tipo, DispositivoFactory factory) {
         if (tipo != null && factory != null) {
-            this.factories.put(tipo, factory.clone());
+            this.factories.put(tipo, factory);
         }
     }
 
@@ -82,7 +81,7 @@ public class DispositivoRegistry implements Serializable {
             return false;
         }
         DispositivoRegistry that = (DispositivoRegistry) o;
-        return Objects.equals(this.factories, that.factories);
+        return Objects.equals(this.factories.keySet(), that.factories.keySet());
     }
 
     /**
@@ -93,7 +92,7 @@ public class DispositivoRegistry implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.factories);
+        return Objects.hash(this.factories.keySet());
     }
 
     /**
@@ -104,15 +103,15 @@ public class DispositivoRegistry implements Serializable {
     @Override
     public String toString() {
         return "DispositivoRegistry{"
-                + "factories=" + this.factories
+                + "tipos=" + this.factories.keySet()
                 + '}';
     }
 
     /**
-     * Cria uma cópia profunda deste registry.
+     * Cria uma cópia deste registry.
      *
-     * As factories são copiadas individualmente para garantir independência
-     * entre o objeto original e a cópia.
+     * As factories registadas são stateless, pelo que a cópia mantém as mesmas
+     * instâncias associadas aos mesmos tipos.
      *
      * @return novo registry com o mesmo estado lógico
      */
@@ -121,7 +120,7 @@ public class DispositivoRegistry implements Serializable {
         copia.factories.clear();
 
         for (Map.Entry<String, DispositivoFactory> entry : this.factories.entrySet()) {
-            copia.factories.put(entry.getKey(), entry.getValue().clone());
+            copia.factories.put(entry.getKey(), entry.getValue());
         }
 
         return copia;
