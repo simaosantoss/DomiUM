@@ -4,7 +4,15 @@ import domus.domain.core.Casa;
 import domus.domain.core.Divisao;
 import domus.domain.core.TipoPermissao;
 import domus.domain.core.Utilizador;
+import domus.domain.devices.ArCondicionadoInteligente;
+import domus.domain.devices.ColunaInteligente;
+import domus.domain.devices.CortinaInteligente;
+import domus.domain.devices.DesumidificadorInteligente;
 import domus.domain.devices.Dispositivo;
+import domus.domain.devices.FechaduraInteligente;
+import domus.domain.devices.LampadaInteligente;
+import domus.domain.devices.OperacaoDispositivo;
+import domus.domain.devices.PortaoGaragemInteligente;
 import domus.domain.factories.DispositivoRegistry;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -288,6 +296,272 @@ public class DomiUM implements Serializable {
     }
 
     /**
+     * Define a intensidade luminosa de uma lâmpada existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @param intensidade nova intensidade luminosa
+     */
+    public void definirIntensidadeLampada(String utilizadorId, String casaId,
+                                          String dispositivoId, int intensidade) {
+        aplicarOperacaoEmCasa(utilizadorId, casaId, dispositivoId, dispositivo -> {
+            if (!(dispositivo instanceof LampadaInteligente)) {
+                return false;
+            }
+
+            ((LampadaInteligente) dispositivo).setIntensidade(intensidade);
+            return true;
+        });
+    }
+
+    /**
+     * Define a temperatura de cor de uma lâmpada existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @param corK nova temperatura de cor, em Kelvin
+     */
+    public void definirCorLampada(String utilizadorId, String casaId, String dispositivoId, int corK) {
+        aplicarOperacaoEmCasa(utilizadorId, casaId, dispositivoId, dispositivo -> {
+            if (!(dispositivo instanceof LampadaInteligente)) {
+                return false;
+            }
+
+            ((LampadaInteligente) dispositivo).setCorK(corK);
+            return true;
+        });
+    }
+
+    /**
+     * Define a percentagem de abertura de uma cortina existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @param percentagemAbertura nova percentagem de abertura
+     */
+    public void definirAberturaCortina(String utilizadorId, String casaId,
+                                       String dispositivoId, int percentagemAbertura) {
+        aplicarOperacaoEmCasa(utilizadorId, casaId, dispositivoId, dispositivo -> {
+            if (!(dispositivo instanceof CortinaInteligente)) {
+                return false;
+            }
+
+            ((CortinaInteligente) dispositivo).setPercentagemAbertura(percentagemAbertura);
+            return true;
+        });
+    }
+
+    /**
+     * Define o volume de uma coluna existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @param volume novo volume
+     */
+    public void definirVolumeColuna(String utilizadorId, String casaId, String dispositivoId, int volume) {
+        aplicarOperacaoEmCasa(utilizadorId, casaId, dispositivoId, dispositivo -> {
+            if (!(dispositivo instanceof ColunaInteligente)) {
+                return false;
+            }
+
+            ((ColunaInteligente) dispositivo).setVolume(volume);
+            return true;
+        });
+    }
+
+    /**
+     * Define a playlist atual de uma coluna existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @param playlist nova playlist atual
+     */
+    public void definirPlaylistColuna(String utilizadorId, String casaId,
+                                      String dispositivoId, String playlist) {
+        aplicarOperacaoEmCasa(utilizadorId, casaId, dispositivoId, dispositivo -> {
+            if (!(dispositivo instanceof ColunaInteligente)) {
+                return false;
+            }
+
+            ((ColunaInteligente) dispositivo).setPlaylistAtual(playlist);
+            return true;
+        });
+    }
+
+    /**
+     * Define a temperatura alvo de um ar condicionado existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @param temperatura nova temperatura alvo
+     */
+    public void definirTemperaturaArCondicionado(String utilizadorId, String casaId,
+                                                 String dispositivoId, double temperatura) {
+        aplicarOperacaoEmCasa(utilizadorId, casaId, dispositivoId, dispositivo -> {
+            if (!(dispositivo instanceof ArCondicionadoInteligente)) {
+                return false;
+            }
+
+            ((ArCondicionadoInteligente) dispositivo).setTemperaturaAlvo(temperatura);
+            return true;
+        });
+    }
+
+    /**
+     * Define o modo de funcionamento de um ar condicionado existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @param modo novo modo de funcionamento
+     */
+    public void definirModoArCondicionado(String utilizadorId, String casaId,
+                                          String dispositivoId, String modo) {
+        aplicarOperacaoEmCasa(utilizadorId, casaId, dispositivoId, dispositivo -> {
+            if (!(dispositivo instanceof ArCondicionadoInteligente)) {
+                return false;
+            }
+
+            ((ArCondicionadoInteligente) dispositivo).setModo(modo);
+            return true;
+        });
+    }
+
+    /**
+     * Tranca uma fechadura existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     */
+    public void trancarFechadura(String utilizadorId, String casaId, String dispositivoId) {
+        aplicarOperacaoEmCasa(utilizadorId, casaId, dispositivoId, dispositivo -> {
+            if (!(dispositivo instanceof FechaduraInteligente)) {
+                return false;
+            }
+
+            ((FechaduraInteligente) dispositivo).trancar();
+            return true;
+        });
+    }
+
+    /**
+     * Destranca uma fechadura existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     */
+    public void destrancarFechadura(String utilizadorId, String casaId, String dispositivoId) {
+        aplicarOperacaoEmCasa(utilizadorId, casaId, dispositivoId, dispositivo -> {
+            if (!(dispositivo instanceof FechaduraInteligente)) {
+                return false;
+            }
+
+            ((FechaduraInteligente) dispositivo).destrancar();
+            return true;
+        });
+    }
+
+    /**
+     * Define a humidade alvo de um desumidificador existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @param humidade nova humidade alvo
+     */
+    public void definirHumidadeDesumidificador(String utilizadorId, String casaId,
+                                               String dispositivoId, double humidade) {
+        aplicarOperacaoEmCasa(utilizadorId, casaId, dispositivoId, dispositivo -> {
+            if (!(dispositivo instanceof DesumidificadorInteligente)) {
+                return false;
+            }
+
+            ((DesumidificadorInteligente) dispositivo).setHumidadeAlvo(humidade);
+            return true;
+        });
+    }
+
+    /**
+     * Abre um portão de garagem existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     */
+    public void abrirPortao(String utilizadorId, String casaId, String dispositivoId) {
+        aplicarOperacaoEmCasa(utilizadorId, casaId, dispositivoId, dispositivo -> {
+            if (!(dispositivo instanceof PortaoGaragemInteligente)) {
+                return false;
+            }
+
+            ((PortaoGaragemInteligente) dispositivo).abrir();
+            return true;
+        });
+    }
+
+    /**
+     * Fecha um portão de garagem existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     */
+    public void fecharPortao(String utilizadorId, String casaId, String dispositivoId) {
+        aplicarOperacaoEmCasa(utilizadorId, casaId, dispositivoId, dispositivo -> {
+            if (!(dispositivo instanceof PortaoGaragemInteligente)) {
+                return false;
+            }
+
+            ((PortaoGaragemInteligente) dispositivo).fechar();
+            return true;
+        });
+    }
+
+    /**
      * Verifica se um utilizador tem permissão de administração sobre uma casa.
      *
      * @param utilizadorId identificador do utilizador
@@ -309,6 +583,57 @@ public class DomiUM implements Serializable {
     private boolean temPermissaoUtilizacao(String utilizadorId, String casaId) {
         Utilizador utilizador = this.utilizadores.get(utilizadorId);
         return utilizador != null && utilizador.temPermissao(casaId, TipoPermissao.NORMAL);
+    }
+
+    /**
+     * Aplica uma operação a um dispositivo de uma casa, se a operação for
+     * autorizada e realizada com sucesso.
+     *
+     * A casa é sempre alterada sobre uma cópia e só volta a ser guardada no
+     * estado interno quando a operação confirma que foi aplicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @param operacao operação a aplicar ao dispositivo
+     */
+    private void aplicarOperacaoEmCasa(String utilizadorId, String casaId,
+                                       String dispositivoId, OperacaoDispositivo operacao) {
+        if (operacao == null) {
+            return;
+        }
+
+        Casa casaAtualizada = prepararCasaParaOperacao(utilizadorId, casaId, dispositivoId);
+        if (casaAtualizada != null && casaAtualizada.aplicarOperacaoDispositivo(dispositivoId, operacao)) {
+            this.casas.put(casaId, casaAtualizada);
+        }
+    }
+
+    /**
+     * Prepara uma cópia da casa para uma operação de utilização sobre um
+     * dispositivo.
+     *
+     * Se os dados forem inválidos, se o utilizador não tiver permissão ou se a
+     * casa não existir, a operação é considerada impossível e é devolvido
+     * {@code null}.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @return cópia da casa pronta a alterar, ou {@code null} se a operação não
+     *         puder avançar
+     */
+    private Casa prepararCasaParaOperacao(String utilizadorId, String casaId, String dispositivoId) {
+        if (dispositivoId == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+            return null;
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return null;
+        }
+
+        return casa.clone();
     }
 
     /**

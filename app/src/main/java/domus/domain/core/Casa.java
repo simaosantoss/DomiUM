@@ -1,6 +1,7 @@
 package domus.domain.core;
 
 import domus.domain.devices.Dispositivo;
+import domus.domain.devices.OperacaoDispositivo;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -198,6 +199,31 @@ public class Casa implements Serializable {
 
         for (Divisao divisao : this.divisoes.values()) {
             if (divisao.desligarDispositivo(dispositivoId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Aplica uma operação a um dispositivo existente numa das divisões da casa.
+     *
+     * A casa apenas localiza a divisão que contém o dispositivo e delega nela a
+     * aplicação da operação, sem expor as divisões internas.
+     *
+     * @param dispositivoId identificador do dispositivo
+     * @param operacao operação a aplicar ao dispositivo
+     * @return {@code true} se alguma divisão tiver aplicado a operação com
+     *         sucesso
+     */
+    public boolean aplicarOperacaoDispositivo(String dispositivoId, OperacaoDispositivo operacao) {
+        if (dispositivoId == null || operacao == null) {
+            return false;
+        }
+
+        for (Divisao divisao : this.divisoes.values()) {
+            if (divisao.aplicarOperacaoDispositivo(dispositivoId, operacao)) {
                 return true;
             }
         }
