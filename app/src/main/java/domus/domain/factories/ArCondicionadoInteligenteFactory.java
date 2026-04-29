@@ -1,23 +1,26 @@
-package domus.domain;
+package domus.domain.factories;
+
+import domus.domain.devices.ArCondicionadoInteligente;
+import domus.domain.devices.Dispositivo;
 
 /**
- * Factory responsável pela criação de colunas inteligentes.
+ * Factory responsável pela criação de aparelhos de ar condicionado inteligentes.
  */
-public class ColunaInteligenteFactory implements DispositivoFactory {
+public class ArCondicionadoInteligenteFactory implements DispositivoFactory {
 
     /**
-     * Cria uma nova coluna inteligente com valores por defeito coerentes para
-     * os atributos específicos deste tipo de dispositivo.
+     * Cria um novo ar condicionado inteligente com valores por defeito coerentes
+     * para os atributos específicos deste tipo de dispositivo.
      *
      * @param id identificador do dispositivo
      * @param marca marca do dispositivo
      * @param modelo modelo do dispositivo
      * @param consumo consumo base por hora do dispositivo
-     * @return nova coluna inteligente
+     * @return novo ar condicionado inteligente
      */
     @Override
     public Dispositivo criarDispositivo(String id, String marca, String modelo, double consumo) {
-        return new ColunaInteligente(id, marca, modelo, consumo, 20);
+        return new ArCondicionadoInteligente(id, marca, modelo, consumo, 22.0);
     }
 
     /**
@@ -51,7 +54,7 @@ public class ColunaInteligenteFactory implements DispositivoFactory {
      */
     @Override
     public String toString() {
-        return "ColunaInteligenteFactory{}";
+        return "ArCondicionadoInteligenteFactory{}";
     }
 
     /**
@@ -60,7 +63,7 @@ public class ColunaInteligenteFactory implements DispositivoFactory {
      * @return nova instância da mesma factory
      */
     @Override
-    public ColunaInteligenteFactory clone() {
-        return new ColunaInteligenteFactory();
+    public ArCondicionadoInteligenteFactory clone() {
+        return new ArCondicionadoInteligenteFactory();
     }
 }

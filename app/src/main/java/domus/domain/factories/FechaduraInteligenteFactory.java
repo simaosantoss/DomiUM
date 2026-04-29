@@ -1,23 +1,25 @@
-package domus.domain;
+package domus.domain.factories;
+
+import domus.domain.devices.Dispositivo;
+import domus.domain.devices.FechaduraInteligente;
 
 /**
- * Factory responsável pela criação de aparelhos de ar condicionado inteligentes.
+ * Factory responsável pela criação de fechaduras inteligentes.
  */
-public class ArCondicionadoInteligenteFactory implements DispositivoFactory {
+public class FechaduraInteligenteFactory implements DispositivoFactory {
 
     /**
-     * Cria um novo ar condicionado inteligente com valores por defeito coerentes
-     * para os atributos específicos deste tipo de dispositivo.
+     * Cria uma nova fechadura inteligente com os dados base fornecidos.
      *
      * @param id identificador do dispositivo
      * @param marca marca do dispositivo
      * @param modelo modelo do dispositivo
      * @param consumo consumo base por hora do dispositivo
-     * @return novo ar condicionado inteligente
+     * @return nova fechadura inteligente
      */
     @Override
     public Dispositivo criarDispositivo(String id, String marca, String modelo, double consumo) {
-        return new ArCondicionadoInteligente(id, marca, modelo, consumo, 22.0);
+        return new FechaduraInteligente(id, marca, modelo, consumo);
     }
 
     /**
@@ -51,7 +53,7 @@ public class ArCondicionadoInteligenteFactory implements DispositivoFactory {
      */
     @Override
     public String toString() {
-        return "ArCondicionadoInteligenteFactory{}";
+        return "FechaduraInteligenteFactory{}";
     }
 
     /**
@@ -60,7 +62,7 @@ public class ArCondicionadoInteligenteFactory implements DispositivoFactory {
      * @return nova instância da mesma factory
      */
     @Override
-    public ArCondicionadoInteligenteFactory clone() {
-        return new ArCondicionadoInteligenteFactory();
+    public FechaduraInteligenteFactory clone() {
+        return new FechaduraInteligenteFactory();
     }
 }

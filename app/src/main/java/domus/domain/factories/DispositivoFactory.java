@@ -1,5 +1,6 @@
-package domus.domain;
+package domus.domain.factories;
 
+import domus.domain.devices.Dispositivo;
 import java.io.Serializable;
 
 /**

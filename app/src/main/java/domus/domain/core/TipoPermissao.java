@@ -1,4 +1,4 @@
-package domus.domain;
+package domus.domain.core;
 
 import java.io.Serializable;
 

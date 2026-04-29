@@ -1,23 +1,26 @@
-package domus.domain;
+package domus.domain.factories;
+
+import domus.domain.devices.ColunaInteligente;
+import domus.domain.devices.Dispositivo;
 
 /**
- * Factory responsável pela criação de lâmpadas inteligentes.
+ * Factory responsável pela criação de colunas inteligentes.
  */
-public class LampadaInteligenteFactory implements DispositivoFactory {
+public class ColunaInteligenteFactory implements DispositivoFactory {
 
     /**
-     * Cria uma nova lâmpada inteligente com valores por defeito coerentes para
+     * Cria uma nova coluna inteligente com valores por defeito coerentes para
      * os atributos específicos deste tipo de dispositivo.
      *
      * @param id identificador do dispositivo
      * @param marca marca do dispositivo
      * @param modelo modelo do dispositivo
      * @param consumo consumo base por hora do dispositivo
-     * @return nova lâmpada inteligente
+     * @return nova coluna inteligente
      */
     @Override
     public Dispositivo criarDispositivo(String id, String marca, String modelo, double consumo) {
-        return new LampadaInteligente(id, marca, modelo, consumo, 50, 3000);
+        return new ColunaInteligente(id, marca, modelo, consumo, 20);
     }
 
     /**
@@ -51,7 +54,7 @@ public class LampadaInteligenteFactory implements DispositivoFactory {
      */
     @Override
     public String toString() {
-        return "LampadaInteligenteFactory{}";
+        return "ColunaInteligenteFactory{}";
     }
 
     /**
@@ -60,7 +63,7 @@ public class LampadaInteligenteFactory implements DispositivoFactory {
      * @return nova instância da mesma factory
      */
     @Override
-    public LampadaInteligenteFactory clone() {
-        return new LampadaInteligenteFactory();
+    public ColunaInteligenteFactory clone() {
+        return new ColunaInteligenteFactory();
     }
 }

@@ -1,5 +1,6 @@
-package domus.domain;
+package domus.domain.core;
 
+import domus.domain.history.RegistoInteracao;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;

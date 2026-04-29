@@ -1,23 +1,25 @@
-package domus.domain;
+package domus.domain.factories;
+
+import domus.domain.devices.Dispositivo;
+import domus.domain.devices.PortaoGaragemInteligente;
 
 /**
- * Factory responsável pela criação de desumidificadores inteligentes.
+ * Factory responsável pela criação de portões de garagem inteligentes.
  */
-public class DesumidificadorInteligenteFactory implements DispositivoFactory {
+public class PortaoGaragemInteligenteFactory implements DispositivoFactory {
 
     /**
-     * Cria um novo desumidificador inteligente com valores por defeito coerentes
-     * para os atributos específicos deste tipo de dispositivo.
+     * Cria um novo portão de garagem inteligente com os dados base fornecidos.
      *
      * @param id identificador do dispositivo
      * @param marca marca do dispositivo
      * @param modelo modelo do dispositivo
      * @param consumo consumo base por hora do dispositivo
-     * @return novo desumidificador inteligente
+     * @return novo portão de garagem inteligente
      */
     @Override
     public Dispositivo criarDispositivo(String id, String marca, String modelo, double consumo) {
-        return new DesumidificadorInteligente(id, marca, modelo, consumo, 50.0);
+        return new PortaoGaragemInteligente(id, marca, modelo, consumo);
     }
 
     /**
@@ -51,7 +53,7 @@ public class DesumidificadorInteligenteFactory implements DispositivoFactory {
      */
     @Override
     public String toString() {
-        return "DesumidificadorInteligenteFactory{}";
+        return "PortaoGaragemInteligenteFactory{}";
     }
 
     /**
@@ -60,7 +62,7 @@ public class DesumidificadorInteligenteFactory implements DispositivoFactory {
      * @return nova instância da mesma factory
      */
     @Override
-    public DesumidificadorInteligenteFactory clone() {
-        return new DesumidificadorInteligenteFactory();
+    public PortaoGaragemInteligenteFactory clone() {
+        return new PortaoGaragemInteligenteFactory();
     }
 }

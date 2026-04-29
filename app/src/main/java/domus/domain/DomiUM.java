@@ -1,5 +1,11 @@
 package domus.domain;
 
+import domus.domain.core.Casa;
+import domus.domain.core.Divisao;
+import domus.domain.core.TipoPermissao;
+import domus.domain.core.Utilizador;
+import domus.domain.devices.Dispositivo;
+import domus.domain.factories.DispositivoRegistry;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;

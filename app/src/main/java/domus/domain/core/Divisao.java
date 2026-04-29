@@ -1,5 +1,6 @@
-package domus.domain;
+package domus.domain.core;
 
+import domus.domain.devices.Dispositivo;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;

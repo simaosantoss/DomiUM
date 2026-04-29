@@ -1,4 +1,4 @@
-package domus.domain;
+package domus.domain.devices;
 
 import java.util.Objects;
 
