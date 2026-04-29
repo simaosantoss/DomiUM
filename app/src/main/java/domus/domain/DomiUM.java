@@ -1,5 +1,7 @@
 package domus.domain;
 
+import domus.domain.commands.Command;
+import domus.domain.commands.ComandoDispositivo;
 import domus.domain.core.Casa;
 import domus.domain.core.Divisao;
 import domus.domain.core.TipoPermissao;
@@ -14,6 +16,7 @@ import domus.domain.devices.LampadaInteligente;
 import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.devices.PortaoGaragemInteligente;
 import domus.domain.factories.DispositivoRegistry;
+import domus.domain.scenarios.Cenario;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -562,6 +565,94 @@ public class DomiUM implements Serializable {
     }
 
     /**
+     * Cria um novo cenário numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada e se ainda não existir um cenário com o mesmo
+     * identificador.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param cenarioId identificador do cenário
+     * @param nome nome do cenário
+     */
+    public void criarCenario(String utilizadorId, String casaId, String cenarioId, String nome) {
+        if (cenarioId == null || nome == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+            return;
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return;
+        }
+
+        Casa casaAtualizada = casa.clone();
+        if (casaAtualizada.getCenario(cenarioId) != null) {
+            return;
+        }
+
+        casaAtualizada.adicionarCenario(cenarioId, new Cenario(nome));
+        this.casas.put(casaId, casaAtualizada);
+    }
+
+    /**
+     * Acrescenta um comando a um cenário existente numa casa.
+     *
+     * A operação só é executada se o utilizador tiver permissão de utilização
+     * sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param cenarioId identificador do cenário
+     * @param cmd comando a acrescentar
+     */
+    public void adicionarComandoACenario(String utilizadorId, String casaId, String cenarioId, Command cmd) {
+        if (cenarioId == null || cmd == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+            return;
+        }
+
+        if (!comandoPertenceAoContexto(utilizadorId, casaId, cmd)) {
+            return;
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return;
+        }
+
+        Casa casaAtualizada = casa.clone();
+        if (casaAtualizada.adicionarComandoACenario(cenarioId, cmd)) {
+            this.casas.put(casaId, casaAtualizada);
+        }
+    }
+
+    /**
+     * Executa um cenário existente numa casa.
+     *
+     * O cenário é obtido por cópia e executado sobre esta fachada, permitindo
+     * que os comandos atualizem diretamente o estado interno da DomiUM.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param cenarioId identificador do cenário
+     */
+    public void executarCenario(String utilizadorId, String casaId, String cenarioId) {
+        if (cenarioId == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+            return;
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return;
+        }
+
+        Cenario cenario = casa.getCenario(cenarioId);
+        if (cenario != null) {
+            cenario.executar(this);
+        }
+    }
+
+    /**
      * Verifica se um utilizador tem permissão de administração sobre uma casa.
      *
      * @param utilizadorId identificador do utilizador
@@ -607,6 +698,27 @@ public class DomiUM implements Serializable {
         if (casaAtualizada != null && casaAtualizada.aplicarOperacaoDispositivo(dispositivoId, operacao)) {
             this.casas.put(casaId, casaAtualizada);
         }
+    }
+
+    /**
+     * Verifica se um comando pertence ao contexto onde está a ser adicionado.
+     *
+     * Para comandos de dispositivo, os identificadores guardados no comando
+     * devem corresponder à casa e ao utilizador recebidos pela fachada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param cmd comando a validar
+     * @return {@code true} se o comando puder ser associado ao cenário
+     */
+    private boolean comandoPertenceAoContexto(String utilizadorId, String casaId, Command cmd) {
+        if (!(cmd instanceof ComandoDispositivo)) {
+            return true;
+        }
+
+        ComandoDispositivo comando = (ComandoDispositivo) cmd;
+        return Objects.equals(comando.getCasaId(), casaId)
+                && Objects.equals(comando.getUtilizadorId(), utilizadorId);
     }
 
     /**

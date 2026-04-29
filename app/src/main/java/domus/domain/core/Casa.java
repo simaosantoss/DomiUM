@@ -1,7 +1,9 @@
 package domus.domain.core;
 
+import domus.domain.commands.Command;
 import domus.domain.devices.Dispositivo;
 import domus.domain.devices.OperacaoDispositivo;
+import domus.domain.scenarios.Cenario;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,6 +37,11 @@ public class Casa implements Serializable {
     private final Map<String, Divisao> divisoes;
 
     /**
+     * Cenários associados à casa, indexados pelo respetivo identificador.
+     */
+    private final Map<String, Cenario> cenarios;
+
+    /**
      * Cria uma casa com identificador e nome.
      *
      * @param id identificador da casa
@@ -44,6 +51,7 @@ public class Casa implements Serializable {
         this.id = id;
         this.nome = nome;
         this.divisoes = new HashMap<String, Divisao>();
+        this.cenarios = new HashMap<String, Cenario>();
     }
 
     /**
@@ -98,6 +106,39 @@ public class Casa implements Serializable {
     }
 
     /**
+     * Obtém um cenário da casa a partir do seu identificador.
+     *
+     * O cenário é devolvido por cópia, preservando o encapsulamento da coleção
+     * interna.
+     *
+     * @param cenarioId identificador do cenário
+     * @return cópia do cenário encontrado, ou {@code null} se não existir
+     */
+    public Cenario getCenario(String cenarioId) {
+        Cenario cenario = this.cenarios.get(cenarioId);
+        if (cenario == null) {
+            return null;
+        }
+        return cenario.clone();
+    }
+
+    /**
+     * Disponibiliza um iterador sobre uma cópia protegida dos cenários da casa.
+     *
+     * Cada cenário é copiado antes de ser exposto, evitando fugas de referência
+     * para a estrutura interna.
+     *
+     * @return iterador sobre uma cópia dos cenários da casa
+     */
+    public Iterator<Cenario> getIteradorCenarios() {
+        List<Cenario> copia = new ArrayList<Cenario>();
+        for (Cenario cenario : this.cenarios.values()) {
+            copia.add(cenario.clone());
+        }
+        return Collections.unmodifiableList(copia).iterator();
+    }
+
+    /**
      * Associa uma divisão a esta casa.
      *
      * A divisão é guardada por cópia, respeitando a composição da casa sobre as
@@ -108,6 +149,21 @@ public class Casa implements Serializable {
     public void adicionarDivisao(Divisao divisao) {
         if (divisao != null) {
             this.divisoes.put(divisao.getNome(), divisao.clone());
+        }
+    }
+
+    /**
+     * Associa um cenário a esta casa.
+     *
+     * O cenário é guardado por cópia, impedindo alterações externas ao estado
+     * interno da casa.
+     *
+     * @param cenarioId identificador do cenário
+     * @param cenario cenário a associar
+     */
+    public void adicionarCenario(String cenarioId, Cenario cenario) {
+        if (cenarioId != null && cenario != null) {
+            this.cenarios.put(cenarioId, cenario.clone());
         }
     }
 
@@ -232,6 +288,29 @@ public class Casa implements Serializable {
     }
 
     /**
+     * Acrescenta um comando a um cenário existente.
+     *
+     * A operação é delegada ao cenário interno, que guarda o comando por cópia.
+     *
+     * @param cenarioId identificador do cenário
+     * @param cmd comando a acrescentar
+     * @return {@code true} se o comando tiver sido acrescentado
+     */
+    public boolean adicionarComandoACenario(String cenarioId, Command cmd) {
+        if (cenarioId == null || cmd == null) {
+            return false;
+        }
+
+        Cenario cenario = this.cenarios.get(cenarioId);
+        if (cenario == null) {
+            return false;
+        }
+
+        cenario.adicionarComando(cmd);
+        return true;
+    }
+
+    /**
      * Calcula o consumo total dos dispositivos existentes em todas as divisões
      * da casa.
      *
@@ -267,7 +346,8 @@ public class Casa implements Serializable {
         Casa casa = (Casa) o;
         return Objects.equals(this.id, casa.id)
                 && Objects.equals(this.nome, casa.nome)
-                && Objects.equals(this.divisoes, casa.divisoes);
+                && Objects.equals(this.divisoes, casa.divisoes)
+                && Objects.equals(this.cenarios, casa.cenarios);
     }
 
     /**
@@ -278,7 +358,7 @@ public class Casa implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.id, this.nome, this.divisoes);
+        return Objects.hash(this.id, this.nome, this.divisoes, this.cenarios);
     }
 
     /**
@@ -292,6 +372,7 @@ public class Casa implements Serializable {
                 + "id='" + this.id + '\''
                 + ", nome='" + this.nome + '\''
                 + ", divisoes=" + this.divisoes
+                + ", cenarios=" + this.cenarios
                 + '}';
     }
 
@@ -308,6 +389,10 @@ public class Casa implements Serializable {
 
         for (Map.Entry<String, Divisao> entry : this.divisoes.entrySet()) {
             copia.divisoes.put(entry.getKey(), entry.getValue().clone());
+        }
+
+        for (Map.Entry<String, Cenario> entry : this.cenarios.entrySet()) {
+            copia.cenarios.put(entry.getKey(), entry.getValue().clone());
         }
 
         return copia;
