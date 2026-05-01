@@ -13,6 +13,11 @@ import domus.domain.managers.GestorUtilizadores;
 import domus.domain.scheduling.Escalonamento;
 import domus.domain.scenarios.Cenario;
 import domus.domain.time.RelogioSistema;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -130,6 +135,57 @@ public class DomiUM implements Serializable {
      */
     public LocalDateTime getDataHoraAtual() {
         return this.relogio.getDataHoraAtual();
+    }
+
+    /**
+     * Grava o estado completo desta fachada num ficheiro binário.
+     *
+     * Se o caminho for inválido ou ocorrer uma falha de escrita, a operação é
+     * ignorada, mantendo o comportamento silencioso do domínio.
+     *
+     * @param filepath caminho do ficheiro onde gravar o estado
+     */
+    public void gravarEstado(String filepath) {
+        if (filepath == null) {
+            return;
+        }
+
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filepath))) {
+            out.writeObject(this);
+        } catch (IOException e) {
+            return;
+        }
+    }
+
+    /**
+     * Carrega o estado completo da fachada a partir de um ficheiro binário.
+     *
+     * Se o caminho for inválido ou se o ficheiro não contiver uma instância
+     * válida de {@code DomiUM}, é devolvida uma nova fachada vazia.
+     *
+     * @param filepath caminho do ficheiro de onde carregar o estado
+     * @return DomiUM carregada, ou uma nova instância vazia se o carregamento
+     *         falhar
+     */
+    public static DomiUM carregarEstado(String filepath) {
+        if (filepath == null) {
+            return new DomiUM();
+        }
+
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filepath))) {
+            Object objeto = in.readObject();
+            if (objeto instanceof DomiUM) {
+                return (DomiUM) objeto;
+            }
+        } catch (IOException e) {
+            return new DomiUM();
+        } catch (ClassNotFoundException e) {
+            return new DomiUM();
+        } catch (ClassCastException e) {
+            return new DomiUM();
+        }
+
+        return new DomiUM();
     }
 
     /**
