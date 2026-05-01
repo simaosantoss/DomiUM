@@ -1,31 +1,31 @@
 package domus.domain.commands;
 
 import domus.domain.DomiUM;
-import domus.domain.devices.LampadaInteligente;
+import domus.domain.devices.CortinaInteligente;
 import java.util.Objects;
 
 /**
- * Comando que define a intensidade luminosa de uma lâmpada.
+ * Comando que define a percentagem de abertura de uma cortina.
  */
-public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
+public class ComandoDefinirAberturaCortina extends ComandoDispositivo {
 
     /**
-     * Intensidade luminosa a aplicar.
+     * Percentagem de abertura a aplicar.
      */
-    private final int intensidade;
+    private final int percentagemAbertura;
 
     /**
-     * Cria um comando para definir a intensidade de uma lâmpada.
+     * Cria um comando para definir a abertura de uma cortina.
      *
      * @param utilizadorId identificador do utilizador
      * @param casaId identificador da casa
      * @param dispositivoId identificador do dispositivo
-     * @param intensidade intensidade luminosa a aplicar
+     * @param percentagemAbertura percentagem de abertura a aplicar
      */
-    public ComandoDefinirIntensidadeLampada(String utilizadorId, String casaId,
-                                            String dispositivoId, int intensidade) {
+    public ComandoDefinirAberturaCortina(String utilizadorId, String casaId,
+                                         String dispositivoId, int percentagemAbertura) {
         super(utilizadorId, casaId, dispositivoId);
-        this.intensidade = intensidade;
+        this.percentagemAbertura = percentagemAbertura;
     }
 
     /**
@@ -33,9 +33,9 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      *
      * @param outro comando de origem
      */
-    private ComandoDefinirIntensidadeLampada(ComandoDefinirIntensidadeLampada outro) {
+    private ComandoDefinirAberturaCortina(ComandoDefinirAberturaCortina outro) {
         super(outro);
-        this.intensidade = outro.intensidade;
+        this.percentagemAbertura = outro.percentagemAbertura;
     }
 
     /**
@@ -47,11 +47,11 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
     public void execute(DomiUM domium) {
         if (domium != null) {
             domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
-                if (!(dispositivo instanceof LampadaInteligente)) {
+                if (!(dispositivo instanceof CortinaInteligente)) {
                     return false;
                 }
 
-                ((LampadaInteligente) dispositivo).setIntensidade(this.intensidade);
+                ((CortinaInteligente) dispositivo).setPercentagemAbertura(this.percentagemAbertura);
                 return true;
             });
         }
@@ -68,8 +68,8 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
         if (!super.equals(o)) {
             return false;
         }
-        ComandoDefinirIntensidadeLampada that = (ComandoDefinirIntensidadeLampada) o;
-        return this.intensidade == that.intensidade;
+        ComandoDefinirAberturaCortina that = (ComandoDefinirAberturaCortina) o;
+        return this.percentagemAbertura == that.percentagemAbertura;
     }
 
     /**
@@ -79,7 +79,7 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), this.intensidade);
+        return Objects.hash(super.hashCode(), this.percentagemAbertura);
     }
 
     /**
@@ -89,11 +89,11 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      */
     @Override
     public String toString() {
-        return "ComandoDefinirIntensidadeLampada{"
+        return "ComandoDefinirAberturaCortina{"
                 + "utilizadorId='" + getUtilizadorId() + '\''
                 + ", casaId='" + getCasaId() + '\''
                 + ", dispositivoId='" + getDispositivoId() + '\''
-                + ", intensidade=" + this.intensidade
+                + ", percentagemAbertura=" + this.percentagemAbertura
                 + '}';
     }
 
@@ -103,7 +103,7 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      * @return novo comando equivalente
      */
     @Override
-    public ComandoDefinirIntensidadeLampada clone() {
-        return new ComandoDefinirIntensidadeLampada(this);
+    public ComandoDefinirAberturaCortina clone() {
+        return new ComandoDefinirAberturaCortina(this);
     }
 }

@@ -35,7 +35,10 @@ public class ComandoDesligar extends ComandoDispositivo {
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.desligarDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId());
+            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+                dispositivo.desligar();
+                return true;
+            });
         }
     }
 

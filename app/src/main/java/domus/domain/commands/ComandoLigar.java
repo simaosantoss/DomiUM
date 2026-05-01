@@ -35,7 +35,10 @@ public class ComandoLigar extends ComandoDispositivo {
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.ligarDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId());
+            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+                dispositivo.ligar();
+                return true;
+            });
         }
     }
 

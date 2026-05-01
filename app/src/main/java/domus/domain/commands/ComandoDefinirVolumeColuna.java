@@ -1,6 +1,7 @@
 package domus.domain.commands;
 
 import domus.domain.DomiUM;
+import domus.domain.devices.ColunaInteligente;
 import java.util.Objects;
 
 /**
@@ -45,7 +46,14 @@ public class ComandoDefinirVolumeColuna extends ComandoDispositivo {
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.definirVolumeColuna(getUtilizadorId(), getCasaId(), getDispositivoId(), this.volume);
+            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+                if (!(dispositivo instanceof ColunaInteligente)) {
+                    return false;
+                }
+
+                ((ColunaInteligente) dispositivo).setVolume(this.volume);
+                return true;
+            });
         }
     }
 

@@ -1,6 +1,7 @@
 package domus.domain.commands;
 
 import domus.domain.DomiUM;
+import domus.domain.devices.PortaoGaragemInteligente;
 
 /**
  * Comando que fecha um portão de garagem através da fachada do domínio.
@@ -35,7 +36,14 @@ public class ComandoFecharPortao extends ComandoDispositivo {
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.fecharPortao(getUtilizadorId(), getCasaId(), getDispositivoId());
+            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+                if (!(dispositivo instanceof PortaoGaragemInteligente)) {
+                    return false;
+                }
+
+                ((PortaoGaragemInteligente) dispositivo).fechar();
+                return true;
+            });
         }
     }
 

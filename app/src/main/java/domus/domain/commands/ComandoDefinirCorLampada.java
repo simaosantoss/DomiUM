@@ -5,27 +5,27 @@ import domus.domain.devices.LampadaInteligente;
 import java.util.Objects;
 
 /**
- * Comando que define a intensidade luminosa de uma lâmpada.
+ * Comando que define a temperatura de cor de uma lâmpada.
  */
-public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
+public class ComandoDefinirCorLampada extends ComandoDispositivo {
 
     /**
-     * Intensidade luminosa a aplicar.
+     * Temperatura de cor a aplicar, em Kelvin.
      */
-    private final int intensidade;
+    private final int corK;
 
     /**
-     * Cria um comando para definir a intensidade de uma lâmpada.
+     * Cria um comando para definir a temperatura de cor de uma lâmpada.
      *
      * @param utilizadorId identificador do utilizador
      * @param casaId identificador da casa
      * @param dispositivoId identificador do dispositivo
-     * @param intensidade intensidade luminosa a aplicar
+     * @param corK temperatura de cor a aplicar, em Kelvin
      */
-    public ComandoDefinirIntensidadeLampada(String utilizadorId, String casaId,
-                                            String dispositivoId, int intensidade) {
+    public ComandoDefinirCorLampada(String utilizadorId, String casaId,
+                                    String dispositivoId, int corK) {
         super(utilizadorId, casaId, dispositivoId);
-        this.intensidade = intensidade;
+        this.corK = corK;
     }
 
     /**
@@ -33,9 +33,9 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      *
      * @param outro comando de origem
      */
-    private ComandoDefinirIntensidadeLampada(ComandoDefinirIntensidadeLampada outro) {
+    private ComandoDefinirCorLampada(ComandoDefinirCorLampada outro) {
         super(outro);
-        this.intensidade = outro.intensidade;
+        this.corK = outro.corK;
     }
 
     /**
@@ -51,7 +51,7 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
                     return false;
                 }
 
-                ((LampadaInteligente) dispositivo).setIntensidade(this.intensidade);
+                ((LampadaInteligente) dispositivo).setCorK(this.corK);
                 return true;
             });
         }
@@ -68,8 +68,8 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
         if (!super.equals(o)) {
             return false;
         }
-        ComandoDefinirIntensidadeLampada that = (ComandoDefinirIntensidadeLampada) o;
-        return this.intensidade == that.intensidade;
+        ComandoDefinirCorLampada that = (ComandoDefinirCorLampada) o;
+        return this.corK == that.corK;
     }
 
     /**
@@ -79,7 +79,7 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), this.intensidade);
+        return Objects.hash(super.hashCode(), this.corK);
     }
 
     /**
@@ -89,11 +89,11 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      */
     @Override
     public String toString() {
-        return "ComandoDefinirIntensidadeLampada{"
+        return "ComandoDefinirCorLampada{"
                 + "utilizadorId='" + getUtilizadorId() + '\''
                 + ", casaId='" + getCasaId() + '\''
                 + ", dispositivoId='" + getDispositivoId() + '\''
-                + ", intensidade=" + this.intensidade
+                + ", corK=" + this.corK
                 + '}';
     }
 
@@ -103,7 +103,7 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      * @return novo comando equivalente
      */
     @Override
-    public ComandoDefinirIntensidadeLampada clone() {
-        return new ComandoDefinirIntensidadeLampada(this);
+    public ComandoDefinirCorLampada clone() {
+        return new ComandoDefinirCorLampada(this);
     }
 }

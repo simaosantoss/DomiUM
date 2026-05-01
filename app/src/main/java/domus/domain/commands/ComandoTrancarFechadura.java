@@ -1,6 +1,7 @@
 package domus.domain.commands;
 
 import domus.domain.DomiUM;
+import domus.domain.devices.FechaduraInteligente;
 
 /**
  * Comando que tranca uma fechadura através da fachada do domínio.
@@ -35,7 +36,14 @@ public class ComandoTrancarFechadura extends ComandoDispositivo {
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.trancarFechadura(getUtilizadorId(), getCasaId(), getDispositivoId());
+            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+                if (!(dispositivo instanceof FechaduraInteligente)) {
+                    return false;
+                }
+
+                ((FechaduraInteligente) dispositivo).trancar();
+                return true;
+            });
         }
     }
 

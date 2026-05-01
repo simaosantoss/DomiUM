@@ -1,31 +1,31 @@
 package domus.domain.commands;
 
 import domus.domain.DomiUM;
-import domus.domain.devices.LampadaInteligente;
+import domus.domain.devices.DesumidificadorInteligente;
 import java.util.Objects;
 
 /**
- * Comando que define a intensidade luminosa de uma lâmpada.
+ * Comando que define a humidade alvo de um desumidificador.
  */
-public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
+public class ComandoDefinirHumidadeDesumidificador extends ComandoDispositivo {
 
     /**
-     * Intensidade luminosa a aplicar.
+     * Humidade alvo a aplicar.
      */
-    private final int intensidade;
+    private final double humidade;
 
     /**
-     * Cria um comando para definir a intensidade de uma lâmpada.
+     * Cria um comando para definir a humidade alvo de um desumidificador.
      *
      * @param utilizadorId identificador do utilizador
      * @param casaId identificador da casa
      * @param dispositivoId identificador do dispositivo
-     * @param intensidade intensidade luminosa a aplicar
+     * @param humidade humidade alvo a aplicar
      */
-    public ComandoDefinirIntensidadeLampada(String utilizadorId, String casaId,
-                                            String dispositivoId, int intensidade) {
+    public ComandoDefinirHumidadeDesumidificador(String utilizadorId, String casaId,
+                                                 String dispositivoId, double humidade) {
         super(utilizadorId, casaId, dispositivoId);
-        this.intensidade = intensidade;
+        this.humidade = humidade;
     }
 
     /**
@@ -33,9 +33,9 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      *
      * @param outro comando de origem
      */
-    private ComandoDefinirIntensidadeLampada(ComandoDefinirIntensidadeLampada outro) {
+    private ComandoDefinirHumidadeDesumidificador(ComandoDefinirHumidadeDesumidificador outro) {
         super(outro);
-        this.intensidade = outro.intensidade;
+        this.humidade = outro.humidade;
     }
 
     /**
@@ -47,11 +47,11 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
     public void execute(DomiUM domium) {
         if (domium != null) {
             domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
-                if (!(dispositivo instanceof LampadaInteligente)) {
+                if (!(dispositivo instanceof DesumidificadorInteligente)) {
                     return false;
                 }
 
-                ((LampadaInteligente) dispositivo).setIntensidade(this.intensidade);
+                ((DesumidificadorInteligente) dispositivo).setHumidadeAlvo(this.humidade);
                 return true;
             });
         }
@@ -68,8 +68,8 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
         if (!super.equals(o)) {
             return false;
         }
-        ComandoDefinirIntensidadeLampada that = (ComandoDefinirIntensidadeLampada) o;
-        return this.intensidade == that.intensidade;
+        ComandoDefinirHumidadeDesumidificador that = (ComandoDefinirHumidadeDesumidificador) o;
+        return Double.compare(this.humidade, that.humidade) == 0;
     }
 
     /**
@@ -79,7 +79,7 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), this.intensidade);
+        return Objects.hash(super.hashCode(), this.humidade);
     }
 
     /**
@@ -89,11 +89,11 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      */
     @Override
     public String toString() {
-        return "ComandoDefinirIntensidadeLampada{"
+        return "ComandoDefinirHumidadeDesumidificador{"
                 + "utilizadorId='" + getUtilizadorId() + '\''
                 + ", casaId='" + getCasaId() + '\''
                 + ", dispositivoId='" + getDispositivoId() + '\''
-                + ", intensidade=" + this.intensidade
+                + ", humidade=" + this.humidade
                 + '}';
     }
 
@@ -103,7 +103,7 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      * @return novo comando equivalente
      */
     @Override
-    public ComandoDefinirIntensidadeLampada clone() {
-        return new ComandoDefinirIntensidadeLampada(this);
+    public ComandoDefinirHumidadeDesumidificador clone() {
+        return new ComandoDefinirHumidadeDesumidificador(this);
     }
 }

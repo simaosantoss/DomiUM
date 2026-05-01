@@ -1,31 +1,31 @@
 package domus.domain.commands;
 
 import domus.domain.DomiUM;
-import domus.domain.devices.LampadaInteligente;
+import domus.domain.devices.ArCondicionadoInteligente;
 import java.util.Objects;
 
 /**
- * Comando que define a intensidade luminosa de uma lâmpada.
+ * Comando que define o modo de funcionamento de um ar condicionado.
  */
-public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
+public class ComandoDefinirModoArCondicionado extends ComandoDispositivo {
 
     /**
-     * Intensidade luminosa a aplicar.
+     * Modo de funcionamento a aplicar.
      */
-    private final int intensidade;
+    private final String modo;
 
     /**
-     * Cria um comando para definir a intensidade de uma lâmpada.
+     * Cria um comando para definir o modo de um ar condicionado.
      *
      * @param utilizadorId identificador do utilizador
      * @param casaId identificador da casa
      * @param dispositivoId identificador do dispositivo
-     * @param intensidade intensidade luminosa a aplicar
+     * @param modo modo de funcionamento a aplicar
      */
-    public ComandoDefinirIntensidadeLampada(String utilizadorId, String casaId,
-                                            String dispositivoId, int intensidade) {
+    public ComandoDefinirModoArCondicionado(String utilizadorId, String casaId,
+                                            String dispositivoId, String modo) {
         super(utilizadorId, casaId, dispositivoId);
-        this.intensidade = intensidade;
+        this.modo = modo;
     }
 
     /**
@@ -33,9 +33,9 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      *
      * @param outro comando de origem
      */
-    private ComandoDefinirIntensidadeLampada(ComandoDefinirIntensidadeLampada outro) {
+    private ComandoDefinirModoArCondicionado(ComandoDefinirModoArCondicionado outro) {
         super(outro);
-        this.intensidade = outro.intensidade;
+        this.modo = outro.modo;
     }
 
     /**
@@ -47,11 +47,11 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
     public void execute(DomiUM domium) {
         if (domium != null) {
             domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
-                if (!(dispositivo instanceof LampadaInteligente)) {
+                if (!(dispositivo instanceof ArCondicionadoInteligente)) {
                     return false;
                 }
 
-                ((LampadaInteligente) dispositivo).setIntensidade(this.intensidade);
+                ((ArCondicionadoInteligente) dispositivo).setModo(this.modo);
                 return true;
             });
         }
@@ -68,8 +68,8 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
         if (!super.equals(o)) {
             return false;
         }
-        ComandoDefinirIntensidadeLampada that = (ComandoDefinirIntensidadeLampada) o;
-        return this.intensidade == that.intensidade;
+        ComandoDefinirModoArCondicionado that = (ComandoDefinirModoArCondicionado) o;
+        return Objects.equals(this.modo, that.modo);
     }
 
     /**
@@ -79,7 +79,7 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), this.intensidade);
+        return Objects.hash(super.hashCode(), this.modo);
     }
 
     /**
@@ -89,11 +89,11 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      */
     @Override
     public String toString() {
-        return "ComandoDefinirIntensidadeLampada{"
+        return "ComandoDefinirModoArCondicionado{"
                 + "utilizadorId='" + getUtilizadorId() + '\''
                 + ", casaId='" + getCasaId() + '\''
                 + ", dispositivoId='" + getDispositivoId() + '\''
-                + ", intensidade=" + this.intensidade
+                + ", modo='" + this.modo + '\''
                 + '}';
     }
 
@@ -103,7 +103,7 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      * @return novo comando equivalente
      */
     @Override
-    public ComandoDefinirIntensidadeLampada clone() {
-        return new ComandoDefinirIntensidadeLampada(this);
+    public ComandoDefinirModoArCondicionado clone() {
+        return new ComandoDefinirModoArCondicionado(this);
     }
 }

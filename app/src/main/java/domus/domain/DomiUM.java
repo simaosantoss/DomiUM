@@ -7,6 +7,7 @@ import domus.domain.conditions.Condicao;
 import domus.domain.core.Casa;
 import domus.domain.core.TipoPermissao;
 import domus.domain.core.Utilizador;
+import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.environment.AmbienteInterior;
 import domus.domain.managers.GestorCasas;
 import domus.domain.managers.GestorUtilizadores;
@@ -189,6 +190,43 @@ public class DomiUM implements Serializable {
     }
 
     /**
+     * Executa uma operação genérica sobre um dispositivo de uma casa.
+     *
+     * A operação só é delegada se os dados forem válidos e se o utilizador tiver
+     * permissão de utilização sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @param operacao operação a aplicar ao dispositivo
+     */
+    public void executarOperacaoDispositivo(String utilizadorId, String casaId,
+                                            String dispositivoId, OperacaoDispositivo operacao) {
+        if (utilizadorId == null || casaId == null || dispositivoId == null || operacao == null) {
+            return;
+        }
+
+        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
+            return;
+        }
+
+        this.gestorCasas.executarOperacaoDispositivo(casaId, dispositivoId, operacao);
+    }
+
+    /**
+     * Executa um comando sobre esta fachada do domínio.
+     *
+     * Se o comando for inválido, a operação é ignorada.
+     *
+     * @param cmd comando a executar
+     */
+    public void executarComando(Command cmd) {
+        if (cmd != null) {
+            cmd.execute(this);
+        }
+    }
+
+    /**
      * Adiciona uma nova divisão a uma casa.
      *
      * @param utilizadorId identificador do utilizador
@@ -228,36 +266,6 @@ public class DomiUM implements Serializable {
     }
 
     /**
-     * Liga um dispositivo existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     */
-    public void ligarDispositivo(String utilizadorId, String casaId, String dispositivoId) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.ligarDispositivo(casaId, dispositivoId);
-    }
-
-    /**
-     * Desliga um dispositivo existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     */
-    public void desligarDispositivo(String utilizadorId, String casaId, String dispositivoId) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.desligarDispositivo(casaId, dispositivoId);
-    }
-
-    /**
      * Avança o relógio simulado e verifica os escalonamentos das casas.
      *
      * @param minutos minutos a avançar
@@ -279,200 +287,6 @@ public class DomiUM implements Serializable {
                 iteradorEscalonamentos.next().verificarEExecutar(horaAnterior, horaAtual, this);
             }
         }
-    }
-
-    /**
-     * Define a intensidade luminosa de uma lâmpada existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param intensidade nova intensidade luminosa
-     */
-    public void definirIntensidadeLampada(String utilizadorId, String casaId,
-                                          String dispositivoId, int intensidade) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.definirIntensidadeLampada(casaId, dispositivoId, intensidade);
-    }
-
-    /**
-     * Define a temperatura de cor de uma lâmpada existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param corK nova temperatura de cor, em Kelvin
-     */
-    public void definirCorLampada(String utilizadorId, String casaId, String dispositivoId, int corK) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.definirCorLampada(casaId, dispositivoId, corK);
-    }
-
-    /**
-     * Define a percentagem de abertura de uma cortina existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param percentagemAbertura nova percentagem de abertura
-     */
-    public void definirAberturaCortina(String utilizadorId, String casaId,
-                                       String dispositivoId, int percentagemAbertura) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.definirAberturaCortina(casaId, dispositivoId, percentagemAbertura);
-    }
-
-    /**
-     * Define o volume de uma coluna existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param volume novo volume
-     */
-    public void definirVolumeColuna(String utilizadorId, String casaId, String dispositivoId, int volume) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.definirVolumeColuna(casaId, dispositivoId, volume);
-    }
-
-    /**
-     * Define a playlist atual de uma coluna existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param playlist nova playlist atual
-     */
-    public void definirPlaylistColuna(String utilizadorId, String casaId,
-                                      String dispositivoId, String playlist) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.definirPlaylistColuna(casaId, dispositivoId, playlist);
-    }
-
-    /**
-     * Define a temperatura alvo de um ar condicionado existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param temperatura nova temperatura alvo
-     */
-    public void definirTemperaturaArCondicionado(String utilizadorId, String casaId,
-                                                 String dispositivoId, double temperatura) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.definirTemperaturaArCondicionado(casaId, dispositivoId, temperatura);
-    }
-
-    /**
-     * Define o modo de funcionamento de um ar condicionado existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param modo novo modo de funcionamento
-     */
-    public void definirModoArCondicionado(String utilizadorId, String casaId,
-                                          String dispositivoId, String modo) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.definirModoArCondicionado(casaId, dispositivoId, modo);
-    }
-
-    /**
-     * Tranca uma fechadura existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     */
-    public void trancarFechadura(String utilizadorId, String casaId, String dispositivoId) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.trancarFechadura(casaId, dispositivoId);
-    }
-
-    /**
-     * Destranca uma fechadura existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     */
-    public void destrancarFechadura(String utilizadorId, String casaId, String dispositivoId) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.destrancarFechadura(casaId, dispositivoId);
-    }
-
-    /**
-     * Define a humidade alvo de um desumidificador existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param humidade nova humidade alvo
-     */
-    public void definirHumidadeDesumidificador(String utilizadorId, String casaId,
-                                               String dispositivoId, double humidade) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.definirHumidadeDesumidificador(casaId, dispositivoId, humidade);
-    }
-
-    /**
-     * Abre um portão de garagem existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     */
-    public void abrirPortao(String utilizadorId, String casaId, String dispositivoId) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.abrirPortao(casaId, dispositivoId);
-    }
-
-    /**
-     * Fecha um portão de garagem existente numa casa.
-     *
-     * @param utilizadorId identificador do utilizador
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     */
-    public void fecharPortao(String utilizadorId, String casaId, String dispositivoId) {
-        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
-        }
-
-        this.gestorCasas.fecharPortao(casaId, dispositivoId);
     }
 
     /**

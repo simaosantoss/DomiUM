@@ -1,31 +1,31 @@
 package domus.domain.commands;
 
 import domus.domain.DomiUM;
-import domus.domain.devices.LampadaInteligente;
+import domus.domain.devices.ColunaInteligente;
 import java.util.Objects;
 
 /**
- * Comando que define a intensidade luminosa de uma lâmpada.
+ * Comando que define a playlist atual de uma coluna inteligente.
  */
-public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
+public class ComandoDefinirPlaylistColuna extends ComandoDispositivo {
 
     /**
-     * Intensidade luminosa a aplicar.
+     * Playlist a aplicar.
      */
-    private final int intensidade;
+    private final String playlist;
 
     /**
-     * Cria um comando para definir a intensidade de uma lâmpada.
+     * Cria um comando para definir a playlist de uma coluna.
      *
      * @param utilizadorId identificador do utilizador
      * @param casaId identificador da casa
      * @param dispositivoId identificador do dispositivo
-     * @param intensidade intensidade luminosa a aplicar
+     * @param playlist playlist a aplicar
      */
-    public ComandoDefinirIntensidadeLampada(String utilizadorId, String casaId,
-                                            String dispositivoId, int intensidade) {
+    public ComandoDefinirPlaylistColuna(String utilizadorId, String casaId,
+                                        String dispositivoId, String playlist) {
         super(utilizadorId, casaId, dispositivoId);
-        this.intensidade = intensidade;
+        this.playlist = playlist;
     }
 
     /**
@@ -33,9 +33,9 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      *
      * @param outro comando de origem
      */
-    private ComandoDefinirIntensidadeLampada(ComandoDefinirIntensidadeLampada outro) {
+    private ComandoDefinirPlaylistColuna(ComandoDefinirPlaylistColuna outro) {
         super(outro);
-        this.intensidade = outro.intensidade;
+        this.playlist = outro.playlist;
     }
 
     /**
@@ -47,11 +47,11 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
     public void execute(DomiUM domium) {
         if (domium != null) {
             domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
-                if (!(dispositivo instanceof LampadaInteligente)) {
+                if (!(dispositivo instanceof ColunaInteligente)) {
                     return false;
                 }
 
-                ((LampadaInteligente) dispositivo).setIntensidade(this.intensidade);
+                ((ColunaInteligente) dispositivo).setPlaylistAtual(this.playlist);
                 return true;
             });
         }
@@ -68,8 +68,8 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
         if (!super.equals(o)) {
             return false;
         }
-        ComandoDefinirIntensidadeLampada that = (ComandoDefinirIntensidadeLampada) o;
-        return this.intensidade == that.intensidade;
+        ComandoDefinirPlaylistColuna that = (ComandoDefinirPlaylistColuna) o;
+        return Objects.equals(this.playlist, that.playlist);
     }
 
     /**
@@ -79,7 +79,7 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), this.intensidade);
+        return Objects.hash(super.hashCode(), this.playlist);
     }
 
     /**
@@ -89,11 +89,11 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      */
     @Override
     public String toString() {
-        return "ComandoDefinirIntensidadeLampada{"
+        return "ComandoDefinirPlaylistColuna{"
                 + "utilizadorId='" + getUtilizadorId() + '\''
                 + ", casaId='" + getCasaId() + '\''
                 + ", dispositivoId='" + getDispositivoId() + '\''
-                + ", intensidade=" + this.intensidade
+                + ", playlist='" + this.playlist + '\''
                 + '}';
     }
 
@@ -103,7 +103,7 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
      * @return novo comando equivalente
      */
     @Override
-    public ComandoDefinirIntensidadeLampada clone() {
-        return new ComandoDefinirIntensidadeLampada(this);
+    public ComandoDefinirPlaylistColuna clone() {
+        return new ComandoDefinirPlaylistColuna(this);
     }
 }

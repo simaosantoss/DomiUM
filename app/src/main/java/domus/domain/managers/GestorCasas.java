@@ -5,15 +5,8 @@ import domus.domain.commands.Command;
 import domus.domain.conditions.Condicao;
 import domus.domain.core.Casa;
 import domus.domain.core.Divisao;
-import domus.domain.devices.ArCondicionadoInteligente;
-import domus.domain.devices.ColunaInteligente;
-import domus.domain.devices.CortinaInteligente;
-import domus.domain.devices.DesumidificadorInteligente;
 import domus.domain.devices.Dispositivo;
-import domus.domain.devices.FechaduraInteligente;
-import domus.domain.devices.LampadaInteligente;
 import domus.domain.devices.OperacaoDispositivo;
-import domus.domain.devices.PortaoGaragemInteligente;
 import domus.domain.environment.AmbienteInterior;
 import domus.domain.factories.DispositivoRegistry;
 import domus.domain.scheduling.Escalonamento;
@@ -183,14 +176,19 @@ public class GestorCasas implements Serializable {
     }
 
     /**
-     * Liga um dispositivo numa casa.
+     * Executa uma operação genérica sobre um dispositivo de uma casa.
+     *
+     * A casa é alterada sobre uma cópia e só volta a ser guardada se a operação
+     * indicar que foi aplicada com sucesso.
      *
      * @param casaId identificador da casa
      * @param dispositivoId identificador do dispositivo
-     * @return {@code true} se o dispositivo tiver sido ligado
+     * @param operacao operação a aplicar ao dispositivo
+     * @return {@code true} se a operação tiver sido aplicada
      */
-    public boolean ligarDispositivo(String casaId, String dispositivoId) {
-        if (casaId == null || dispositivoId == null) {
+    public boolean executarOperacaoDispositivo(String casaId, String dispositivoId,
+                                               OperacaoDispositivo operacao) {
+        if (casaId == null || dispositivoId == null || operacao == null) {
             return false;
         }
 
@@ -200,265 +198,12 @@ public class GestorCasas implements Serializable {
         }
 
         Casa casaAtualizada = casa.clone();
-        if (casaAtualizada.ligarDispositivo(dispositivoId)) {
+        if (casaAtualizada.aplicarOperacaoDispositivo(dispositivoId, operacao)) {
             this.casas.put(casaId, casaAtualizada);
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * Desliga um dispositivo numa casa.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @return {@code true} se o dispositivo tiver sido desligado
-     */
-    public boolean desligarDispositivo(String casaId, String dispositivoId) {
-        if (casaId == null || dispositivoId == null) {
-            return false;
-        }
-
-        Casa casa = this.casas.get(casaId);
-        if (casa == null) {
-            return false;
-        }
-
-        Casa casaAtualizada = casa.clone();
-        if (casaAtualizada.desligarDispositivo(dispositivoId)) {
-            this.casas.put(casaId, casaAtualizada);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Define a intensidade luminosa de uma lâmpada.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param intensidade nova intensidade luminosa
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    public boolean definirIntensidadeLampada(String casaId, String dispositivoId, int intensidade) {
-        return aplicarOperacaoEmCasa(casaId, dispositivoId, dispositivo -> {
-            if (!(dispositivo instanceof LampadaInteligente)) {
-                return false;
-            }
-
-            ((LampadaInteligente) dispositivo).setIntensidade(intensidade);
-            return true;
-        });
-    }
-
-    /**
-     * Define a temperatura de cor de uma lâmpada.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param corK nova temperatura de cor, em Kelvin
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    public boolean definirCorLampada(String casaId, String dispositivoId, int corK) {
-        return aplicarOperacaoEmCasa(casaId, dispositivoId, dispositivo -> {
-            if (!(dispositivo instanceof LampadaInteligente)) {
-                return false;
-            }
-
-            ((LampadaInteligente) dispositivo).setCorK(corK);
-            return true;
-        });
-    }
-
-    /**
-     * Define a percentagem de abertura de uma cortina.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param percentagemAbertura nova percentagem de abertura
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    public boolean definirAberturaCortina(String casaId, String dispositivoId,
-                                          int percentagemAbertura) {
-        return aplicarOperacaoEmCasa(casaId, dispositivoId, dispositivo -> {
-            if (!(dispositivo instanceof CortinaInteligente)) {
-                return false;
-            }
-
-            ((CortinaInteligente) dispositivo).setPercentagemAbertura(percentagemAbertura);
-            return true;
-        });
-    }
-
-    /**
-     * Define o volume de uma coluna.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param volume novo volume
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    public boolean definirVolumeColuna(String casaId, String dispositivoId, int volume) {
-        return aplicarOperacaoEmCasa(casaId, dispositivoId, dispositivo -> {
-            if (!(dispositivo instanceof ColunaInteligente)) {
-                return false;
-            }
-
-            ((ColunaInteligente) dispositivo).setVolume(volume);
-            return true;
-        });
-    }
-
-    /**
-     * Define a playlist atual de uma coluna.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param playlist nova playlist atual
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    public boolean definirPlaylistColuna(String casaId, String dispositivoId, String playlist) {
-        return aplicarOperacaoEmCasa(casaId, dispositivoId, dispositivo -> {
-            if (!(dispositivo instanceof ColunaInteligente)) {
-                return false;
-            }
-
-            ((ColunaInteligente) dispositivo).setPlaylistAtual(playlist);
-            return true;
-        });
-    }
-
-    /**
-     * Define a temperatura alvo de um ar condicionado.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param temperatura nova temperatura alvo
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    public boolean definirTemperaturaArCondicionado(String casaId, String dispositivoId,
-                                                    double temperatura) {
-        return aplicarOperacaoEmCasa(casaId, dispositivoId, dispositivo -> {
-            if (!(dispositivo instanceof ArCondicionadoInteligente)) {
-                return false;
-            }
-
-            ((ArCondicionadoInteligente) dispositivo).setTemperaturaAlvo(temperatura);
-            return true;
-        });
-    }
-
-    /**
-     * Define o modo de funcionamento de um ar condicionado.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param modo novo modo de funcionamento
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    public boolean definirModoArCondicionado(String casaId, String dispositivoId, String modo) {
-        return aplicarOperacaoEmCasa(casaId, dispositivoId, dispositivo -> {
-            if (!(dispositivo instanceof ArCondicionadoInteligente)) {
-                return false;
-            }
-
-            ((ArCondicionadoInteligente) dispositivo).setModo(modo);
-            return true;
-        });
-    }
-
-    /**
-     * Tranca uma fechadura.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    public boolean trancarFechadura(String casaId, String dispositivoId) {
-        return aplicarOperacaoEmCasa(casaId, dispositivoId, dispositivo -> {
-            if (!(dispositivo instanceof FechaduraInteligente)) {
-                return false;
-            }
-
-            ((FechaduraInteligente) dispositivo).trancar();
-            return true;
-        });
-    }
-
-    /**
-     * Destranca uma fechadura.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    public boolean destrancarFechadura(String casaId, String dispositivoId) {
-        return aplicarOperacaoEmCasa(casaId, dispositivoId, dispositivo -> {
-            if (!(dispositivo instanceof FechaduraInteligente)) {
-                return false;
-            }
-
-            ((FechaduraInteligente) dispositivo).destrancar();
-            return true;
-        });
-    }
-
-    /**
-     * Define a humidade alvo de um desumidificador.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param humidade nova humidade alvo
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    public boolean definirHumidadeDesumidificador(String casaId, String dispositivoId,
-                                                  double humidade) {
-        return aplicarOperacaoEmCasa(casaId, dispositivoId, dispositivo -> {
-            if (!(dispositivo instanceof DesumidificadorInteligente)) {
-                return false;
-            }
-
-            ((DesumidificadorInteligente) dispositivo).setHumidadeAlvo(humidade);
-            return true;
-        });
-    }
-
-    /**
-     * Abre um portão de garagem.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    public boolean abrirPortao(String casaId, String dispositivoId) {
-        return aplicarOperacaoEmCasa(casaId, dispositivoId, dispositivo -> {
-            if (!(dispositivo instanceof PortaoGaragemInteligente)) {
-                return false;
-            }
-
-            ((PortaoGaragemInteligente) dispositivo).abrir();
-            return true;
-        });
-    }
-
-    /**
-     * Fecha um portão de garagem.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    public boolean fecharPortao(String casaId, String dispositivoId) {
-        return aplicarOperacaoEmCasa(casaId, dispositivoId, dispositivo -> {
-            if (!(dispositivo instanceof PortaoGaragemInteligente)) {
-                return false;
-            }
-
-            ((PortaoGaragemInteligente) dispositivo).fechar();
-            return true;
-        });
     }
 
     /**
@@ -743,37 +488,6 @@ public class GestorCasas implements Serializable {
 
         Casa casaAtualizada = casa.clone();
         if (casaAtualizada.adicionarAcaoFimAEscalonamento(escalonamentoId, cmd)) {
-            this.casas.put(casaId, casaAtualizada);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Aplica uma operação a um dispositivo de uma casa.
-     *
-     * A casa é alterada sobre uma cópia e só volta a ser guardada se a operação
-     * for aplicada com sucesso.
-     *
-     * @param casaId identificador da casa
-     * @param dispositivoId identificador do dispositivo
-     * @param operacao operação a aplicar ao dispositivo
-     * @return {@code true} se a operação tiver sido aplicada
-     */
-    private boolean aplicarOperacaoEmCasa(String casaId, String dispositivoId,
-                                          OperacaoDispositivo operacao) {
-        if (casaId == null || dispositivoId == null || operacao == null) {
-            return false;
-        }
-
-        Casa casa = this.casas.get(casaId);
-        if (casa == null) {
-            return false;
-        }
-
-        Casa casaAtualizada = casa.clone();
-        if (casaAtualizada.aplicarOperacaoDispositivo(dispositivoId, operacao)) {
             this.casas.put(casaId, casaAtualizada);
             return true;
         }
