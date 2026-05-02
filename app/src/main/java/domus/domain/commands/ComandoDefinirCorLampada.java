@@ -46,14 +46,14 @@ public class ComandoDefinirCorLampada extends ComandoDispositivo {
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+            domium.executarOperacaoDispositivoComDescricao(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
                 if (!(dispositivo instanceof LampadaInteligente)) {
                     return false;
                 }
 
                 ((LampadaInteligente) dispositivo).setCorK(this.corK);
                 return true;
-            });
+            }, "Definiu cor da lâmpada para " + this.corK + "K");
         }
     }
 

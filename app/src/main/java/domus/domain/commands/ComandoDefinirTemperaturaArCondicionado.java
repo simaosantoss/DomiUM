@@ -46,14 +46,14 @@ public class ComandoDefinirTemperaturaArCondicionado extends ComandoDispositivo 
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+            domium.executarOperacaoDispositivoComDescricao(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
                 if (!(dispositivo instanceof ArCondicionadoInteligente)) {
                     return false;
                 }
 
                 ((ArCondicionadoInteligente) dispositivo).setTemperaturaAlvo(this.temperatura);
                 return true;
-            });
+            }, "Definiu temperatura do ar condicionado para " + this.temperatura);
         }
     }
 

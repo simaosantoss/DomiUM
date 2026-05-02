@@ -46,14 +46,14 @@ public class ComandoDefinirModoArCondicionado extends ComandoDispositivo {
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+            domium.executarOperacaoDispositivoComDescricao(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
                 if (!(dispositivo instanceof ArCondicionadoInteligente)) {
                     return false;
                 }
 
                 ((ArCondicionadoInteligente) dispositivo).setModo(this.modo);
                 return true;
-            });
+            }, "Definiu modo do ar condicionado para " + this.modo);
         }
     }
 

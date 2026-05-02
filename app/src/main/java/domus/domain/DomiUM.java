@@ -9,6 +9,7 @@ import domus.domain.core.TipoPermissao;
 import domus.domain.core.Utilizador;
 import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.environment.AmbienteInterior;
+import domus.domain.history.RegistoInteracao;
 import domus.domain.managers.GestorCasas;
 import domus.domain.managers.GestorUtilizadores;
 import domus.domain.scheduling.Escalonamento;
@@ -202,6 +203,28 @@ public class DomiUM implements Serializable {
      */
     public void executarOperacaoDispositivo(String utilizadorId, String casaId,
                                             String dispositivoId, OperacaoDispositivo operacao) {
+        executarOperacaoDispositivoComDescricao(
+                utilizadorId, casaId, dispositivoId, operacao, "Operação sobre dispositivo"
+        );
+    }
+
+    /**
+     * Executa uma operação genérica sobre um dispositivo de uma casa e regista
+     * a interação no histórico do utilizador quando a operação é bem-sucedida.
+     *
+     * A operação só é delegada se os dados forem válidos e se o utilizador tiver
+     * permissão de utilização sobre a casa indicada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @param operacao operação a aplicar ao dispositivo
+     * @param descricaoAcao descrição da ação realizada
+     */
+    public void executarOperacaoDispositivoComDescricao(String utilizadorId, String casaId,
+                                                        String dispositivoId,
+                                                        OperacaoDispositivo operacao,
+                                                        String descricaoAcao) {
         if (utilizadorId == null || casaId == null || dispositivoId == null || operacao == null) {
             return;
         }
@@ -210,7 +233,17 @@ public class DomiUM implements Serializable {
             return;
         }
 
-        this.gestorCasas.executarOperacaoDispositivo(casaId, dispositivoId, operacao);
+        if (this.gestorCasas.executarOperacaoDispositivo(casaId, dispositivoId, operacao)) {
+            String acao = descricaoAcao;
+            if (acao == null || acao.isEmpty()) {
+                acao = "Operação sobre dispositivo";
+            }
+
+            RegistoInteracao registo = new RegistoInteracao(
+                    this.relogio.getDataHoraAtual(), dispositivoId, acao
+            );
+            this.gestorUtilizadores.registarInteracao(utilizadorId, registo);
+        }
     }
 
     /**

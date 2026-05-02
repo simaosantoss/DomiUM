@@ -36,14 +36,14 @@ public class ComandoFecharPortao extends ComandoDispositivo {
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+            domium.executarOperacaoDispositivoComDescricao(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
                 if (!(dispositivo instanceof PortaoGaragemInteligente)) {
                     return false;
                 }
 
                 ((PortaoGaragemInteligente) dispositivo).fechar();
                 return true;
-            });
+            }, "Fechou o portão");
         }
     }
 

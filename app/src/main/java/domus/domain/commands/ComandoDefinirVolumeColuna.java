@@ -46,14 +46,14 @@ public class ComandoDefinirVolumeColuna extends ComandoDispositivo {
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+            domium.executarOperacaoDispositivoComDescricao(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
                 if (!(dispositivo instanceof ColunaInteligente)) {
                     return false;
                 }
 
                 ((ColunaInteligente) dispositivo).setVolume(this.volume);
                 return true;
-            });
+            }, "Definiu volume da coluna para " + this.volume);
         }
     }
 

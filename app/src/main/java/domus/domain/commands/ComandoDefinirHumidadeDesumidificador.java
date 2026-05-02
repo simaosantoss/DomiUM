@@ -46,14 +46,14 @@ public class ComandoDefinirHumidadeDesumidificador extends ComandoDispositivo {
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+            domium.executarOperacaoDispositivoComDescricao(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
                 if (!(dispositivo instanceof DesumidificadorInteligente)) {
                     return false;
                 }
 
                 ((DesumidificadorInteligente) dispositivo).setHumidadeAlvo(this.humidade);
                 return true;
-            });
+            }, "Definiu humidade alvo do desumidificador para " + this.humidade);
         }
     }
 

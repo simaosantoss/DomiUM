@@ -2,6 +2,7 @@ package domus.domain.managers;
 
 import domus.domain.core.TipoPermissao;
 import domus.domain.core.Utilizador;
+import domus.domain.history.RegistoInteracao;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -144,6 +145,31 @@ public class GestorUtilizadores implements Serializable {
 
         Utilizador utilizadorAtualizado = utilizador.clone();
         utilizadorAtualizado.adicionarPermissao(casaId, permissao);
+        this.utilizadores.put(utilizadorId, utilizadorAtualizado);
+    }
+
+    /**
+     * Regista uma interação no histórico de um utilizador.
+     *
+     * Se algum dado for inválido ou o utilizador não existir, a operação é
+     * ignorada. O utilizador é atualizado por cópia para manter a disciplina de
+     * encapsulamento do gestor.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param registo registo de interação a acrescentar
+     */
+    public void registarInteracao(String utilizadorId, RegistoInteracao registo) {
+        if (utilizadorId == null || registo == null) {
+            return;
+        }
+
+        Utilizador utilizador = this.utilizadores.get(utilizadorId);
+        if (utilizador == null) {
+            return;
+        }
+
+        Utilizador utilizadorAtualizado = utilizador.clone();
+        utilizadorAtualizado.registarInteracao(registo);
         this.utilizadores.put(utilizadorId, utilizadorAtualizado);
     }
 

@@ -46,14 +46,14 @@ public class ComandoDefinirAberturaCortina extends ComandoDispositivo {
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+            domium.executarOperacaoDispositivoComDescricao(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
                 if (!(dispositivo instanceof CortinaInteligente)) {
                     return false;
                 }
 
                 ((CortinaInteligente) dispositivo).setPercentagemAbertura(this.percentagemAbertura);
                 return true;
-            });
+            }, "Definiu abertura da cortina para " + this.percentagemAbertura + "%");
         }
     }
 

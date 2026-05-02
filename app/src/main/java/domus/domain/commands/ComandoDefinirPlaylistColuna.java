@@ -46,14 +46,14 @@ public class ComandoDefinirPlaylistColuna extends ComandoDispositivo {
     @Override
     public void execute(DomiUM domium) {
         if (domium != null) {
-            domium.executarOperacaoDispositivo(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
+            domium.executarOperacaoDispositivoComDescricao(getUtilizadorId(), getCasaId(), getDispositivoId(), dispositivo -> {
                 if (!(dispositivo instanceof ColunaInteligente)) {
                     return false;
                 }
 
                 ((ColunaInteligente) dispositivo).setPlaylistAtual(this.playlist);
                 return true;
-            });
+            }, "Definiu playlist da coluna para " + this.playlist);
         }
     }
 
