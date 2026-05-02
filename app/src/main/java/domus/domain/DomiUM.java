@@ -14,6 +14,9 @@ import domus.domain.managers.GestorCasas;
 import domus.domain.managers.GestorUtilizadores;
 import domus.domain.scheduling.Escalonamento;
 import domus.domain.scenarios.Cenario;
+import domus.domain.statistics.ResumoCasaConsumo;
+import domus.domain.statistics.ResumoDispositivoUso;
+import domus.domain.statistics.ResumoDivisaoDispositivos;
 import domus.domain.time.RelogioSistema;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -128,6 +131,56 @@ public class DomiUM implements Serializable {
      */
     public Iterator<Casa> getIteradorCasas() {
         return this.gestorCasas.getIteradorCasas();
+    }
+
+    /**
+     * Obtém a casa com maior consumo total.
+     *
+     * @return resumo da casa com maior consumo, ou {@code null} se não houver
+     *         casas registadas
+     */
+    public ResumoCasaConsumo getCasaMaiorConsumo() {
+        return this.gestorCasas.getCasaMaiorConsumo();
+    }
+
+    /**
+     * Obtém os três dispositivos mais utilizados por tempo total ligado numa
+     * casa.
+     *
+     * @param casaId identificador da casa
+     * @return iterador sobre os resumos dos dispositivos encontrados
+     */
+    public Iterator<ResumoDispositivoUso> getTop3DispositivosPorTempo(String casaId) {
+        return this.gestorCasas.getTopDispositivosPorTempo(casaId, 3);
+    }
+
+    /**
+     * Obtém os três dispositivos mais utilizados por número de ativações numa
+     * casa.
+     *
+     * @param casaId identificador da casa
+     * @return iterador sobre os resumos dos dispositivos encontrados
+     */
+    public Iterator<ResumoDispositivoUso> getTop3DispositivosPorAtivacoes(String casaId) {
+        return this.gestorCasas.getTopDispositivosPorAtivacoes(casaId, 3);
+    }
+
+    /**
+     * Obtém as três divisões com mais dispositivos, indicando a casa respetiva.
+     *
+     * @return iterador sobre os resumos das divisões encontradas
+     */
+    public Iterator<ResumoDivisaoDispositivos> getTop3DivisoesComMaisDispositivos() {
+        return this.gestorCasas.getTopDivisoesComMaisDispositivos(3);
+    }
+
+    /**
+     * Produz um resumo textual do consumo total das casas registadas.
+     *
+     * @return texto com o consumo total por casa
+     */
+    public String getResumoConsumoCasas() {
+        return this.gestorCasas.getResumoConsumoCasas();
     }
 
     /**

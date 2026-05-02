@@ -11,10 +11,14 @@ import domus.domain.environment.AmbienteInterior;
 import domus.domain.factories.DispositivoRegistry;
 import domus.domain.scheduling.Escalonamento;
 import domus.domain.scenarios.Cenario;
+import domus.domain.statistics.ResumoCasaConsumo;
+import domus.domain.statistics.ResumoDispositivoUso;
+import domus.domain.statistics.ResumoDivisaoDispositivos;
 import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -100,6 +104,188 @@ public class GestorCasas implements Serializable {
             copia.add(casa.clone());
         }
         return Collections.unmodifiableList(copia).iterator();
+    }
+
+    /**
+     * Obtém a casa com maior consumo total.
+     *
+     * @return resumo da casa com maior consumo, ou {@code null} se não houver
+     *         casas registadas
+     */
+    public ResumoCasaConsumo getCasaMaiorConsumo() {
+        ResumoCasaConsumo maiorConsumo = null;
+
+        for (Casa casa : this.casas.values()) {
+            double consumoTotal = casa.getConsumoTotal();
+            if (maiorConsumo == null || consumoTotal > maiorConsumo.getConsumoTotal()) {
+                maiorConsumo = new ResumoCasaConsumo(casa.getId(), casa.getNome(), consumoTotal);
+            }
+        }
+
+        if (maiorConsumo == null) {
+            return null;
+        }
+        return maiorConsumo.clone();
+    }
+
+    /**
+     * Obtém os dispositivos mais utilizados por tempo total ligado numa casa.
+     *
+     * @param casaId identificador da casa
+     * @param limite número máximo de resultados
+     * @return iterador sobre uma cópia protegida dos resumos encontrados
+     */
+    public Iterator<ResumoDispositivoUso> getTopDispositivosPorTempo(String casaId, int limite) {
+        if (casaId == null || limite <= 0) {
+            return Collections.<ResumoDispositivoUso>unmodifiableList(
+                    new ArrayList<ResumoDispositivoUso>()
+            ).iterator();
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return Collections.<ResumoDispositivoUso>unmodifiableList(
+                    new ArrayList<ResumoDispositivoUso>()
+            ).iterator();
+        }
+
+        List<ResumoDispositivoUso> resumos = criarResumosDispositivos(casa);
+        Collections.sort(resumos, new Comparator<ResumoDispositivoUso>() {
+            @Override
+            public int compare(ResumoDispositivoUso r1, ResumoDispositivoUso r2) {
+                int comparacao = Long.compare(r2.getTempoTotalLigado(), r1.getTempoTotalLigado());
+                if (comparacao != 0) {
+                    return comparacao;
+                }
+                return r1.getDispositivoId().compareTo(r2.getDispositivoId());
+            }
+        });
+
+        List<ResumoDispositivoUso> resultado = new ArrayList<ResumoDispositivoUso>();
+        for (int i = 0; i < resumos.size() && i < limite; i++) {
+            resultado.add(resumos.get(i).clone());
+        }
+
+        return Collections.unmodifiableList(resultado).iterator();
+    }
+
+    /**
+     * Obtém os dispositivos mais utilizados por número de ativações numa casa.
+     *
+     * @param casaId identificador da casa
+     * @param limite número máximo de resultados
+     * @return iterador sobre uma cópia protegida dos resumos encontrados
+     */
+    public Iterator<ResumoDispositivoUso> getTopDispositivosPorAtivacoes(String casaId, int limite) {
+        if (casaId == null || limite <= 0) {
+            return Collections.<ResumoDispositivoUso>unmodifiableList(
+                    new ArrayList<ResumoDispositivoUso>()
+            ).iterator();
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return Collections.<ResumoDispositivoUso>unmodifiableList(
+                    new ArrayList<ResumoDispositivoUso>()
+            ).iterator();
+        }
+
+        List<ResumoDispositivoUso> resumos = criarResumosDispositivos(casa);
+        Collections.sort(resumos, new Comparator<ResumoDispositivoUso>() {
+            @Override
+            public int compare(ResumoDispositivoUso r1, ResumoDispositivoUso r2) {
+                int comparacao = Integer.compare(r2.getNumeroAtivacoes(), r1.getNumeroAtivacoes());
+                if (comparacao != 0) {
+                    return comparacao;
+                }
+                return r1.getDispositivoId().compareTo(r2.getDispositivoId());
+            }
+        });
+
+        List<ResumoDispositivoUso> resultado = new ArrayList<ResumoDispositivoUso>();
+        for (int i = 0; i < resumos.size() && i < limite; i++) {
+            resultado.add(resumos.get(i).clone());
+        }
+
+        return Collections.unmodifiableList(resultado).iterator();
+    }
+
+    /**
+     * Obtém as divisões com mais dispositivos, considerando todas as casas.
+     *
+     * @param limite número máximo de resultados
+     * @return iterador sobre uma cópia protegida dos resumos encontrados
+     */
+    public Iterator<ResumoDivisaoDispositivos> getTopDivisoesComMaisDispositivos(int limite) {
+        if (limite <= 0) {
+            return Collections.<ResumoDivisaoDispositivos>unmodifiableList(
+                    new ArrayList<ResumoDivisaoDispositivos>()
+            ).iterator();
+        }
+
+        List<ResumoDivisaoDispositivos> resumos = new ArrayList<ResumoDivisaoDispositivos>();
+        for (Casa casa : this.casas.values()) {
+            Iterator<Divisao> iteradorDivisoes = casa.getIteradorDivisoes();
+            while (iteradorDivisoes.hasNext()) {
+                Divisao divisao = iteradorDivisoes.next();
+                int numeroDispositivos = 0;
+                Iterator<Dispositivo> iteradorDispositivos = divisao.getIteradorDispositivos();
+                while (iteradorDispositivos.hasNext()) {
+                    iteradorDispositivos.next();
+                    numeroDispositivos++;
+                }
+
+                resumos.add(new ResumoDivisaoDispositivos(
+                        casa.getId(), casa.getNome(), divisao.getNome(), numeroDispositivos
+                ));
+            }
+        }
+
+        Collections.sort(resumos, new Comparator<ResumoDivisaoDispositivos>() {
+            @Override
+            public int compare(ResumoDivisaoDispositivos r1, ResumoDivisaoDispositivos r2) {
+                int comparacao = Integer.compare(r2.getNumeroDispositivos(), r1.getNumeroDispositivos());
+                if (comparacao != 0) {
+                    return comparacao;
+                }
+                comparacao = r1.getCasaId().compareTo(r2.getCasaId());
+                if (comparacao != 0) {
+                    return comparacao;
+                }
+                return r1.getNomeDivisao().compareTo(r2.getNomeDivisao());
+            }
+        });
+
+        List<ResumoDivisaoDispositivos> resultado = new ArrayList<ResumoDivisaoDispositivos>();
+        for (int i = 0; i < resumos.size() && i < limite; i++) {
+            resultado.add(resumos.get(i).clone());
+        }
+
+        return Collections.unmodifiableList(resultado).iterator();
+    }
+
+    /**
+     * Produz um resumo textual do consumo total das casas registadas.
+     *
+     * @return texto com o consumo total por casa
+     */
+    public String getResumoConsumoCasas() {
+        if (this.casas.isEmpty()) {
+            return "Não existem casas registadas.";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (Casa casa : this.casas.values()) {
+            sb.append("Casa ")
+                    .append(casa.getId())
+                    .append(" - ")
+                    .append(casa.getNome())
+                    .append(": ")
+                    .append(casa.getConsumoTotal())
+                    .append(System.lineSeparator());
+        }
+
+        return sb.toString();
     }
 
     /**
@@ -493,6 +679,35 @@ public class GestorCasas implements Serializable {
         }
 
         return false;
+    }
+
+    /**
+     * Cria resumos dos dispositivos existentes numa casa.
+     *
+     * @param casa casa a analisar
+     * @return lista de resumos dos dispositivos encontrados
+     */
+    private List<ResumoDispositivoUso> criarResumosDispositivos(Casa casa) {
+        List<ResumoDispositivoUso> resumos = new ArrayList<ResumoDispositivoUso>();
+
+        Iterator<Divisao> iteradorDivisoes = casa.getIteradorDivisoes();
+        while (iteradorDivisoes.hasNext()) {
+            Divisao divisao = iteradorDivisoes.next();
+            Iterator<Dispositivo> iteradorDispositivos = divisao.getIteradorDispositivos();
+            while (iteradorDispositivos.hasNext()) {
+                Dispositivo dispositivo = iteradorDispositivos.next();
+                resumos.add(new ResumoDispositivoUso(
+                        dispositivo.getIdentificador(),
+                        dispositivo.getMarca(),
+                        dispositivo.getModelo(),
+                        dispositivo.getConsumo(),
+                        dispositivo.getTempoTotalLigado(),
+                        dispositivo.getNumeroAtivacoes()
+                ));
+            }
+        }
+
+        return resumos;
     }
 
     /**
