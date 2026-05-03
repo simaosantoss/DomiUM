@@ -1,13 +1,16 @@
 package domus.domain;
 
 import domus.domain.commands.ComandoLigar;
+import domus.domain.core.Casa;
 import domus.domain.suggestions.SugestaoEscalonamento;
+import java.time.LocalTime;
 import java.util.Iterator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -81,6 +84,46 @@ class SugestoesHistoricoTest {
         Iterator<SugestaoEscalonamento> iterador = domium.getSugestoesEscalonamento("inexistente");
 
         assertFalse(iterador.hasNext());
+    }
+
+    @Test
+    void aceitarSugestaoCriaEscalonamentoNaCasa() {
+        DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
+        executarLigar(domium, "u1", "c1", "l1", 3);
+
+        Iterator<SugestaoEscalonamento> iterador = domium.getSugestoesEscalonamento("u1");
+        assertTrue(iterador.hasNext());
+        SugestaoEscalonamento sugestao = iterador.next();
+
+        domium.aceitarSugestaoEscalonamento("u1", "esc1", "Ligar automaticamente", sugestao);
+
+        Casa casa = domium.getCasa("c1");
+        assertNotNull(casa);
+        assertNotNull(casa.getEscalonamento("esc1"));
+    }
+
+    @Test
+    void aceitarSugestaoDeUtilizadorSemPermissaoNaoCriaEscalonamento() {
+        DomiUM domium = new DomiUM();
+        domium.criarUtilizador("admin", "Administrador");
+        domium.criarCasa("admin", "c1", "Casa");
+        domium.criarUtilizador("u2", "Utilizador");
+
+        SugestaoEscalonamento sugestao = new SugestaoEscalonamento(
+                "admin",
+                "c1",
+                "l1",
+                "Ligou o dispositivo",
+                LocalTime.of(10, 30),
+                3,
+                "Sugestão de teste"
+        );
+
+        domium.aceitarSugestaoEscalonamento("u2", "esc1", "Ligar automaticamente", sugestao);
+
+        Casa casa = domium.getCasa("c1");
+        assertNotNull(casa);
+        assertNull(casa.getEscalonamento("esc1"));
     }
 
     /**
