@@ -6,6 +6,7 @@ import domus.domain.core.Utilizador;
 import domus.domain.history.RegistoInteracao;
 import domus.domain.statistics.ResumoCasaConsumo;
 import domus.domain.statistics.ResumoDivisaoDispositivos;
+import domus.domain.suggestions.SugestaoEscalonamento;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -126,6 +127,26 @@ class DomiUMTest {
         ResumoDivisaoDispositivos primeiro = iterador.next();
         assertEquals("Sala", primeiro.getNomeDivisao());
         assertEquals(2, primeiro.getNumeroDispositivos());
+    }
+
+    @Test
+    void sugestoesEscalonamentoSaoGeradasComAcoesRepetidas() {
+        DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1", 10.0);
+
+        domium.executarComando(new ComandoLigar("u1", "c1", "l1"));
+        domium.executarComando(new ComandoLigar("u1", "c1", "l1"));
+        domium.executarComando(new ComandoLigar("u1", "c1", "l1"));
+
+        Iterator<SugestaoEscalonamento> iterador = domium.getSugestoesEscalonamento("u1");
+
+        assertTrue(iterador.hasNext());
+        SugestaoEscalonamento sugestao = iterador.next();
+        assertEquals("c1", sugestao.getCasaId());
+        assertEquals("l1", sugestao.getDispositivoId());
+        assertEquals("Ligou o dispositivo", sugestao.getAcao());
+        assertTrue(sugestao.getOcorrencias() >= 3);
+        assertNotNull(sugestao.getMensagem());
+        assertFalse(sugestao.getMensagem().isEmpty());
     }
 
     /**

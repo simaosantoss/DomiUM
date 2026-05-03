@@ -1,0 +1,138 @@
+package domus.domain;
+
+import domus.domain.commands.ComandoLigar;
+import domus.domain.suggestions.SugestaoEscalonamento;
+import java.util.Iterator;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Testes de regressão das sugestões de escalonamento geradas a partir do
+ * histórico de interações.
+ */
+class SugestoesHistoricoTest {
+
+    @Test
+    void geraSugestaoQuandoAcaoSeRepeteTresVezes() {
+        DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
+
+        executarLigar(domium, "u1", "c1", "l1", 3);
+
+        Iterator<SugestaoEscalonamento> iterador = domium.getSugestoesEscalonamento("u1");
+
+        assertTrue(iterador.hasNext());
+        SugestaoEscalonamento sugestao = iterador.next();
+        assertEquals("c1", sugestao.getCasaId());
+        assertEquals("l1", sugestao.getDispositivoId());
+        assertEquals("Ligou o dispositivo", sugestao.getAcao());
+        assertTrue(sugestao.getOcorrencias() >= 3);
+        assertNotNull(sugestao.getMensagem());
+        assertFalse(sugestao.getMensagem().isEmpty());
+    }
+
+    @Test
+    void naoGeraSugestaoAbaixoDoMinimoDeOcorrencias() {
+        DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
+
+        executarLigar(domium, "u1", "c1", "l1", 2);
+
+        Iterator<SugestaoEscalonamento> iterador = domium.getSugestoesEscalonamento("u1");
+
+        assertFalse(iterador.hasNext());
+    }
+
+    @Test
+    void respeitaMinimoOcorrenciasConfiguravel() {
+        DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
+
+        executarLigar(domium, "u1", "c1", "l1", 2);
+
+        Iterator<SugestaoEscalonamento> iterador = domium.getSugestoesEscalonamento("u1", 2, 5);
+
+        assertTrue(iterador.hasNext());
+        assertTrue(iterador.next().getOcorrencias() >= 2);
+    }
+
+    @Test
+    void respeitaLimiteDeSugestoes() {
+        DomiUM domium = new DomiUM();
+        domium.criarUtilizador("u1", "Utilizador");
+        domium.criarCasa("u1", "c1", "Casa");
+        domium.adicionarDivisao("u1", "c1", "Sala");
+        domium.adicionarDispositivo("u1", "c1", "Sala", "lampada", "l1", "Philips", "Hue", 10.0);
+        domium.adicionarDispositivo("u1", "c1", "Sala", "lampada", "l2", "Philips", "Hue", 8.0);
+
+        executarLigar(domium, "u1", "c1", "l1", 3);
+        executarLigar(domium, "u1", "c1", "l2", 3);
+
+        Iterator<SugestaoEscalonamento> iterador = domium.getSugestoesEscalonamento("u1", 3, 1);
+
+        assertEquals(1, contarSugestoes(iterador));
+    }
+
+    @Test
+    void utilizadorInexistenteNaoGeraSugestoes() {
+        DomiUM domium = new DomiUM();
+
+        Iterator<SugestaoEscalonamento> iterador = domium.getSugestoesEscalonamento("inexistente");
+
+        assertFalse(iterador.hasNext());
+    }
+
+    /**
+     * Cria um domínio mínimo com uma lâmpada registada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param divisaoNome nome da divisão
+     * @param dispositivoId identificador do dispositivo
+     * @return fachada preparada para os testes
+     */
+    private DomiUM criarDominioComLampada(String utilizadorId, String casaId,
+                                          String divisaoNome, String dispositivoId) {
+        DomiUM domium = new DomiUM();
+        domium.criarUtilizador(utilizadorId, "Utilizador");
+        domium.criarCasa(utilizadorId, casaId, "Casa");
+        domium.adicionarDivisao(utilizadorId, casaId, divisaoNome);
+        domium.adicionarDispositivo(
+                utilizadorId, casaId, divisaoNome, "lampada", dispositivoId,
+                "Philips", "Hue", 10.0
+        );
+        return domium;
+    }
+
+    /**
+     * Executa repetidamente o comando de ligar dispositivo.
+     *
+     * @param domium fachada do domínio
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @param vezes número de execuções
+     */
+    private void executarLigar(DomiUM domium, String utilizadorId,
+                               String casaId, String dispositivoId, int vezes) {
+        for (int i = 0; i < vezes; i++) {
+            domium.executarComando(new ComandoLigar(utilizadorId, casaId, dispositivoId));
+        }
+    }
+
+    /**
+     * Conta as sugestões disponibilizadas por um iterador.
+     *
+     * @param iterador iterador a percorrer
+     * @return número de sugestões encontradas
+     */
+    private int contarSugestoes(Iterator<SugestaoEscalonamento> iterador) {
+        int total = 0;
+        while (iterador.hasNext()) {
+            iterador.next();
+            total++;
+        }
+        return total;
+    }
+}
