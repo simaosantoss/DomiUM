@@ -28,6 +28,7 @@ import domus.domain.scheduling.Escalonamento;
 import domus.domain.statistics.ResumoCasaConsumo;
 import domus.domain.statistics.ResumoDispositivoUso;
 import domus.domain.statistics.ResumoDivisaoDispositivos;
+import domus.domain.suggestions.SugestaoCommandRegistry;
 import domus.domain.suggestions.SugestaoEscalonamento;
 import domus.domain.time.RelogioSistema;
 
@@ -115,6 +116,47 @@ public class DomiUM implements Serializable {
      */
     public Iterator<SugestaoEscalonamento> getSugestoesEscalonamento(String utilizadorId, int minimoOcorrencias, int limite) {
         return this.gestorUtilizadores.getSugestoesEscalonamento(utilizadorId, minimoOcorrencias, limite);
+    }
+
+    /**
+     * Aceita uma sugestão de escalonamento, criando um escalonamento real na
+     * casa indicada pela sugestão e adicionando a ação sugerida como ação de
+     * início.
+     *
+     * Nesta fase apenas são aceites sugestões de ações simples, sem parâmetros
+     * adicionais na descrição textual.
+     *
+     * @param utilizadorId identificador do utilizador que aceita a sugestão
+     * @param escalonamentoId identificador do escalonamento a criar
+     * @param nome nome do escalonamento
+     * @param sugestao sugestão a aceitar
+     */
+    public void aceitarSugestaoEscalonamento(String utilizadorId, String escalonamentoId,
+                                             String nome, SugestaoEscalonamento sugestao) {
+        if (utilizadorId == null || escalonamentoId == null || nome == null || sugestao == null) {
+            return;
+        }
+
+        if (!Objects.equals(utilizadorId, sugestao.getUtilizadorId())) {
+            return;
+        }
+
+        String casaId = sugestao.getCasaId();
+        LocalTime horaInicio = sugestao.getHoraSugerida();
+        if (casaId == null || horaInicio == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+            return;
+        }
+
+        SugestaoCommandRegistry registry = new SugestaoCommandRegistry();
+        Command comando = registry.criarComando(utilizadorId, sugestao);
+        if (comando == null) {
+            return;
+        }
+
+        if (this.gestorCasas.criarEscalonamento(
+                casaId, escalonamentoId, nome, horaInicio, horaInicio.plusMinutes(1))) {
+            this.gestorCasas.adicionarAcaoInicioAEscalonamento(casaId, escalonamentoId, comando);
+        }
     }
 
     /**
