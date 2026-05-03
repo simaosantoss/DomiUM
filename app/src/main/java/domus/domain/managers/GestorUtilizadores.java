@@ -3,6 +3,8 @@ package domus.domain.managers;
 import domus.domain.core.TipoPermissao;
 import domus.domain.core.Utilizador;
 import domus.domain.history.RegistoInteracao;
+import domus.domain.suggestions.GeradorSugestoesHistorico;
+import domus.domain.suggestions.SugestaoEscalonamento;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -171,6 +173,33 @@ public class GestorUtilizadores implements Serializable {
         Utilizador utilizadorAtualizado = utilizador.clone();
         utilizadorAtualizado.registarInteracao(registo);
         this.utilizadores.put(utilizadorId, utilizadorAtualizado);
+    }
+
+    /**
+     * Gera sugestões de escalonamento a partir do histórico de um utilizador.
+     *
+     * Se o identificador for inválido ou o utilizador não existir, é devolvido
+     * um iterador vazio.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param minimoOcorrencias número mínimo de ocorrências para sugerir
+     * @param limite número máximo de sugestões
+     * @return iterador sobre as sugestões geradas
+     */
+    public Iterator<SugestaoEscalonamento> getSugestoesEscalonamento(String utilizadorId, int minimoOcorrencias, int limite) {
+        if (utilizadorId == null) {
+            return Collections.<SugestaoEscalonamento>emptyList().iterator();
+        }
+
+        Utilizador utilizador = this.utilizadores.get(utilizadorId);
+        if (utilizador == null) {
+            return Collections.<SugestaoEscalonamento>emptyList().iterator();
+        }
+
+        GeradorSugestoesHistorico gerador = new GeradorSugestoesHistorico();
+        return gerador.gerarSugestoesEscalonamento(
+                utilizadorId, utilizador.getIteradorHistorico(), minimoOcorrencias, limite
+        );
     }
 
     /**

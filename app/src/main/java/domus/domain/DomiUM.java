@@ -1,23 +1,5 @@
 package domus.domain;
 
-import domus.domain.automation.Automacao;
-import domus.domain.commands.Command;
-import domus.domain.commands.ComandoDispositivo;
-import domus.domain.conditions.Condicao;
-import domus.domain.core.Casa;
-import domus.domain.core.TipoPermissao;
-import domus.domain.core.Utilizador;
-import domus.domain.devices.OperacaoDispositivo;
-import domus.domain.environment.AmbienteInterior;
-import domus.domain.history.RegistoInteracao;
-import domus.domain.managers.GestorCasas;
-import domus.domain.managers.GestorUtilizadores;
-import domus.domain.scheduling.Escalonamento;
-import domus.domain.scenarios.Cenario;
-import domus.domain.statistics.ResumoCasaConsumo;
-import domus.domain.statistics.ResumoDispositivoUso;
-import domus.domain.statistics.ResumoDivisaoDispositivos;
-import domus.domain.time.RelogioSistema;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,6 +10,26 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Iterator;
 import java.util.Objects;
+
+import domus.domain.automation.Automacao;
+import domus.domain.commands.ComandoDispositivo;
+import domus.domain.commands.Command;
+import domus.domain.conditions.Condicao;
+import domus.domain.core.Casa;
+import domus.domain.core.TipoPermissao;
+import domus.domain.core.Utilizador;
+import domus.domain.devices.OperacaoDispositivo;
+import domus.domain.environment.AmbienteInterior;
+import domus.domain.history.RegistoInteracao;
+import domus.domain.managers.GestorCasas;
+import domus.domain.managers.GestorUtilizadores;
+import domus.domain.scenarios.Cenario;
+import domus.domain.scheduling.Escalonamento;
+import domus.domain.statistics.ResumoCasaConsumo;
+import domus.domain.statistics.ResumoDispositivoUso;
+import domus.domain.statistics.ResumoDivisaoDispositivos;
+import domus.domain.suggestions.SugestaoEscalonamento;
+import domus.domain.time.RelogioSistema;
 
 /**
  * Representa a fachada central do domínio DomusControl.
@@ -90,6 +92,29 @@ public class DomiUM implements Serializable {
      */
     public Iterator<Utilizador> getIteradorUtilizadores() {
         return this.gestorUtilizadores.getIteradorUtilizadores();
+    }
+
+    /**
+     * Obtém sugestões de escalonamento para um utilizador, usando os valores
+     * padrão do domínio.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @return iterador sobre as sugestões encontradas
+     */
+    public Iterator<SugestaoEscalonamento> getSugestoesEscalonamento(String utilizadorId) {
+        return this.gestorUtilizadores.getSugestoesEscalonamento(utilizadorId, 3, 5);
+    }
+
+    /**
+     * Obtém sugestões de escalonamento para um utilizador.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param minimoOcorrencias número mínimo de ocorrências para gerar sugestão
+     * @param limite número máximo de sugestões a devolver
+     * @return iterador sobre as sugestões encontradas
+     */
+    public Iterator<SugestaoEscalonamento> getSugestoesEscalonamento(String utilizadorId, int minimoOcorrencias, int limite) {
+        return this.gestorUtilizadores.getSugestoesEscalonamento(utilizadorId, minimoOcorrencias, limite);
     }
 
     /**
@@ -293,7 +318,7 @@ public class DomiUM implements Serializable {
             }
 
             RegistoInteracao registo = new RegistoInteracao(
-                    this.relogio.getDataHoraAtual(), dispositivoId, acao
+                    this.relogio.getDataHoraAtual(), casaId, dispositivoId, acao
             );
             this.gestorUtilizadores.registarInteracao(utilizadorId, registo);
         }

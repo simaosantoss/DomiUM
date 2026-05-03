@@ -19,6 +19,11 @@ public final class RegistoInteracao implements Serializable {
     private final LocalDateTime dataHora;
 
     /**
+     * Identificador da casa onde a interação ocorreu.
+     */
+    private final String casaId;
+
+    /**
      * Identificador do dispositivo envolvido na interação.
      */
     private final String dispositivoId;
@@ -29,14 +34,16 @@ public final class RegistoInteracao implements Serializable {
     private final String acao;
 
     /**
-     * Cria um novo registo de interação.
+     * Cria um novo registo de interação com indicação da casa.
      *
      * @param dataHora instante em que a interação aconteceu
+     * @param casaId identificador da casa onde ocorreu a interação
      * @param dispositivoId identificador do dispositivo envolvido
      * @param acao descrição da ação realizada
      */
-    public RegistoInteracao(LocalDateTime dataHora, String dispositivoId, String acao) {
+    public RegistoInteracao(LocalDateTime dataHora, String casaId, String dispositivoId, String acao) {
         this.dataHora = dataHora;
+        this.casaId = casaId;
         this.dispositivoId = dispositivoId;
         this.acao = acao;
     }
@@ -48,6 +55,15 @@ public final class RegistoInteracao implements Serializable {
      */
     public LocalDateTime getDataHora() {
         return this.dataHora;
+    }
+
+    /**
+     * Dá acesso ao identificador da casa associada ao registo.
+     *
+     * @return identificador da casa
+     */
+    public String getCasaId() {
+        return this.casaId;
     }
 
     /**
@@ -84,6 +100,7 @@ public final class RegistoInteracao implements Serializable {
         }
         RegistoInteracao that = (RegistoInteracao) o;
         return Objects.equals(this.dataHora, that.dataHora)
+                && Objects.equals(this.casaId, that.casaId)
                 && Objects.equals(this.dispositivoId, that.dispositivoId)
                 && Objects.equals(this.acao, that.acao);
     }
@@ -96,7 +113,7 @@ public final class RegistoInteracao implements Serializable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.dataHora, this.dispositivoId, this.acao);
+        return Objects.hash(this.dataHora, this.casaId, this.dispositivoId, this.acao);
     }
 
     /**
@@ -108,6 +125,7 @@ public final class RegistoInteracao implements Serializable {
     public String toString() {
         return "RegistoInteracao{"
                 + "dataHora=" + this.dataHora
+                + ", casaId='" + this.casaId + '\''
                 + ", dispositivoId='" + this.dispositivoId + '\''
                 + ", acao='" + this.acao + '\''
                 + '}';
@@ -119,6 +137,6 @@ public final class RegistoInteracao implements Serializable {
      * @return novo registo com o mesmo conteúdo
      */
     public RegistoInteracao clone() {
-        return new RegistoInteracao(this.dataHora, this.dispositivoId, this.acao);
+        return new RegistoInteracao(this.dataHora, this.casaId, this.dispositivoId, this.acao);
     }
 }
