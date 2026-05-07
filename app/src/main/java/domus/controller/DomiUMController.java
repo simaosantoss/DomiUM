@@ -8,10 +8,16 @@ import domus.domain.conditions.CondicaoLuminosidade;
 import domus.domain.conditions.CondicaoTemperatura;
 import domus.domain.core.Casa;
 import domus.domain.core.Utilizador;
+import domus.domain.statistics.ResumoCasaConsumo;
+import domus.domain.statistics.ResumoDispositivoUso;
+import domus.domain.statistics.ResumoDivisaoDispositivos;
+import domus.domain.suggestions.SugestaoEscalonamento;
 import domus.ui.ConsoleView;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Controller da aplicação de consola DomusControl.
@@ -110,6 +116,15 @@ public class DomiUMController {
                 break;
             case 15:
                 atualizarAmbienteDivisao();
+                break;
+            case 16:
+                menuEstatisticas();
+                break;
+            case 17:
+                menuSugestoes();
+                break;
+            case 18:
+                criarEstadoDemonstracao();
                 break;
             case 0:
                 sair();
@@ -602,6 +617,269 @@ public class DomiUMController {
                 utilizadorId, casaId, divisaoNome, temperatura, humidade, luminosidade
         );
         this.view.mostrarMensagem("Ambiente atualizado.");
+    }
+
+    /**
+     * Apresenta e processa o submenu de estatísticas.
+     */
+    private void menuEstatisticas() {
+        boolean voltar = false;
+        while (!voltar && this.emExecucao) {
+            this.view.mostrarMenuEstatisticas();
+            int opcao = this.view.lerOpcao();
+            switch (opcao) {
+                case 1:
+                    mostrarCasaMaiorConsumo();
+                    break;
+                case 2:
+                    mostrarTopDispositivosPorTempo();
+                    break;
+                case 3:
+                    mostrarTopDispositivosPorAtivacoes();
+                    break;
+                case 4:
+                    mostrarTopDivisoesComMaisDispositivos();
+                    break;
+                case 5:
+                    mostrarResumoConsumoCasas();
+                    break;
+                case 0:
+                    voltar = true;
+                    break;
+                default:
+                    this.view.mostrarErro("Opção desconhecida.");
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Mostra a casa com maior consumo total.
+     */
+    private void mostrarCasaMaiorConsumo() {
+        ResumoCasaConsumo resumo = this.model.getCasaMaiorConsumo();
+        if (resumo == null) {
+            this.view.mostrarMensagem("Não existem casas registadas.");
+            return;
+        }
+
+        this.view.mostrarMensagem(resumo.toString());
+    }
+
+    /**
+     * Mostra os dispositivos mais utilizados por tempo ligado numa casa.
+     */
+    private void mostrarTopDispositivosPorTempo() {
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        Iterator<ResumoDispositivoUso> iterador = this.model.getTop3DispositivosPorTempo(casaId);
+        boolean encontrou = false;
+
+        while (iterador.hasNext()) {
+            encontrou = true;
+            this.view.mostrarMensagem(iterador.next().toString());
+        }
+
+        if (!encontrou) {
+            this.view.mostrarMensagem("Não existem resultados para a casa indicada.");
+        }
+    }
+
+    /**
+     * Mostra os dispositivos mais utilizados por número de ativações numa casa.
+     */
+    private void mostrarTopDispositivosPorAtivacoes() {
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        Iterator<ResumoDispositivoUso> iterador = this.model.getTop3DispositivosPorAtivacoes(casaId);
+        boolean encontrou = false;
+
+        while (iterador.hasNext()) {
+            encontrou = true;
+            this.view.mostrarMensagem(iterador.next().toString());
+        }
+
+        if (!encontrou) {
+            this.view.mostrarMensagem("Não existem resultados para a casa indicada.");
+        }
+    }
+
+    /**
+     * Mostra as divisões com mais dispositivos.
+     */
+    private void mostrarTopDivisoesComMaisDispositivos() {
+        Iterator<ResumoDivisaoDispositivos> iterador = this.model.getTop3DivisoesComMaisDispositivos();
+        boolean encontrou = false;
+
+        while (iterador.hasNext()) {
+            encontrou = true;
+            this.view.mostrarMensagem(iterador.next().toString());
+        }
+
+        if (!encontrou) {
+            this.view.mostrarMensagem("Não existem divisões registadas.");
+        }
+    }
+
+    /**
+     * Mostra o resumo textual de consumo das casas.
+     */
+    private void mostrarResumoConsumoCasas() {
+        this.view.mostrarMensagem(this.model.getResumoConsumoCasas());
+    }
+
+    /**
+     * Apresenta e processa o submenu de sugestões.
+     */
+    private void menuSugestoes() {
+        boolean voltar = false;
+        while (!voltar && this.emExecucao) {
+            this.view.mostrarMenuSugestoes();
+            int opcao = this.view.lerOpcao();
+            switch (opcao) {
+                case 1:
+                    listarSugestoesEscalonamento();
+                    break;
+                case 2:
+                    aceitarSugestaoEscalonamento();
+                    break;
+                case 0:
+                    voltar = true;
+                    break;
+                default:
+                    this.view.mostrarErro("Opção desconhecida.");
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Lista as sugestões de escalonamento de um utilizador.
+     */
+    private void listarSugestoesEscalonamento() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        Iterator<SugestaoEscalonamento> iterador = this.model.getSugestoesEscalonamento(utilizadorId);
+        boolean encontrou = false;
+        int numero = 1;
+
+        while (iterador.hasNext()) {
+            encontrou = true;
+            this.view.mostrarMensagem(numero + ". " + iterador.next().toString());
+            numero++;
+        }
+
+        if (!encontrou) {
+            this.view.mostrarMensagem("Não existem sugestões de escalonamento.");
+        }
+    }
+
+    /**
+     * Aceita uma sugestão de escalonamento de um utilizador.
+     */
+    private void aceitarSugestaoEscalonamento() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        List<SugestaoEscalonamento> sugestoes = obterSugestoesEscalonamento(utilizadorId);
+
+        if (sugestoes.isEmpty()) {
+            this.view.mostrarMensagem("Não existem sugestões de escalonamento.");
+            return;
+        }
+
+        for (int i = 0; i < sugestoes.size(); i++) {
+            this.view.mostrarMensagem((i + 1) + ". " + sugestoes.get(i).toString());
+        }
+
+        int escolha = this.view.lerInteiro("Número da sugestão a aceitar: ");
+        if (escolha < 1 || escolha > sugestoes.size()) {
+            this.view.mostrarErro("Sugestão inválida.");
+            return;
+        }
+
+        String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
+        String nome = this.view.lerTexto("Nome do escalonamento: ");
+
+        this.model.aceitarSugestaoEscalonamento(
+                utilizadorId, escalonamentoId, nome, sugestoes.get(escolha - 1)
+        );
+        this.view.mostrarMensagem("Sugestão aceite.");
+    }
+
+    /**
+     * Obtém as sugestões de escalonamento de um utilizador para uma lista local.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @return lista local de sugestões
+     */
+    private List<SugestaoEscalonamento> obterSugestoesEscalonamento(String utilizadorId) {
+        List<SugestaoEscalonamento> sugestoes = new ArrayList<SugestaoEscalonamento>();
+        Iterator<SugestaoEscalonamento> iterador = this.model.getSugestoesEscalonamento(utilizadorId);
+
+        while (iterador.hasNext()) {
+            sugestoes.add(iterador.next());
+        }
+
+        return sugestoes;
+    }
+
+    /**
+     * Cria um pequeno estado de demonstração no model atual.
+     */
+    private void criarEstadoDemonstracao() {
+        String utilizadorId = "demo_u1";
+        String casaId = "demo_c1";
+
+        this.model.criarUtilizador(utilizadorId, "Utilizador Demonstração");
+        this.model.criarCasa(utilizadorId, casaId, "Casa Demonstração");
+        this.model.adicionarDivisao(utilizadorId, casaId, "Sala");
+        this.model.adicionarDivisao(utilizadorId, casaId, "Quarto");
+        this.model.adicionarDivisao(utilizadorId, casaId, "Garagem");
+
+        this.model.adicionarDispositivo(
+                utilizadorId, casaId, "Sala", "lampada", "demo_l1",
+                "Philips", "Hue", 10.0
+        );
+        this.model.adicionarDispositivo(
+                utilizadorId, casaId, "Quarto", "lampada", "demo_l2",
+                "Philips", "Hue", 8.0
+        );
+        this.model.adicionarDispositivo(
+                utilizadorId, casaId, "Garagem", "lampada", "demo_l3",
+                "Philips", "Hue", 6.0
+        );
+
+        this.model.criarCenario(utilizadorId, casaId, "demo_cenario_noite", "Cenário Noite");
+        this.model.adicionarComandoACenario(
+                utilizadorId, casaId, "demo_cenario_noite",
+                new ComandoLigar(utilizadorId, casaId, "demo_l1")
+        );
+        this.model.adicionarComandoACenario(
+                utilizadorId, casaId, "demo_cenario_noite",
+                new ComandoDesligar(utilizadorId, casaId, "demo_l1")
+        );
+
+        this.model.criarEscalonamento(
+                utilizadorId, casaId, "demo_esc_manha", "Luz da manhã",
+                LocalTime.of(8, 0), LocalTime.of(8, 1)
+        );
+        this.model.adicionarAcaoInicioAEscalonamento(
+                utilizadorId, casaId, "demo_esc_manha",
+                new ComandoLigar(utilizadorId, casaId, "demo_l2")
+        );
+
+        this.model.criarAutomacao(
+                utilizadorId, casaId, "demo_auto_luz", "Ligar luz com pouca luminosidade",
+                "Sala", new CondicaoLuminosidade(30.0, false)
+        );
+        this.model.adicionarAcaoAAutomacao(
+                utilizadorId, casaId, "demo_auto_luz",
+                new ComandoLigar(utilizadorId, casaId, "demo_l1")
+        );
+
+        for (int i = 0; i < 3; i++) {
+            this.model.executarComando(new ComandoLigar(utilizadorId, casaId, "demo_l1"));
+        }
+
+        this.view.mostrarMensagem(
+                "Estado de demonstração criado. Pode agora consultar estatísticas, sugestões, cenários, automações e escalonamentos."
+        );
     }
 
     /**

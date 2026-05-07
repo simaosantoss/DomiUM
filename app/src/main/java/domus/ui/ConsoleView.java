@@ -40,6 +40,9 @@ public class ConsoleView {
         System.out.println("13. Menu de automações");
         System.out.println("14. Avançar tempo");
         System.out.println("15. Atualizar ambiente de divisão");
+        System.out.println("16. Menu de estatísticas");
+        System.out.println("17. Menu de sugestões");
+        System.out.println("18. Criar estado de demonstração");
         System.out.println("0. Sair");
     }
 
@@ -81,6 +84,31 @@ public class ConsoleView {
         System.out.println("3. Criar automação por luminosidade");
         System.out.println("4. Adicionar ação ligar a automação");
         System.out.println("5. Adicionar ação desligar a automação");
+        System.out.println("0. Voltar");
+    }
+
+    /**
+     * Mostra o submenu de estatísticas.
+     */
+    public void mostrarMenuEstatisticas() {
+        System.out.println();
+        System.out.println("=== Estatísticas ===");
+        System.out.println("1. Casa com maior consumo");
+        System.out.println("2. Top 3 dispositivos por tempo ligado");
+        System.out.println("3. Top 3 dispositivos por número de ativações");
+        System.out.println("4. Top 3 divisões com mais dispositivos");
+        System.out.println("5. Resumo de consumo das casas");
+        System.out.println("0. Voltar");
+    }
+
+    /**
+     * Mostra o submenu de sugestões.
+     */
+    public void mostrarMenuSugestoes() {
+        System.out.println();
+        System.out.println("=== Sugestões ===");
+        System.out.println("1. Listar sugestões de escalonamento");
+        System.out.println("2. Aceitar sugestão de escalonamento");
         System.out.println("0. Voltar");
     }
 
