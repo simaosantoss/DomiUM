@@ -35,7 +35,53 @@ public class ConsoleView {
         System.out.println("8. Listar utilizadores");
         System.out.println("9. Guardar estado");
         System.out.println("10. Carregar estado");
+        System.out.println("11. Menu de cenários");
+        System.out.println("12. Menu de escalonamentos");
+        System.out.println("13. Menu de automações");
+        System.out.println("14. Avançar tempo");
+        System.out.println("15. Atualizar ambiente de divisão");
         System.out.println("0. Sair");
+    }
+
+    /**
+     * Mostra o submenu de cenários.
+     */
+    public void mostrarMenuCenarios() {
+        System.out.println();
+        System.out.println("=== Cenários ===");
+        System.out.println("1. Criar cenário");
+        System.out.println("2. Adicionar comando ligar a cenário");
+        System.out.println("3. Adicionar comando desligar a cenário");
+        System.out.println("4. Executar cenário");
+        System.out.println("0. Voltar");
+    }
+
+    /**
+     * Mostra o submenu de escalonamentos.
+     */
+    public void mostrarMenuEscalonamentos() {
+        System.out.println();
+        System.out.println("=== Escalonamentos ===");
+        System.out.println("1. Criar escalonamento");
+        System.out.println("2. Adicionar ação de início: ligar dispositivo");
+        System.out.println("3. Adicionar ação de início: desligar dispositivo");
+        System.out.println("4. Adicionar ação de fim: ligar dispositivo");
+        System.out.println("5. Adicionar ação de fim: desligar dispositivo");
+        System.out.println("0. Voltar");
+    }
+
+    /**
+     * Mostra o submenu de automações.
+     */
+    public void mostrarMenuAutomacoes() {
+        System.out.println();
+        System.out.println("=== Automações ===");
+        System.out.println("1. Criar automação por temperatura");
+        System.out.println("2. Criar automação por humidade");
+        System.out.println("3. Criar automação por luminosidade");
+        System.out.println("4. Adicionar ação ligar a automação");
+        System.out.println("5. Adicionar ação desligar a automação");
+        System.out.println("0. Voltar");
     }
 
     /**

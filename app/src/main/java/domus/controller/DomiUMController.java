@@ -3,9 +3,14 @@ package domus.controller;
 import domus.domain.DomiUM;
 import domus.domain.commands.ComandoDesligar;
 import domus.domain.commands.ComandoLigar;
+import domus.domain.conditions.CondicaoHumidade;
+import domus.domain.conditions.CondicaoLuminosidade;
+import domus.domain.conditions.CondicaoTemperatura;
 import domus.domain.core.Casa;
 import domus.domain.core.Utilizador;
 import domus.ui.ConsoleView;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.Iterator;
 
 /**
@@ -90,6 +95,21 @@ public class DomiUMController {
                 break;
             case 10:
                 carregarEstado();
+                break;
+            case 11:
+                menuCenarios();
+                break;
+            case 12:
+                menuEscalonamentos();
+                break;
+            case 13:
+                menuAutomacoes();
+                break;
+            case 14:
+                avancarTempo();
+                break;
+            case 15:
+                atualizarAmbienteDivisao();
                 break;
             case 0:
                 sair();
@@ -231,6 +251,393 @@ public class DomiUMController {
 
         this.model = DomiUM.carregarEstado(caminho);
         this.view.mostrarMensagem("Estado carregado.");
+    }
+
+    /**
+     * Apresenta e processa o submenu de cenários.
+     */
+    private void menuCenarios() {
+        boolean voltar = false;
+        while (!voltar && this.emExecucao) {
+            this.view.mostrarMenuCenarios();
+            int opcao = this.view.lerOpcao();
+            switch (opcao) {
+                case 1:
+                    criarCenario();
+                    break;
+                case 2:
+                    adicionarComandoLigarACenario();
+                    break;
+                case 3:
+                    adicionarComandoDesligarACenario();
+                    break;
+                case 4:
+                    executarCenario();
+                    break;
+                case 0:
+                    voltar = true;
+                    break;
+                default:
+                    this.view.mostrarErro("Opção desconhecida.");
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Cria um cenário numa casa.
+     */
+    private void criarCenario() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String cenarioId = this.view.lerTexto("Identificador do cenário: ");
+        String nome = this.view.lerTexto("Nome do cenário: ");
+
+        this.model.criarCenario(utilizadorId, casaId, cenarioId, nome);
+        this.view.mostrarMensagem("Cenário criado.");
+    }
+
+    /**
+     * Adiciona um comando de ligar a um cenário.
+     */
+    private void adicionarComandoLigarACenario() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String cenarioId = this.view.lerTexto("Identificador do cenário: ");
+        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
+
+        this.model.adicionarComandoACenario(
+                utilizadorId, casaId, cenarioId,
+                new ComandoLigar(utilizadorId, casaId, dispositivoId)
+        );
+        this.view.mostrarMensagem("Comando adicionado ao cenário.");
+    }
+
+    /**
+     * Adiciona um comando de desligar a um cenário.
+     */
+    private void adicionarComandoDesligarACenario() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String cenarioId = this.view.lerTexto("Identificador do cenário: ");
+        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
+
+        this.model.adicionarComandoACenario(
+                utilizadorId, casaId, cenarioId,
+                new ComandoDesligar(utilizadorId, casaId, dispositivoId)
+        );
+        this.view.mostrarMensagem("Comando adicionado ao cenário.");
+    }
+
+    /**
+     * Executa um cenário.
+     */
+    private void executarCenario() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String cenarioId = this.view.lerTexto("Identificador do cenário: ");
+
+        this.model.executarCenario(utilizadorId, casaId, cenarioId);
+        this.view.mostrarMensagem("Cenário executado.");
+    }
+
+    /**
+     * Apresenta e processa o submenu de escalonamentos.
+     */
+    private void menuEscalonamentos() {
+        boolean voltar = false;
+        while (!voltar && this.emExecucao) {
+            this.view.mostrarMenuEscalonamentos();
+            int opcao = this.view.lerOpcao();
+            switch (opcao) {
+                case 1:
+                    criarEscalonamento();
+                    break;
+                case 2:
+                    adicionarAcaoInicioLigarAEscalonamento();
+                    break;
+                case 3:
+                    adicionarAcaoInicioDesligarAEscalonamento();
+                    break;
+                case 4:
+                    adicionarAcaoFimLigarAEscalonamento();
+                    break;
+                case 5:
+                    adicionarAcaoFimDesligarAEscalonamento();
+                    break;
+                case 0:
+                    voltar = true;
+                    break;
+                default:
+                    this.view.mostrarErro("Opção desconhecida.");
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Cria um escalonamento numa casa.
+     */
+    private void criarEscalonamento() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
+        String nome = this.view.lerTexto("Nome do escalonamento: ");
+        LocalTime horaInicio = lerHora("Hora de início (HH:mm): ");
+        LocalTime horaFim = lerHora("Hora de fim (HH:mm): ");
+
+        this.model.criarEscalonamento(utilizadorId, casaId, escalonamentoId, nome, horaInicio, horaFim);
+        this.view.mostrarMensagem("Escalonamento criado.");
+    }
+
+    /**
+     * Adiciona uma ação de início para ligar dispositivo.
+     */
+    private void adicionarAcaoInicioLigarAEscalonamento() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
+        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
+
+        this.model.adicionarAcaoInicioAEscalonamento(
+                utilizadorId, casaId, escalonamentoId,
+                new ComandoLigar(utilizadorId, casaId, dispositivoId)
+        );
+        this.view.mostrarMensagem("Ação de início adicionada.");
+    }
+
+    /**
+     * Adiciona uma ação de início para desligar dispositivo.
+     */
+    private void adicionarAcaoInicioDesligarAEscalonamento() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
+        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
+
+        this.model.adicionarAcaoInicioAEscalonamento(
+                utilizadorId, casaId, escalonamentoId,
+                new ComandoDesligar(utilizadorId, casaId, dispositivoId)
+        );
+        this.view.mostrarMensagem("Ação de início adicionada.");
+    }
+
+    /**
+     * Adiciona uma ação de fim para ligar dispositivo.
+     */
+    private void adicionarAcaoFimLigarAEscalonamento() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
+        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
+
+        this.model.adicionarAcaoFimAEscalonamento(
+                utilizadorId, casaId, escalonamentoId,
+                new ComandoLigar(utilizadorId, casaId, dispositivoId)
+        );
+        this.view.mostrarMensagem("Ação de fim adicionada.");
+    }
+
+    /**
+     * Adiciona uma ação de fim para desligar dispositivo.
+     */
+    private void adicionarAcaoFimDesligarAEscalonamento() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
+        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
+
+        this.model.adicionarAcaoFimAEscalonamento(
+                utilizadorId, casaId, escalonamentoId,
+                new ComandoDesligar(utilizadorId, casaId, dispositivoId)
+        );
+        this.view.mostrarMensagem("Ação de fim adicionada.");
+    }
+
+    /**
+     * Apresenta e processa o submenu de automações.
+     */
+    private void menuAutomacoes() {
+        boolean voltar = false;
+        while (!voltar && this.emExecucao) {
+            this.view.mostrarMenuAutomacoes();
+            int opcao = this.view.lerOpcao();
+            switch (opcao) {
+                case 1:
+                    criarAutomacaoTemperatura();
+                    break;
+                case 2:
+                    criarAutomacaoHumidade();
+                    break;
+                case 3:
+                    criarAutomacaoLuminosidade();
+                    break;
+                case 4:
+                    adicionarAcaoLigarAAutomacao();
+                    break;
+                case 5:
+                    adicionarAcaoDesligarAAutomacao();
+                    break;
+                case 0:
+                    voltar = true;
+                    break;
+                default:
+                    this.view.mostrarErro("Opção desconhecida.");
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Cria uma automação por temperatura.
+     */
+    private void criarAutomacaoTemperatura() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String automacaoId = this.view.lerTexto("Identificador da automação: ");
+        String nome = this.view.lerTexto("Nome da automação: ");
+        String divisaoNome = this.view.lerTexto("Nome da divisão: ");
+        double limite = this.view.lerDouble("Limite de temperatura: ");
+        boolean maiorQue = lerMaiorQue();
+
+        this.model.criarAutomacao(
+                utilizadorId, casaId, automacaoId, nome, divisaoNome,
+                new CondicaoTemperatura(limite, maiorQue)
+        );
+        this.view.mostrarMensagem("Automação criada.");
+    }
+
+    /**
+     * Cria uma automação por humidade.
+     */
+    private void criarAutomacaoHumidade() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String automacaoId = this.view.lerTexto("Identificador da automação: ");
+        String nome = this.view.lerTexto("Nome da automação: ");
+        String divisaoNome = this.view.lerTexto("Nome da divisão: ");
+        double limite = this.view.lerDouble("Limite de humidade: ");
+        boolean maiorQue = lerMaiorQue();
+
+        this.model.criarAutomacao(
+                utilizadorId, casaId, automacaoId, nome, divisaoNome,
+                new CondicaoHumidade(limite, maiorQue)
+        );
+        this.view.mostrarMensagem("Automação criada.");
+    }
+
+    /**
+     * Cria uma automação por luminosidade.
+     */
+    private void criarAutomacaoLuminosidade() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String automacaoId = this.view.lerTexto("Identificador da automação: ");
+        String nome = this.view.lerTexto("Nome da automação: ");
+        String divisaoNome = this.view.lerTexto("Nome da divisão: ");
+        double limite = this.view.lerDouble("Limite de luminosidade: ");
+        boolean maiorQue = lerMaiorQue();
+
+        this.model.criarAutomacao(
+                utilizadorId, casaId, automacaoId, nome, divisaoNome,
+                new CondicaoLuminosidade(limite, maiorQue)
+        );
+        this.view.mostrarMensagem("Automação criada.");
+    }
+
+    /**
+     * Adiciona uma ação de ligar a uma automação.
+     */
+    private void adicionarAcaoLigarAAutomacao() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String automacaoId = this.view.lerTexto("Identificador da automação: ");
+        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
+
+        this.model.adicionarAcaoAAutomacao(
+                utilizadorId, casaId, automacaoId,
+                new ComandoLigar(utilizadorId, casaId, dispositivoId)
+        );
+        this.view.mostrarMensagem("Ação adicionada à automação.");
+    }
+
+    /**
+     * Adiciona uma ação de desligar a uma automação.
+     */
+    private void adicionarAcaoDesligarAAutomacao() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String automacaoId = this.view.lerTexto("Identificador da automação: ");
+        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
+
+        this.model.adicionarAcaoAAutomacao(
+                utilizadorId, casaId, automacaoId,
+                new ComandoDesligar(utilizadorId, casaId, dispositivoId)
+        );
+        this.view.mostrarMensagem("Ação adicionada à automação.");
+    }
+
+    /**
+     * Avança o tempo simulado do domínio.
+     */
+    private void avancarTempo() {
+        int minutos = this.view.lerInteiro("Minutos a avançar: ");
+
+        this.model.avancarTempo(minutos);
+        this.view.mostrarMensagem("Tempo avançado.");
+    }
+
+    /**
+     * Atualiza o ambiente interior de uma divisão.
+     */
+    private void atualizarAmbienteDivisao() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String divisaoNome = this.view.lerTexto("Nome da divisão: ");
+        double temperatura = this.view.lerDouble("Temperatura: ");
+        double humidade = this.view.lerDouble("Humidade: ");
+        double luminosidade = this.view.lerDouble("Luminosidade: ");
+
+        this.model.atualizarAmbienteDivisao(
+                utilizadorId, casaId, divisaoNome, temperatura, humidade, luminosidade
+        );
+        this.view.mostrarMensagem("Ambiente atualizado.");
+    }
+
+    /**
+     * Lê uma hora no formato HH:mm.
+     *
+     * @param mensagem mensagem apresentada antes da leitura
+     * @return hora lida
+     */
+    private LocalTime lerHora(String mensagem) {
+        while (true) {
+            String texto = this.view.lerTexto(mensagem);
+            try {
+                return LocalTime.parse(texto);
+            } catch (DateTimeParseException e) {
+                this.view.mostrarErro("Hora inválida. Use o formato HH:mm.");
+            }
+        }
+    }
+
+    /**
+     * Lê o sentido de comparação de uma condição.
+     *
+     * @return {@code true} se a condição for maior que o limite
+     */
+    private boolean lerMaiorQue() {
+        while (true) {
+            String texto = this.view.lerTexto("A condição é maior que o limite? (s/n): ");
+            if ("s".equalsIgnoreCase(texto) || "sim".equalsIgnoreCase(texto)) {
+                return true;
+            }
+            if ("n".equalsIgnoreCase(texto) || "nao".equalsIgnoreCase(texto)
+                    || "não".equalsIgnoreCase(texto)) {
+                return false;
+            }
+            this.view.mostrarErro("Resposta inválida. Introduza s ou n.");
+        }
     }
 
     /**
