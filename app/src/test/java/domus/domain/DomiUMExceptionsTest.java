@@ -1,11 +1,22 @@
 package domus.domain;
 
 import domus.domain.commands.ComandoLigar;
+import domus.domain.conditions.CondicaoLuminosidade;
 import domus.domain.core.Utilizador;
+import domus.domain.exceptions.CasaJaExisteException;
+import domus.domain.exceptions.CenarioJaExisteException;
+import domus.domain.exceptions.CenarioNaoExisteException;
 import domus.domain.exceptions.DispositivoNaoExisteException;
 import domus.domain.exceptions.DomusException;
+import domus.domain.exceptions.DivisaoJaExisteException;
+import domus.domain.exceptions.DivisaoNaoExisteException;
+import domus.domain.exceptions.EscalonamentoJaExisteException;
 import domus.domain.exceptions.SemPermissaoException;
+import domus.domain.exceptions.TipoDispositivoInvalidoException;
+import domus.domain.exceptions.UtilizadorJaExisteException;
+import domus.domain.exceptions.UtilizadorNaoExisteException;
 import domus.domain.history.RegistoInteracao;
+import java.time.LocalTime;
 import java.util.Iterator;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +28,124 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Testes de regressão das exceções de domínio expostas pela fachada DomiUM.
  */
 class DomiUMExceptionsTest {
+
+    @Test
+    void criarUtilizadorDuplicadoLancaExcecao() throws DomusException {
+        DomiUM domium = new DomiUM();
+        domium.criarUtilizador("u1", "Utilizador");
+
+        assertThrows(UtilizadorJaExisteException.class, () ->
+                domium.criarUtilizador("u1", "Outro Utilizador")
+        );
+    }
+
+    @Test
+    void criarCasaComUtilizadorInexistenteLancaExcecao() {
+        DomiUM domium = new DomiUM();
+
+        assertThrows(UtilizadorNaoExisteException.class, () ->
+                domium.criarCasa("u1", "c1", "Casa")
+        );
+    }
+
+    @Test
+    void criarCasaDuplicadaLancaExcecao() throws DomusException {
+        DomiUM domium = criarDominioComUtilizadorECasa("u1", "c1");
+
+        assertThrows(CasaJaExisteException.class, () ->
+                domium.criarCasa("u1", "c1", "Casa Repetida")
+        );
+    }
+
+    @Test
+    void adicionarDivisaoSemPermissaoLancaExcecao() throws DomusException {
+        DomiUM domium = criarDominioComUtilizadorECasa("admin", "c1");
+        domium.criarUtilizador("u2", "Utilizador Sem Permissao");
+
+        assertThrows(SemPermissaoException.class, () ->
+                domium.adicionarDivisao("u2", "c1", "Sala")
+        );
+    }
+
+    @Test
+    void adicionarDivisaoDuplicadaLancaExcecao() throws DomusException {
+        DomiUM domium = criarDominioComUtilizadorCasaEDivisao("u1", "c1", "Sala");
+
+        assertThrows(DivisaoJaExisteException.class, () ->
+                domium.adicionarDivisao("u1", "c1", "Sala")
+        );
+    }
+
+    @Test
+    void adicionarDispositivoEmDivisaoInexistenteLancaExcecao() throws DomusException {
+        DomiUM domium = criarDominioComUtilizadorECasa("u1", "c1");
+
+        assertThrows(DivisaoNaoExisteException.class, () ->
+                domium.adicionarDispositivo(
+                        "u1", "c1", "Sala", "lampada", "l1",
+                        "Philips", "Hue", 10.0
+                )
+        );
+    }
+
+    @Test
+    void adicionarDispositivoComTipoInvalidoLancaExcecao() throws DomusException {
+        DomiUM domium = criarDominioComUtilizadorCasaEDivisao("u1", "c1", "Sala");
+
+        assertThrows(TipoDispositivoInvalidoException.class, () ->
+                domium.adicionarDispositivo(
+                        "u1", "c1", "Sala", "tipo_inexistente", "d1",
+                        "Marca", "Modelo", 10.0
+                )
+        );
+    }
+
+    @Test
+    void executarCenarioInexistenteLancaExcecao() throws DomusException {
+        DomiUM domium = criarDominioComUtilizadorECasa("u1", "c1");
+
+        assertThrows(CenarioNaoExisteException.class, () ->
+                domium.executarCenario("u1", "c1", "noite")
+        );
+    }
+
+    @Test
+    void criarCenarioDuplicadoLancaExcecao() throws DomusException {
+        DomiUM domium = criarDominioComUtilizadorECasa("u1", "c1");
+        domium.criarCenario("u1", "c1", "noite", "Modo Noite");
+
+        assertThrows(CenarioJaExisteException.class, () ->
+                domium.criarCenario("u1", "c1", "noite", "Modo Noite Repetido")
+        );
+    }
+
+    @Test
+    void criarEscalonamentoDuplicadoLancaExcecao() throws DomusException {
+        DomiUM domium = criarDominioComUtilizadorECasa("u1", "c1");
+        domium.criarEscalonamento(
+                "u1", "c1", "esc1", "Escalonamento",
+                LocalTime.of(8, 0), LocalTime.of(8, 1)
+        );
+
+        assertThrows(EscalonamentoJaExisteException.class, () ->
+                domium.criarEscalonamento(
+                        "u1", "c1", "esc1", "Escalonamento Repetido",
+                        LocalTime.of(9, 0), LocalTime.of(9, 1)
+                )
+        );
+    }
+
+    @Test
+    void criarAutomacaoEmDivisaoInexistenteLancaExcecao() throws DomusException {
+        DomiUM domium = criarDominioComUtilizadorECasa("u1", "c1");
+
+        assertThrows(DivisaoNaoExisteException.class, () ->
+                domium.criarAutomacao(
+                        "u1", "c1", "auto1", "Automação",
+                        "Sala", new CondicaoLuminosidade(30.0, false)
+                )
+        );
+    }
 
     @Test
     void executarComandoValidadoComDispositivoInexistenteLancaExcecao() throws DomusException {
@@ -49,6 +178,39 @@ class DomiUMExceptionsTest {
         Utilizador utilizador = domium.getUtilizador("u1");
         assertNotNull(utilizador);
         assertTrue(historicoContemAcao(utilizador, "Ligou o dispositivo"));
+    }
+
+    /**
+     * Cria um domínio mínimo com utilizador e casa.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @return fachada preparada para os testes
+     * @throws DomusException se a preparação falhar
+     */
+    private DomiUM criarDominioComUtilizadorECasa(String utilizadorId, String casaId)
+            throws DomusException {
+        DomiUM domium = new DomiUM();
+        domium.criarUtilizador(utilizadorId, "Utilizador");
+        domium.criarCasa(utilizadorId, casaId, "Casa");
+        return domium;
+    }
+
+    /**
+     * Cria um domínio mínimo com utilizador, casa e divisão.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param divisaoNome nome da divisão
+     * @return fachada preparada para os testes
+     * @throws DomusException se a preparação falhar
+     */
+    private DomiUM criarDominioComUtilizadorCasaEDivisao(String utilizadorId, String casaId,
+                                                         String divisaoNome)
+            throws DomusException {
+        DomiUM domium = criarDominioComUtilizadorECasa(utilizadorId, casaId);
+        domium.adicionarDivisao(utilizadorId, casaId, divisaoNome);
+        return domium;
     }
 
     /**
