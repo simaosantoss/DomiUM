@@ -149,9 +149,10 @@ public class DomiUM implements Serializable {
      * @param escalonamentoId identificador do escalonamento a criar
      * @param nome nome do escalonamento
      * @param sugestao sugestão a aceitar
+     * @throws DomusException se a sugestão não puder ser aceite
      */
     public void aceitarSugestaoEscalonamento(String utilizadorId, String escalonamentoId,
-                                             String nome, SugestaoEscalonamento sugestao) throws OperacaoInvalidaException, SemPermissaoException {
+                                             String nome, SugestaoEscalonamento sugestao) throws DomusException {
         if (utilizadorId == null || escalonamentoId == null || nome == null || sugestao == null) {
             return;
         }
@@ -172,16 +173,12 @@ public class DomiUM implements Serializable {
         SugestaoCommandRegistry registry = new SugestaoCommandRegistry();
         Command comando = registry.criarComando(utilizadorId, sugestao);
         if (comando == null) {
-            return;
+            throw new OperacaoInvalidaException("A sugestão não corresponde a uma ação suportada.");
         }
 
-        try {
-            this.gestorCasas.criarEscalonamento(
-                    casaId, escalonamentoId, nome, horaInicio, horaInicio.plusMinutes(1));
-            this.gestorCasas.adicionarAcaoInicioAEscalonamento(casaId, escalonamentoId, comando);
-        } catch (domus.domain.exceptions.DomusException e) {
-            // sugestão inválida ou escalonamento já existe — ignorar silenciosamente
-        }
+        this.gestorCasas.criarEscalonamento(
+                casaId, escalonamentoId, nome, horaInicio, horaInicio.plusMinutes(1));
+        this.gestorCasas.adicionarAcaoInicioAEscalonamento(casaId, escalonamentoId, comando);
     }
 
     /**

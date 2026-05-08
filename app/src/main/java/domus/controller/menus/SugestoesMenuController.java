@@ -1,6 +1,7 @@
 package domus.controller.menus;
 
 import domus.domain.DomiUM;
+import domus.domain.exceptions.DomusException;
 import domus.domain.suggestions.SugestaoEscalonamento;
 import domus.ui.ConsoleView;
 import java.util.ArrayList;
@@ -108,9 +109,7 @@ public class SugestoesMenuController {
                     utilizadorId, escalonamentoId, nome, sugestoes.get(escolha - 1)
             );
             this.view.mostrarMensagem("Sugestão aceite.");
-        } catch (domus.domain.exceptions.SemPermissaoException e) {
-            this.view.mostrarErro("Sem permissão na casa da sugestão.");
-        } catch (domus.domain.exceptions.OperacaoInvalidaException e) {
+        } catch (DomusException e) {
             this.view.mostrarErro(e.getMessage());
         }
     }

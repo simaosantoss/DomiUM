@@ -3,6 +3,7 @@ package domus.domain;
 import domus.domain.commands.ComandoLigar;
 import domus.domain.core.Casa;
 import domus.domain.exceptions.DomusException;
+import domus.domain.exceptions.EscalonamentoJaExisteException;
 import domus.domain.exceptions.OperacaoInvalidaException;
 import domus.domain.suggestions.SugestaoEscalonamento;
 import java.time.LocalTime;
@@ -105,7 +106,7 @@ class SugestoesHistoricoTest {
     }
 
     @Test
-    void aceitarSugestaoDeUtilizadorSemPermissaoNaoCriaEscalonamento() throws DomusException {
+    void aceitarSugestaoDeOutroUtilizadorLancaOperacaoInvalida() throws DomusException {
         DomiUM domium = new DomiUM();
         domium.criarUtilizador("admin", "Administrador");
         domium.criarCasa("admin", "c1", "Casa");
@@ -123,6 +124,23 @@ class SugestoesHistoricoTest {
 
         assertThrows(OperacaoInvalidaException.class, () ->
                 domium.aceitarSugestaoEscalonamento("u2", "esc1", "Ligar automaticamente", sugestao)
+        );
+    }
+
+    @Test
+    void aceitarSugestaoParaEscalonamentoExistenteLancaExcecao() throws DomusException {
+        DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
+        executarLigar(domium, "u1", "c1", "l1", 3);
+        Iterator<SugestaoEscalonamento> iterador = domium.getSugestoesEscalonamento("u1");
+        assertTrue(iterador.hasNext());
+        SugestaoEscalonamento sugestao = iterador.next();
+        domium.criarEscalonamento(
+                "u1", "c1", "esc1", "Escalonamento existente",
+                LocalTime.of(9, 0), LocalTime.of(9, 1)
+        );
+
+        assertThrows(EscalonamentoJaExisteException.class, () ->
+                domium.aceitarSugestaoEscalonamento("u1", "esc1", "Ligar automaticamente", sugestao)
         );
     }
 
