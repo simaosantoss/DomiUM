@@ -315,10 +315,20 @@ public class DomiUMController {
         double humidade = this.view.lerDouble("Humidade: ");
         double luminosidade = this.view.lerDouble("Luminosidade: ");
 
-        this.model.atualizarAmbienteDivisao(
-                utilizadorId, casaId, divisaoNome, temperatura, humidade, luminosidade
-        );
-        this.view.mostrarMensagem("Ambiente atualizado.");
+        try {
+            this.model.atualizarAmbienteDivisao(
+                    utilizadorId, casaId, divisaoNome, temperatura, humidade, luminosidade
+            );
+            this.view.mostrarMensagem("Ambiente atualizado.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.DivisaoNaoExisteException e) {
+            this.view.mostrarErro("Divisão \"" + e.getDivisaoNome() + "\" não existe.");
+        }
     }
 
     /**

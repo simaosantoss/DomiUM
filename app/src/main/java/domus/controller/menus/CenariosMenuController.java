@@ -71,8 +71,18 @@ public class CenariosMenuController {
         String cenarioId = this.view.lerTexto("Identificador do cenário: ");
         String nome = this.view.lerTexto("Nome do cenário: ");
 
-        this.model.criarCenario(utilizadorId, casaId, cenarioId, nome);
-        this.view.mostrarMensagem("Cenário criado.");
+        try {
+            this.model.criarCenario(utilizadorId, casaId, cenarioId, nome);
+            this.view.mostrarMensagem("Cenário criado.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.CenarioJaExisteException e) {
+            this.view.mostrarErro("Já existe um cenário com o identificador \"" + e.getCenarioId() + "\".");
+        }
     }
 
     /**
@@ -84,11 +94,21 @@ public class CenariosMenuController {
         String cenarioId = this.view.lerTexto("Identificador do cenário: ");
         String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
-        this.model.adicionarComandoACenario(
-                utilizadorId, casaId, cenarioId,
-                new ComandoLigar(utilizadorId, casaId, dispositivoId)
-        );
-        this.view.mostrarMensagem("Comando adicionado ao cenário.");
+        try {
+            this.model.adicionarComandoACenario(
+                    utilizadorId, casaId, cenarioId,
+                    new ComandoLigar(utilizadorId, casaId, dispositivoId)
+            );
+            this.view.mostrarMensagem("Comando adicionado ao cenário.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.CenarioNaoExisteException e) {
+            this.view.mostrarErro("Cenário \"" + e.getCenarioId() + "\" não existe.");
+        }
     }
 
     /**
@@ -100,11 +120,21 @@ public class CenariosMenuController {
         String cenarioId = this.view.lerTexto("Identificador do cenário: ");
         String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
-        this.model.adicionarComandoACenario(
-                utilizadorId, casaId, cenarioId,
-                new ComandoDesligar(utilizadorId, casaId, dispositivoId)
-        );
-        this.view.mostrarMensagem("Comando adicionado ao cenário.");
+        try {
+            this.model.adicionarComandoACenario(
+                    utilizadorId, casaId, cenarioId,
+                    new ComandoDesligar(utilizadorId, casaId, dispositivoId)
+            );
+            this.view.mostrarMensagem("Comando adicionado ao cenário.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.CenarioNaoExisteException e) {
+            this.view.mostrarErro("Cenário \"" + e.getCenarioId() + "\" não existe.");
+        }
     }
 
     /**
@@ -115,7 +145,17 @@ public class CenariosMenuController {
         String casaId = this.view.lerTexto("Identificador da casa: ");
         String cenarioId = this.view.lerTexto("Identificador do cenário: ");
 
-        this.model.executarCenario(utilizadorId, casaId, cenarioId);
-        this.view.mostrarMensagem("Cenário executado.");
+        try {
+            this.model.executarCenario(utilizadorId, casaId, cenarioId);
+            this.view.mostrarMensagem("Cenário executado.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.CenarioNaoExisteException e) {
+            this.view.mostrarErro("Cenário \"" + e.getCenarioId() + "\" não existe.");
+        }
     }
 }

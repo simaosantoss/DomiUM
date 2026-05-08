@@ -103,10 +103,16 @@ public class SugestoesMenuController {
         String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
         String nome = this.view.lerTexto("Nome do escalonamento: ");
 
-        this.model.aceitarSugestaoEscalonamento(
-                utilizadorId, escalonamentoId, nome, sugestoes.get(escolha - 1)
-        );
-        this.view.mostrarMensagem("Sugestão aceite.");
+        try {
+            this.model.aceitarSugestaoEscalonamento(
+                    utilizadorId, escalonamentoId, nome, sugestoes.get(escolha - 1)
+            );
+            this.view.mostrarMensagem("Sugestão aceite.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa da sugestão.");
+        } catch (domus.domain.exceptions.OperacaoInvalidaException e) {
+            this.view.mostrarErro(e.getMessage());
+        }
     }
 
     /**

@@ -8,10 +8,16 @@ import domus.domain.core.Divisao;
 import domus.domain.devices.Dispositivo;
 import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.environment.AmbienteInterior;
+import domus.domain.exceptions.AutomacaoJaExisteException;
+import domus.domain.exceptions.AutomacaoNaoExisteException;
 import domus.domain.exceptions.CasaNaoExisteException;
+import domus.domain.exceptions.CenarioJaExisteException;
+import domus.domain.exceptions.CenarioNaoExisteException;
 import domus.domain.exceptions.DivisaoJaExisteException;
 import domus.domain.exceptions.DivisaoNaoExisteException;
 import domus.domain.exceptions.DispositivoJaExisteException;
+import domus.domain.exceptions.EscalonamentoJaExisteException;
+import domus.domain.exceptions.EscalonamentoNaoExisteException;
 import domus.domain.exceptions.TipoDispositivoInvalidoException;
 import domus.domain.factories.DispositivoRegistry;
 import domus.domain.scheduling.Escalonamento;
@@ -402,24 +408,23 @@ public class GestorCasas implements Serializable {
      * @param nome nome do cenário
      * @return {@code true} se o cenário tiver sido criado
      */
-    public boolean criarCenario(String casaId, String cenarioId, String nome) {
+    public void criarCenario(String casaId, String cenarioId, String nome) throws CasaNaoExisteException, CenarioJaExisteException {
         if (casaId == null || cenarioId == null || nome == null) {
-            return false;
+            return;
         }
 
         Casa casa = this.casas.get(casaId);
         if (casa == null) {
-            return false;
+            throw new CasaNaoExisteException(casaId);
         }
 
         Casa casaAtualizada = casa.clone();
         if (casaAtualizada.getCenario(cenarioId) != null) {
-            return false;
+            throw new CenarioJaExisteException(casaId, cenarioId);
         }
 
         casaAtualizada.adicionarCenario(cenarioId, new Cenario(nome));
         this.casas.put(casaId, casaAtualizada);
-        return true;
     }
 
     /**
@@ -430,23 +435,22 @@ public class GestorCasas implements Serializable {
      * @param cmd comando a acrescentar
      * @return {@code true} se o comando tiver sido acrescentado
      */
-    public boolean adicionarComandoACenario(String casaId, String cenarioId, Command cmd) {
+    public void adicionarComandoACenario(String casaId, String cenarioId, Command cmd) throws CasaNaoExisteException, CenarioNaoExisteException {
         if (casaId == null || cenarioId == null || cmd == null) {
-            return false;
+            return;
         }
 
         Casa casa = this.casas.get(casaId);
         if (casa == null) {
-            return false;
+            throw new CasaNaoExisteException(casaId);
         }
 
         Casa casaAtualizada = casa.clone();
-        if (casaAtualizada.adicionarComandoACenario(cenarioId, cmd)) {
-            this.casas.put(casaId, casaAtualizada);
-            return true;
+        if (!casaAtualizada.adicionarComandoACenario(cenarioId, cmd)) {
+            throw new CenarioNaoExisteException(casaId, cenarioId);
         }
 
-        return false;
+        this.casas.put(casaId, casaAtualizada);
     }
 
     /**
@@ -474,28 +478,27 @@ public class GestorCasas implements Serializable {
      * @param luminosidade nova luminosidade interior
      * @return {@code true} se o ambiente tiver sido atualizado
      */
-    public boolean atualizarAmbienteDivisao(String casaId, String divisaoNome,
-                                            double temperatura, double humidade,
-                                            double luminosidade) {
+    public void atualizarAmbienteDivisao(String casaId, String divisaoNome,
+                                         double temperatura, double humidade,
+                                         double luminosidade) throws CasaNaoExisteException, DivisaoNaoExisteException {
         if (casaId == null || divisaoNome == null) {
-            return false;
+            return;
         }
 
         Casa casa = this.casas.get(casaId);
         if (casa == null) {
-            return false;
+            throw new CasaNaoExisteException(casaId);
         }
 
         Casa casaAtualizada = casa.clone();
         Divisao divisaoAtualizada = casaAtualizada.getDivisao(divisaoNome);
         if (divisaoAtualizada == null) {
-            return false;
+            throw new DivisaoNaoExisteException(casaId, divisaoNome);
         }
 
         divisaoAtualizada.atualizarAmbienteInterior(temperatura, humidade, luminosidade);
         casaAtualizada.adicionarDivisao(divisaoAtualizada);
         this.casas.put(casaId, casaAtualizada);
-        return true;
     }
 
     /**
@@ -544,26 +547,28 @@ public class GestorCasas implements Serializable {
      * @param condicao condição que ativa a automação
      * @return {@code true} se a automação tiver sido criada
      */
-    public boolean criarAutomacao(String casaId, String automacaoId, String nome,
-                                  String divisaoNome, Condicao condicao) {
+    public void criarAutomacao(String casaId, String automacaoId, String nome,
+                               String divisaoNome, Condicao condicao) throws CasaNaoExisteException, DivisaoNaoExisteException, AutomacaoJaExisteException {
         if (casaId == null || automacaoId == null || nome == null || divisaoNome == null
                 || condicao == null) {
-            return false;
+            return;
         }
 
         Casa casa = this.casas.get(casaId);
         if (casa == null) {
-            return false;
+            throw new CasaNaoExisteException(casaId);
         }
 
         Casa casaAtualizada = casa.clone();
-        if (!casaAtualizada.contemDivisao(divisaoNome) || casaAtualizada.getAutomacao(automacaoId) != null) {
-            return false;
+        if (!casaAtualizada.contemDivisao(divisaoNome)) {
+            throw new DivisaoNaoExisteException(casaId, divisaoNome);
+        }
+        if (casaAtualizada.getAutomacao(automacaoId) != null) {
+            throw new AutomacaoJaExisteException(casaId, automacaoId);
         }
 
         casaAtualizada.adicionarAutomacao(automacaoId, new Automacao(nome, divisaoNome, condicao));
         this.casas.put(casaId, casaAtualizada);
-        return true;
     }
 
     /**
@@ -574,23 +579,22 @@ public class GestorCasas implements Serializable {
      * @param cmd comando a acrescentar
      * @return {@code true} se a ação tiver sido acrescentada
      */
-    public boolean adicionarAcaoAAutomacao(String casaId, String automacaoId, Command cmd) {
+    public void adicionarAcaoAAutomacao(String casaId, String automacaoId, Command cmd) throws CasaNaoExisteException, AutomacaoNaoExisteException {
         if (casaId == null || automacaoId == null || cmd == null) {
-            return false;
+            return;
         }
 
         Casa casa = this.casas.get(casaId);
         if (casa == null) {
-            return false;
+            throw new CasaNaoExisteException(casaId);
         }
 
         Casa casaAtualizada = casa.clone();
-        if (casaAtualizada.adicionarAcaoAAutomacao(automacaoId, cmd)) {
-            this.casas.put(casaId, casaAtualizada);
-            return true;
+        if (!casaAtualizada.adicionarAcaoAAutomacao(automacaoId, cmd)) {
+            throw new AutomacaoNaoExisteException(casaId, automacaoId);
         }
 
-        return false;
+        this.casas.put(casaId, casaAtualizada);
     }
 
     /**
@@ -603,28 +607,27 @@ public class GestorCasas implements Serializable {
      * @param horaFim hora de fim
      * @return {@code true} se o escalonamento tiver sido criado
      */
-    public boolean criarEscalonamento(String casaId, String escalonamentoId, String nome,
-                                      LocalTime horaInicio, LocalTime horaFim) {
+    public void criarEscalonamento(String casaId, String escalonamentoId, String nome,
+                                   LocalTime horaInicio, LocalTime horaFim) throws CasaNaoExisteException, EscalonamentoJaExisteException {
         if (casaId == null || escalonamentoId == null || nome == null
                 || horaInicio == null || horaFim == null) {
-            return false;
+            return;
         }
 
         Casa casa = this.casas.get(casaId);
         if (casa == null) {
-            return false;
+            throw new CasaNaoExisteException(casaId);
         }
 
         Casa casaAtualizada = casa.clone();
         if (casaAtualizada.getEscalonamento(escalonamentoId) != null) {
-            return false;
+            throw new EscalonamentoJaExisteException(casaId, escalonamentoId);
         }
 
         casaAtualizada.adicionarEscalonamento(
                 escalonamentoId, new Escalonamento(nome, horaInicio, horaFim)
         );
         this.casas.put(casaId, casaAtualizada);
-        return true;
     }
 
     /**
@@ -635,24 +638,23 @@ public class GestorCasas implements Serializable {
      * @param cmd comando a acrescentar
      * @return {@code true} se a ação tiver sido acrescentada
      */
-    public boolean adicionarAcaoInicioAEscalonamento(String casaId, String escalonamentoId,
-                                                     Command cmd) {
+    public void adicionarAcaoInicioAEscalonamento(String casaId, String escalonamentoId,
+                                                  Command cmd) throws CasaNaoExisteException, EscalonamentoNaoExisteException {
         if (casaId == null || escalonamentoId == null || cmd == null) {
-            return false;
+            return;
         }
 
         Casa casa = this.casas.get(casaId);
         if (casa == null) {
-            return false;
+            throw new CasaNaoExisteException(casaId);
         }
 
         Casa casaAtualizada = casa.clone();
-        if (casaAtualizada.adicionarAcaoInicioAEscalonamento(escalonamentoId, cmd)) {
-            this.casas.put(casaId, casaAtualizada);
-            return true;
+        if (!casaAtualizada.adicionarAcaoInicioAEscalonamento(escalonamentoId, cmd)) {
+            throw new EscalonamentoNaoExisteException(casaId, escalonamentoId);
         }
 
-        return false;
+        this.casas.put(casaId, casaAtualizada);
     }
 
     /**
@@ -663,24 +665,23 @@ public class GestorCasas implements Serializable {
      * @param cmd comando a acrescentar
      * @return {@code true} se a ação tiver sido acrescentada
      */
-    public boolean adicionarAcaoFimAEscalonamento(String casaId, String escalonamentoId,
-                                                  Command cmd) {
+    public void adicionarAcaoFimAEscalonamento(String casaId, String escalonamentoId,
+                                               Command cmd) throws CasaNaoExisteException, EscalonamentoNaoExisteException {
         if (casaId == null || escalonamentoId == null || cmd == null) {
-            return false;
+            return;
         }
 
         Casa casa = this.casas.get(casaId);
         if (casa == null) {
-            return false;
+            throw new CasaNaoExisteException(casaId);
         }
 
         Casa casaAtualizada = casa.clone();
-        if (casaAtualizada.adicionarAcaoFimAEscalonamento(escalonamentoId, cmd)) {
-            this.casas.put(casaId, casaAtualizada);
-            return true;
+        if (!casaAtualizada.adicionarAcaoFimAEscalonamento(escalonamentoId, cmd)) {
+            throw new EscalonamentoNaoExisteException(casaId, escalonamentoId);
         }
 
-        return false;
+        this.casas.put(casaId, casaAtualizada);
     }
 
     /**

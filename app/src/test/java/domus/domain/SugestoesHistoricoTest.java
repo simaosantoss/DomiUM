@@ -3,6 +3,7 @@ package domus.domain;
 import domus.domain.commands.ComandoLigar;
 import domus.domain.core.Casa;
 import domus.domain.exceptions.DomusException;
+import domus.domain.exceptions.OperacaoInvalidaException;
 import domus.domain.suggestions.SugestaoEscalonamento;
 import java.time.LocalTime;
 import java.util.Iterator;
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -120,11 +121,9 @@ class SugestoesHistoricoTest {
                 "Sugestão de teste"
         );
 
-        domium.aceitarSugestaoEscalonamento("u2", "esc1", "Ligar automaticamente", sugestao);
-
-        Casa casa = domium.getCasa("c1");
-        assertNotNull(casa);
-        assertNull(casa.getEscalonamento("esc1"));
+        assertThrows(OperacaoInvalidaException.class, () ->
+                domium.aceitarSugestaoEscalonamento("u2", "esc1", "Ligar automaticamente", sugestao)
+        );
     }
 
     /**

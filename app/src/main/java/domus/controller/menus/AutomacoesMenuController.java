@@ -80,11 +80,23 @@ public class AutomacoesMenuController {
         double limite = this.view.lerDouble("Limite de temperatura: ");
         boolean maiorQue = lerMaiorQue();
 
-        this.model.criarAutomacao(
-                utilizadorId, casaId, automacaoId, nome, divisaoNome,
-                new CondicaoTemperatura(limite, maiorQue)
-        );
-        this.view.mostrarMensagem("Automação criada.");
+        try {
+            this.model.criarAutomacao(
+                    utilizadorId, casaId, automacaoId, nome, divisaoNome,
+                    new CondicaoTemperatura(limite, maiorQue)
+            );
+            this.view.mostrarMensagem("Automação criada.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.DivisaoNaoExisteException e) {
+            this.view.mostrarErro("Divisão \"" + e.getDivisaoNome() + "\" não existe.");
+        } catch (domus.domain.exceptions.AutomacaoJaExisteException e) {
+            this.view.mostrarErro("Já existe uma automação com o identificador \"" + e.getAutomacaoId() + "\".");
+        }
     }
 
     /**
@@ -99,11 +111,23 @@ public class AutomacoesMenuController {
         double limite = this.view.lerDouble("Limite de humidade: ");
         boolean maiorQue = lerMaiorQue();
 
-        this.model.criarAutomacao(
-                utilizadorId, casaId, automacaoId, nome, divisaoNome,
-                new CondicaoHumidade(limite, maiorQue)
-        );
-        this.view.mostrarMensagem("Automação criada.");
+        try {
+            this.model.criarAutomacao(
+                    utilizadorId, casaId, automacaoId, nome, divisaoNome,
+                    new CondicaoHumidade(limite, maiorQue)
+            );
+            this.view.mostrarMensagem("Automação criada.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.DivisaoNaoExisteException e) {
+            this.view.mostrarErro("Divisão \"" + e.getDivisaoNome() + "\" não existe.");
+        } catch (domus.domain.exceptions.AutomacaoJaExisteException e) {
+            this.view.mostrarErro("Já existe uma automação com o identificador \"" + e.getAutomacaoId() + "\".");
+        }
     }
 
     /**
@@ -118,11 +142,23 @@ public class AutomacoesMenuController {
         double limite = this.view.lerDouble("Limite de luminosidade: ");
         boolean maiorQue = lerMaiorQue();
 
-        this.model.criarAutomacao(
-                utilizadorId, casaId, automacaoId, nome, divisaoNome,
-                new CondicaoLuminosidade(limite, maiorQue)
-        );
-        this.view.mostrarMensagem("Automação criada.");
+        try {
+            this.model.criarAutomacao(
+                    utilizadorId, casaId, automacaoId, nome, divisaoNome,
+                    new CondicaoLuminosidade(limite, maiorQue)
+            );
+            this.view.mostrarMensagem("Automação criada.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.DivisaoNaoExisteException e) {
+            this.view.mostrarErro("Divisão \"" + e.getDivisaoNome() + "\" não existe.");
+        } catch (domus.domain.exceptions.AutomacaoJaExisteException e) {
+            this.view.mostrarErro("Já existe uma automação com o identificador \"" + e.getAutomacaoId() + "\".");
+        }
     }
 
     /**
@@ -134,11 +170,21 @@ public class AutomacoesMenuController {
         String automacaoId = this.view.lerTexto("Identificador da automação: ");
         String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
-        this.model.adicionarAcaoAAutomacao(
-                utilizadorId, casaId, automacaoId,
-                new ComandoLigar(utilizadorId, casaId, dispositivoId)
-        );
-        this.view.mostrarMensagem("Ação adicionada à automação.");
+        try {
+            this.model.adicionarAcaoAAutomacao(
+                    utilizadorId, casaId, automacaoId,
+                    new ComandoLigar(utilizadorId, casaId, dispositivoId)
+            );
+            this.view.mostrarMensagem("Ação adicionada à automação.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.AutomacaoNaoExisteException e) {
+            this.view.mostrarErro("Automação \"" + e.getAutomacaoId() + "\" não existe.");
+        }
     }
 
     /**
@@ -150,11 +196,21 @@ public class AutomacoesMenuController {
         String automacaoId = this.view.lerTexto("Identificador da automação: ");
         String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
-        this.model.adicionarAcaoAAutomacao(
-                utilizadorId, casaId, automacaoId,
-                new ComandoDesligar(utilizadorId, casaId, dispositivoId)
-        );
-        this.view.mostrarMensagem("Ação adicionada à automação.");
+        try {
+            this.model.adicionarAcaoAAutomacao(
+                    utilizadorId, casaId, automacaoId,
+                    new ComandoDesligar(utilizadorId, casaId, dispositivoId)
+            );
+            this.view.mostrarMensagem("Ação adicionada à automação.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.AutomacaoNaoExisteException e) {
+            this.view.mostrarErro("Automação \"" + e.getAutomacaoId() + "\" não existe.");
+        }
     }
 
     /**

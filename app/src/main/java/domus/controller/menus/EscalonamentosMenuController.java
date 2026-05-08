@@ -78,8 +78,18 @@ public class EscalonamentosMenuController {
         LocalTime horaInicio = lerHora("Hora de início (HH:mm): ");
         LocalTime horaFim = lerHora("Hora de fim (HH:mm): ");
 
-        this.model.criarEscalonamento(utilizadorId, casaId, escalonamentoId, nome, horaInicio, horaFim);
-        this.view.mostrarMensagem("Escalonamento criado.");
+        try {
+            this.model.criarEscalonamento(utilizadorId, casaId, escalonamentoId, nome, horaInicio, horaFim);
+            this.view.mostrarMensagem("Escalonamento criado.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.EscalonamentoJaExisteException e) {
+            this.view.mostrarErro("Já existe um escalonamento com o identificador \"" + e.getEscalonamentoId() + "\".");
+        }
     }
 
     /**
@@ -91,11 +101,21 @@ public class EscalonamentosMenuController {
         String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
         String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
-        this.model.adicionarAcaoInicioAEscalonamento(
-                utilizadorId, casaId, escalonamentoId,
-                new ComandoLigar(utilizadorId, casaId, dispositivoId)
-        );
-        this.view.mostrarMensagem("Ação de início adicionada.");
+        try {
+            this.model.adicionarAcaoInicioAEscalonamento(
+                    utilizadorId, casaId, escalonamentoId,
+                    new ComandoLigar(utilizadorId, casaId, dispositivoId)
+            );
+            this.view.mostrarMensagem("Ação de início adicionada.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
+            this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
+        }
     }
 
     /**
@@ -107,11 +127,21 @@ public class EscalonamentosMenuController {
         String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
         String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
-        this.model.adicionarAcaoInicioAEscalonamento(
-                utilizadorId, casaId, escalonamentoId,
-                new ComandoDesligar(utilizadorId, casaId, dispositivoId)
-        );
-        this.view.mostrarMensagem("Ação de início adicionada.");
+        try {
+            this.model.adicionarAcaoInicioAEscalonamento(
+                    utilizadorId, casaId, escalonamentoId,
+                    new ComandoDesligar(utilizadorId, casaId, dispositivoId)
+            );
+            this.view.mostrarMensagem("Ação de início adicionada.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
+            this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
+        }
     }
 
     /**
@@ -123,11 +153,21 @@ public class EscalonamentosMenuController {
         String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
         String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
-        this.model.adicionarAcaoFimAEscalonamento(
-                utilizadorId, casaId, escalonamentoId,
-                new ComandoLigar(utilizadorId, casaId, dispositivoId)
-        );
-        this.view.mostrarMensagem("Ação de fim adicionada.");
+        try {
+            this.model.adicionarAcaoFimAEscalonamento(
+                    utilizadorId, casaId, escalonamentoId,
+                    new ComandoLigar(utilizadorId, casaId, dispositivoId)
+            );
+            this.view.mostrarMensagem("Ação de fim adicionada.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
+            this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
+        }
     }
 
     /**
@@ -139,11 +179,21 @@ public class EscalonamentosMenuController {
         String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
         String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
-        this.model.adicionarAcaoFimAEscalonamento(
-                utilizadorId, casaId, escalonamentoId,
-                new ComandoDesligar(utilizadorId, casaId, dispositivoId)
-        );
-        this.view.mostrarMensagem("Ação de fim adicionada.");
+        try {
+            this.model.adicionarAcaoFimAEscalonamento(
+                    utilizadorId, casaId, escalonamentoId,
+                    new ComandoDesligar(utilizadorId, casaId, dispositivoId)
+            );
+            this.view.mostrarMensagem("Ação de fim adicionada.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
+            this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
+        }
     }
 
     /**

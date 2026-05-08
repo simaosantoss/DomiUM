@@ -21,11 +21,19 @@ import domus.domain.core.Utilizador;
 import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.environment.AmbienteInterior;
 import domus.domain.history.RegistoInteracao;
+import domus.domain.exceptions.AutomacaoJaExisteException;
+import domus.domain.exceptions.AutomacaoNaoExisteException;
 import domus.domain.exceptions.CasaJaExisteException;
 import domus.domain.exceptions.CasaNaoExisteException;
+import domus.domain.exceptions.CenarioJaExisteException;
+import domus.domain.exceptions.CenarioNaoExisteException;
 import domus.domain.exceptions.DivisaoJaExisteException;
 import domus.domain.exceptions.DivisaoNaoExisteException;
 import domus.domain.exceptions.DispositivoJaExisteException;
+import domus.domain.exceptions.DomusException;
+import domus.domain.exceptions.EscalonamentoJaExisteException;
+import domus.domain.exceptions.EscalonamentoNaoExisteException;
+import domus.domain.exceptions.OperacaoInvalidaException;
 import domus.domain.exceptions.SemPermissaoException;
 import domus.domain.exceptions.TipoDispositivoInvalidoException;
 import domus.domain.exceptions.UtilizadorJaExisteException;
@@ -141,19 +149,22 @@ public class DomiUM implements Serializable {
      * @param sugestao sugestão a aceitar
      */
     public void aceitarSugestaoEscalonamento(String utilizadorId, String escalonamentoId,
-                                             String nome, SugestaoEscalonamento sugestao) {
+                                             String nome, SugestaoEscalonamento sugestao) throws OperacaoInvalidaException, SemPermissaoException {
         if (utilizadorId == null || escalonamentoId == null || nome == null || sugestao == null) {
             return;
         }
 
         if (!Objects.equals(utilizadorId, sugestao.getUtilizadorId())) {
-            return;
+            throw new OperacaoInvalidaException("Sugestão não pertence ao utilizador: " + utilizadorId);
         }
 
         String casaId = sugestao.getCasaId();
         LocalTime horaInicio = sugestao.getHoraSugerida();
-        if (casaId == null || horaInicio == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+        if (casaId == null || horaInicio == null) {
             return;
+        }
+        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
+            throw new SemPermissaoException(utilizadorId, casaId);
         }
 
         SugestaoCommandRegistry registry = new SugestaoCommandRegistry();
@@ -162,9 +173,12 @@ public class DomiUM implements Serializable {
             return;
         }
 
-        if (this.gestorCasas.criarEscalonamento(
-                casaId, escalonamentoId, nome, horaInicio, horaInicio.plusMinutes(1))) {
+        try {
+            this.gestorCasas.criarEscalonamento(
+                    casaId, escalonamentoId, nome, horaInicio, horaInicio.plusMinutes(1));
             this.gestorCasas.adicionarAcaoInicioAEscalonamento(casaId, escalonamentoId, comando);
+        } catch (domus.domain.exceptions.DomusException e) {
+            // sugestão inválida ou escalonamento já existe — ignorar silenciosamente
         }
     }
 
@@ -473,9 +487,15 @@ public class DomiUM implements Serializable {
      * @param cenarioId identificador do cenário
      * @param nome nome do cenário
      */
-    public void criarCenario(String utilizadorId, String casaId, String cenarioId, String nome) {
+    public void criarCenario(String utilizadorId, String casaId, String cenarioId, String nome) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, CenarioJaExisteException {
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
         if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
+            throw new SemPermissaoException(utilizadorId, casaId);
         }
 
         this.gestorCasas.criarCenario(casaId, cenarioId, nome);
@@ -489,11 +509,19 @@ public class DomiUM implements Serializable {
      * @param cenarioId identificador do cenário
      * @param cmd comando a acrescentar
      */
-    public void adicionarComandoACenario(String utilizadorId, String casaId, String cenarioId, Command cmd) {
-        if (cenarioId == null || cmd == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+    public void adicionarComandoACenario(String utilizadorId, String casaId, String cenarioId, Command cmd) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, CenarioNaoExisteException {
+        if (cenarioId == null || cmd == null) {
             return;
         }
-
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
+        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
+            throw new SemPermissaoException(utilizadorId, casaId);
+        }
         if (!comandoPertenceAoContexto(utilizadorId, casaId, cmd)) {
             return;
         }
@@ -511,15 +539,25 @@ public class DomiUM implements Serializable {
      * @param casaId identificador da casa
      * @param cenarioId identificador do cenário
      */
-    public void executarCenario(String utilizadorId, String casaId, String cenarioId) {
-        if (cenarioId == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+    public void executarCenario(String utilizadorId, String casaId, String cenarioId) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, CenarioNaoExisteException {
+        if (cenarioId == null) {
             return;
+        }
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
+        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
+            throw new SemPermissaoException(utilizadorId, casaId);
         }
 
         Cenario cenario = this.gestorCasas.getCenario(casaId, cenarioId);
-        if (cenario != null) {
-            cenario.executar(this);
+        if (cenario == null) {
+            throw new CenarioNaoExisteException(casaId, cenarioId);
         }
+        cenario.executar(this);
     }
 
     /**
@@ -534,15 +572,21 @@ public class DomiUM implements Serializable {
      * @param luminosidade nova luminosidade interior
      */
     public void atualizarAmbienteDivisao(String utilizadorId, String casaId, String divisaoNome,
-                                         double temperatura, double humidade, double luminosidade) {
-        if (divisaoNome == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+                                         double temperatura, double humidade, double luminosidade) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, DivisaoNaoExisteException {
+        if (divisaoNome == null) {
             return;
+        }
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
+        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
+            throw new SemPermissaoException(utilizadorId, casaId);
         }
 
-        if (!this.gestorCasas.atualizarAmbienteDivisao(
-                casaId, divisaoNome, temperatura, humidade, luminosidade)) {
-            return;
-        }
+        this.gestorCasas.atualizarAmbienteDivisao(casaId, divisaoNome, temperatura, humidade, luminosidade);
 
         AmbienteInterior ambiente = this.gestorCasas.getAmbienteInteriorDivisao(casaId, divisaoNome);
         if (ambiente == null) {
@@ -569,9 +613,15 @@ public class DomiUM implements Serializable {
      * @param condicao condição que ativa a automação
      */
     public void criarAutomacao(String utilizadorId, String casaId, String automacaoId,
-                               String nome, String divisaoNome, Condicao condicao) {
+                               String nome, String divisaoNome, Condicao condicao) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, DivisaoNaoExisteException, AutomacaoJaExisteException {
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
         if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
+            throw new SemPermissaoException(utilizadorId, casaId);
         }
 
         this.gestorCasas.criarAutomacao(casaId, automacaoId, nome, divisaoNome, condicao);
@@ -586,11 +636,19 @@ public class DomiUM implements Serializable {
      * @param cmd comando a acrescentar como ação
      */
     public void adicionarAcaoAAutomacao(String utilizadorId, String casaId,
-                                        String automacaoId, Command cmd) {
-        if (automacaoId == null || cmd == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+                                        String automacaoId, Command cmd) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, AutomacaoNaoExisteException {
+        if (automacaoId == null || cmd == null) {
             return;
         }
-
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
+        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
+            throw new SemPermissaoException(utilizadorId, casaId);
+        }
         if (!comandoPertenceAoContexto(utilizadorId, casaId, cmd)) {
             return;
         }
@@ -609,9 +667,15 @@ public class DomiUM implements Serializable {
      * @param horaFim hora de fim
      */
     public void criarEscalonamento(String utilizadorId, String casaId, String escalonamentoId,
-                                   String nome, LocalTime horaInicio, LocalTime horaFim) {
+                                   String nome, LocalTime horaInicio, LocalTime horaFim) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, EscalonamentoJaExisteException {
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
         if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
-            return;
+            throw new SemPermissaoException(utilizadorId, casaId);
         }
 
         this.gestorCasas.criarEscalonamento(casaId, escalonamentoId, nome, horaInicio, horaFim);
@@ -626,11 +690,19 @@ public class DomiUM implements Serializable {
      * @param cmd comando a acrescentar como ação de início
      */
     public void adicionarAcaoInicioAEscalonamento(String utilizadorId, String casaId,
-                                                  String escalonamentoId, Command cmd) {
-        if (escalonamentoId == null || cmd == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+                                                  String escalonamentoId, Command cmd) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, EscalonamentoNaoExisteException {
+        if (escalonamentoId == null || cmd == null) {
             return;
         }
-
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
+        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
+            throw new SemPermissaoException(utilizadorId, casaId);
+        }
         if (!comandoPertenceAoContexto(utilizadorId, casaId, cmd)) {
             return;
         }
@@ -647,11 +719,19 @@ public class DomiUM implements Serializable {
      * @param cmd comando a acrescentar como ação de fim
      */
     public void adicionarAcaoFimAEscalonamento(String utilizadorId, String casaId,
-                                               String escalonamentoId, Command cmd) {
-        if (escalonamentoId == null || cmd == null || !temPermissaoUtilizacao(utilizadorId, casaId)) {
+                                               String escalonamentoId, Command cmd) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, EscalonamentoNaoExisteException {
+        if (escalonamentoId == null || cmd == null) {
             return;
         }
-
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
+        if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
+            throw new SemPermissaoException(utilizadorId, casaId);
+        }
         if (!comandoPertenceAoContexto(utilizadorId, casaId, cmd)) {
             return;
         }
