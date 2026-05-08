@@ -13,6 +13,7 @@ import domus.domain.core.Casa;
 import domus.domain.core.Divisao;
 import domus.domain.core.Utilizador;
 import domus.domain.devices.Dispositivo;
+import domus.domain.exceptions.DomusException;
 import domus.ui.ConsoleView;
 import java.util.Iterator;
 
@@ -238,8 +239,12 @@ public class DomiUMController {
         String casaId = this.view.lerTexto("Identificador da casa: ");
         String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
-        this.model.executarComando(new ComandoLigar(utilizadorId, casaId, dispositivoId));
-        this.view.mostrarMensagem("Comando de ligar executado.");
+        try {
+            this.model.executarComandoValidado(new ComandoLigar(utilizadorId, casaId, dispositivoId));
+            this.view.mostrarMensagem("Comando de ligar executado.");
+        } catch (DomusException e) {
+            this.view.mostrarErro(e.getMessage());
+        }
     }
 
     /**
@@ -250,8 +255,12 @@ public class DomiUMController {
         String casaId = this.view.lerTexto("Identificador da casa: ");
         String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
-        this.model.executarComando(new ComandoDesligar(utilizadorId, casaId, dispositivoId));
-        this.view.mostrarMensagem("Comando de desligar executado.");
+        try {
+            this.model.executarComandoValidado(new ComandoDesligar(utilizadorId, casaId, dispositivoId));
+            this.view.mostrarMensagem("Comando de desligar executado.");
+        } catch (DomusException e) {
+            this.view.mostrarErro(e.getMessage());
+        }
     }
 
     /**

@@ -32,6 +32,7 @@ import domus.domain.exceptions.CenarioNaoExisteException;
 import domus.domain.exceptions.DivisaoJaExisteException;
 import domus.domain.exceptions.DivisaoNaoExisteException;
 import domus.domain.exceptions.DispositivoJaExisteException;
+import domus.domain.exceptions.DispositivoNaoExisteException;
 import domus.domain.exceptions.DomusException;
 import domus.domain.exceptions.EscalonamentoJaExisteException;
 import domus.domain.exceptions.EscalonamentoNaoExisteException;
@@ -426,6 +427,49 @@ public class DomiUM implements Serializable {
         if (cmd != null) {
             cmd.execute(this);
         }
+    }
+
+    /**
+     * Executa um comando depois de validar o seu contexto de domínio.
+     *
+     * Este método deve ser usado por fluxos interativos em que seja necessário
+     * reportar erros ao utilizador. O método {@link #executarComando(Command)}
+     * mantém o comportamento silencioso usado por cenários, automações e
+     * escalonamentos.
+     *
+     * @param cmd comando a executar
+     * @throws DomusException se o comando for inválido ou não puder ser
+     *         executado no contexto indicado
+     */
+    public void executarComandoValidado(Command cmd) throws DomusException {
+        if (cmd == null) {
+            throw new OperacaoInvalidaException("Comando inválido.");
+        }
+
+        if (cmd instanceof ComandoDispositivo) {
+            ComandoDispositivo comando = (ComandoDispositivo) cmd;
+            String utilizadorId = comando.getUtilizadorId();
+            String casaId = comando.getCasaId();
+            String dispositivoId = comando.getDispositivoId();
+
+            if (utilizadorId == null || casaId == null || dispositivoId == null) {
+                throw new OperacaoInvalidaException("Comando de dispositivo inválido.");
+            }
+            if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+                throw new UtilizadorNaoExisteException(utilizadorId);
+            }
+            if (!this.gestorCasas.existeCasa(casaId)) {
+                throw new CasaNaoExisteException(casaId);
+            }
+            if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
+                throw new SemPermissaoException(utilizadorId, casaId);
+            }
+            if (this.gestorCasas.getDispositivo(casaId, dispositivoId) == null) {
+                throw new DispositivoNaoExisteException(casaId, dispositivoId);
+            }
+        }
+
+        cmd.execute(this);
     }
 
     /**
