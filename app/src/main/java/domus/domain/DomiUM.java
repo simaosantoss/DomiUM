@@ -21,6 +21,7 @@ import domus.domain.core.Utilizador;
 import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.environment.AmbienteInterior;
 import domus.domain.history.RegistoInteracao;
+import domus.domain.exceptions.UtilizadorJaExisteException;
 import domus.domain.managers.GestorCasas;
 import domus.domain.managers.GestorUtilizadores;
 import domus.domain.scenarios.Cenario;
@@ -71,7 +72,7 @@ public class DomiUM implements Serializable {
      * @param id identificador do utilizador
      * @param nome nome do utilizador
      */
-    public void criarUtilizador(String id, String nome) {
+    public void criarUtilizador(String id, String nome) throws UtilizadorJaExisteException {
         this.gestorUtilizadores.criarUtilizador(id, nome);
     }
 

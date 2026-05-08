@@ -4,6 +4,7 @@ import domus.domain.DomiUM;
 import domus.domain.commands.ComandoDesligar;
 import domus.domain.commands.ComandoLigar;
 import domus.domain.conditions.CondicaoLuminosidade;
+import domus.domain.exceptions.DomusException;
 import java.time.LocalTime;
 
 /**
@@ -24,7 +25,7 @@ public final class EstadoDemonstracao {
      *
      * @param model fachada do domínio a popular
      */
-    public static void popular(DomiUM model) {
+    public static void popular(DomiUM model) throws DomusException {
         if (model == null) {
             return;
         }

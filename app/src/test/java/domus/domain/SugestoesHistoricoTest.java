@@ -2,6 +2,7 @@ package domus.domain;
 
 import domus.domain.commands.ComandoLigar;
 import domus.domain.core.Casa;
+import domus.domain.exceptions.DomusException;
 import domus.domain.suggestions.SugestaoEscalonamento;
 import java.time.LocalTime;
 import java.util.Iterator;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SugestoesHistoricoTest {
 
     @Test
-    void geraSugestaoQuandoAcaoSeRepeteTresVezes() {
+    void geraSugestaoQuandoAcaoSeRepeteTresVezes() throws DomusException {
         DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
 
         executarLigar(domium, "u1", "c1", "l1", 3);
@@ -38,7 +39,7 @@ class SugestoesHistoricoTest {
     }
 
     @Test
-    void naoGeraSugestaoAbaixoDoMinimoDeOcorrencias() {
+    void naoGeraSugestaoAbaixoDoMinimoDeOcorrencias() throws DomusException {
         DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
 
         executarLigar(domium, "u1", "c1", "l1", 2);
@@ -49,7 +50,7 @@ class SugestoesHistoricoTest {
     }
 
     @Test
-    void respeitaMinimoOcorrenciasConfiguravel() {
+    void respeitaMinimoOcorrenciasConfiguravel() throws DomusException {
         DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
 
         executarLigar(domium, "u1", "c1", "l1", 2);
@@ -61,7 +62,7 @@ class SugestoesHistoricoTest {
     }
 
     @Test
-    void respeitaLimiteDeSugestoes() {
+    void respeitaLimiteDeSugestoes() throws DomusException {
         DomiUM domium = new DomiUM();
         domium.criarUtilizador("u1", "Utilizador");
         domium.criarCasa("u1", "c1", "Casa");
@@ -87,7 +88,7 @@ class SugestoesHistoricoTest {
     }
 
     @Test
-    void aceitarSugestaoCriaEscalonamentoNaCasa() {
+    void aceitarSugestaoCriaEscalonamentoNaCasa() throws DomusException {
         DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
         executarLigar(domium, "u1", "c1", "l1", 3);
 
@@ -103,7 +104,7 @@ class SugestoesHistoricoTest {
     }
 
     @Test
-    void aceitarSugestaoDeUtilizadorSemPermissaoNaoCriaEscalonamento() {
+    void aceitarSugestaoDeUtilizadorSemPermissaoNaoCriaEscalonamento() throws DomusException {
         DomiUM domium = new DomiUM();
         domium.criarUtilizador("admin", "Administrador");
         domium.criarCasa("admin", "c1", "Casa");
@@ -136,7 +137,7 @@ class SugestoesHistoricoTest {
      * @return fachada preparada para os testes
      */
     private DomiUM criarDominioComLampada(String utilizadorId, String casaId,
-                                          String divisaoNome, String dispositivoId) {
+                                          String divisaoNome, String dispositivoId) throws DomusException {
         DomiUM domium = new DomiUM();
         domium.criarUtilizador(utilizadorId, "Utilizador");
         domium.criarCasa(utilizadorId, casaId, "Casa");

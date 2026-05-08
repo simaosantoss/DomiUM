@@ -136,9 +136,12 @@ public class DomiUMController {
     private void criarUtilizador() {
         String id = this.view.lerTexto("Identificador do utilizador: ");
         String nome = this.view.lerTexto("Nome do utilizador: ");
-
-        this.model.criarUtilizador(id, nome);
-        this.view.mostrarMensagem("Utilizador criado.");
+        try {
+            this.model.criarUtilizador(id, nome);
+            this.view.mostrarMensagem("Utilizador criado.");
+        } catch (domus.domain.exceptions.UtilizadorJaExisteException e) {
+            this.view.mostrarErro("Já existe um utilizador com o identificador \"" + e.getUtilizadorId() + "\".");
+        }
     }
 
     /**
@@ -294,10 +297,14 @@ public class DomiUMController {
      * Cria um pequeno estado de demonstração no model atual.
      */
     private void criarEstadoDemonstracao() {
-        EstadoDemonstracao.popular(this.model);
-        this.view.mostrarMensagem(
-                "Estado de demonstração criado. Pode agora consultar estatísticas, sugestões, cenários, automações e escalonamentos."
-        );
+        try {
+            EstadoDemonstracao.popular(this.model);
+            this.view.mostrarMensagem(
+                    "Estado de demonstração criado. Pode agora consultar estatísticas, sugestões, cenários, automações e escalonamentos."
+            );
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
+        }
     }
 
     /**

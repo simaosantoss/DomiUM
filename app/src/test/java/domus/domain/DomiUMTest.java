@@ -3,6 +3,7 @@ package domus.domain;
 import domus.domain.commands.ComandoLigar;
 import domus.domain.core.Casa;
 import domus.domain.core.Utilizador;
+import domus.domain.exceptions.DomusException;
 import domus.domain.history.RegistoInteracao;
 import domus.domain.statistics.ResumoCasaConsumo;
 import domus.domain.statistics.ResumoDivisaoDispositivos;
@@ -31,7 +32,7 @@ class DomiUMTest {
     private Path tempDir;
 
     @Test
-    void criarCasaAtribuiPermissaoAdminEAceitaAdicionarDivisao() {
+    void criarCasaAtribuiPermissaoAdminEAceitaAdicionarDivisao() throws DomusException {
         DomiUM domium = new DomiUM();
 
         domium.criarUtilizador("u1", "Simao");
@@ -44,7 +45,7 @@ class DomiUMTest {
     }
 
     @Test
-    void adicionarDispositivoEExecutarComandoLigarRegistaHistorico() {
+    void adicionarDispositivoEExecutarComandoLigarRegistaHistorico() throws DomusException {
         DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1", 10.0);
 
         domium.executarComando(new ComandoLigar("u1", "c1", "l1"));
@@ -55,7 +56,7 @@ class DomiUMTest {
     }
 
     @Test
-    void comandoSemPermissaoNaoRegistaHistorico() {
+    void comandoSemPermissaoNaoRegistaHistorico() throws DomusException {
         DomiUM domium = criarDominioComLampada("admin", "c1", "Sala", "l1", 10.0);
         domium.criarUtilizador("u2", "Utilizador Sem Permissao");
 
@@ -67,7 +68,7 @@ class DomiUMTest {
     }
 
     @Test
-    void cenarioExecutaComandosERegistaHistorico() {
+    void cenarioExecutaComandosERegistaHistorico() throws DomusException {
         DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1", 10.0);
 
         domium.criarCenario("u1", "c1", "noite", "Modo Noite");
@@ -80,7 +81,7 @@ class DomiUMTest {
     }
 
     @Test
-    void persistenciaGuardaECarregaEstadoBasico() throws IOException {
+    void persistenciaGuardaECarregaEstadoBasico() throws IOException, DomusException {
         DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1", 10.0);
         Path ficheiro = this.tempDir.resolve("estado.dat");
 
@@ -94,7 +95,7 @@ class DomiUMTest {
     }
 
     @Test
-    void estatisticasDevolvemCasaMaiorConsumo() {
+    void estatisticasDevolvemCasaMaiorConsumo() throws DomusException {
         DomiUM domium = new DomiUM();
         domium.criarUtilizador("u1", "Simao");
         domium.criarCasa("u1", "c1", "Casa Baixo Consumo");
@@ -111,7 +112,7 @@ class DomiUMTest {
     }
 
     @Test
-    void topDivisoesComMaisDispositivosDevolveResultados() {
+    void topDivisoesComMaisDispositivosDevolveResultados() throws DomusException {
         DomiUM domium = new DomiUM();
         domium.criarUtilizador("u1", "Simao");
         domium.criarCasa("u1", "c1", "Casa Principal");
@@ -130,7 +131,7 @@ class DomiUMTest {
     }
 
     @Test
-    void sugestoesEscalonamentoSaoGeradasComAcoesRepetidas() {
+    void sugestoesEscalonamentoSaoGeradasComAcoesRepetidas() throws DomusException {
         DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1", 10.0);
 
         domium.executarComando(new ComandoLigar("u1", "c1", "l1"));
@@ -161,7 +162,7 @@ class DomiUMTest {
      */
     private DomiUM criarDominioComLampada(String utilizadorId, String casaId,
                                           String divisaoNome, String dispositivoId,
-                                          double consumo) {
+                                          double consumo) throws DomusException {
         DomiUM domium = new DomiUM();
         domium.criarUtilizador(utilizadorId, "Utilizador");
         domium.criarCasa(utilizadorId, casaId, "Casa");

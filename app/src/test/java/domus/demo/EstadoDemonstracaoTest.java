@@ -2,6 +2,7 @@ package domus.demo;
 
 import domus.domain.DomiUM;
 import domus.domain.core.Casa;
+import domus.domain.exceptions.DomusException;
 import domus.domain.statistics.ResumoDivisaoDispositivos;
 import domus.domain.suggestions.SugestaoEscalonamento;
 import java.util.Iterator;
@@ -16,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class EstadoDemonstracaoTest {
 
     @Test
-    void popularCriaEstadoDemonstracaoComDadosPrincipais() {
+    void popularCriaEstadoDemonstracaoComDadosPrincipais() throws DomusException {
         DomiUM model = new DomiUM();
 
         EstadoDemonstracao.popular(model);

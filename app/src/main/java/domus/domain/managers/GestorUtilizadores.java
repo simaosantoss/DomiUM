@@ -2,6 +2,7 @@ package domus.domain.managers;
 
 import domus.domain.core.TipoPermissao;
 import domus.domain.core.Utilizador;
+import domus.domain.exceptions.UtilizadorJaExisteException;
 import domus.domain.history.RegistoInteracao;
 import domus.domain.suggestions.GeradorSugestoesHistorico;
 import domus.domain.suggestions.SugestaoEscalonamento;
@@ -43,11 +44,13 @@ public class GestorUtilizadores implements Serializable {
      * @param id identificador do utilizador
      * @param nome nome do utilizador
      */
-    public void criarUtilizador(String id, String nome) {
-        if (id == null || nome == null || this.utilizadores.containsKey(id)) {
+    public void criarUtilizador(String id, String nome) throws UtilizadorJaExisteException {
+        if (id == null || nome == null) {
             return;
         }
-
+        if (this.utilizadores.containsKey(id)) {
+            throw new UtilizadorJaExisteException(id);
+        }
         this.utilizadores.put(id, new Utilizador(id, nome));
     }
 
