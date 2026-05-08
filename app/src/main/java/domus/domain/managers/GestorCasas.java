@@ -105,6 +105,57 @@ public class GestorCasas implements Serializable {
     }
 
     /**
+     * Obtém uma divisão de uma casa a partir do seu nome.
+     *
+     * @param casaId identificador da casa
+     * @param divisaoNome nome da divisão
+     * @return cópia da divisão encontrada, ou {@code null} se a casa ou a
+     *         divisão não existirem
+     */
+    public Divisao getDivisao(String casaId, String divisaoNome) {
+        if (casaId == null || divisaoNome == null) {
+            return null;
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return null;
+        }
+
+        return casa.getDivisao(divisaoNome);
+    }
+
+    /**
+     * Obtém um dispositivo de uma casa a partir do seu identificador,
+     * independentemente da divisão em que se encontra.
+     *
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @return cópia do dispositivo encontrado, ou {@code null} se a casa ou o
+     *         dispositivo não existirem
+     */
+    public Dispositivo getDispositivo(String casaId, String dispositivoId) {
+        if (casaId == null || dispositivoId == null) {
+            return null;
+        }
+
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return null;
+        }
+
+        Iterator<Divisao> iterador = casa.getIteradorDivisoes();
+        while (iterador.hasNext()) {
+            Dispositivo dispositivo = iterador.next().getDispositivo(dispositivoId);
+            if (dispositivo != null) {
+                return dispositivo;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Disponibiliza um iterador sobre uma cópia protegida das casas.
      *
      * @return iterador sobre uma cópia das casas registadas

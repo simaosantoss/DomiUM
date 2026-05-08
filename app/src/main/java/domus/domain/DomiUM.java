@@ -18,6 +18,8 @@ import domus.domain.conditions.Condicao;
 import domus.domain.core.Casa;
 import domus.domain.core.TipoPermissao;
 import domus.domain.core.Utilizador;
+import domus.domain.core.Divisao;
+import domus.domain.devices.Dispositivo;
 import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.environment.AmbienteInterior;
 import domus.domain.history.RegistoInteracao;
@@ -223,6 +225,31 @@ public class DomiUM implements Serializable {
      */
     public Iterator<Casa> getIteradorCasas() {
         return this.gestorCasas.getIteradorCasas();
+    }
+
+    /**
+     * Obtém uma divisão de uma casa a partir do seu nome.
+     *
+     * @param casaId identificador da casa
+     * @param divisaoNome nome da divisão
+     * @return cópia da divisão encontrada, ou {@code null} se a casa ou a
+     *         divisão não existirem
+     */
+    public Divisao getDivisao(String casaId, String divisaoNome) {
+        return this.gestorCasas.getDivisao(casaId, divisaoNome);
+    }
+
+    /**
+     * Obtém um dispositivo de uma casa a partir do seu identificador,
+     * independentemente da divisão em que se encontra.
+     *
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @return cópia do dispositivo encontrado, ou {@code null} se a casa ou o
+     *         dispositivo não existirem
+     */
+    public Dispositivo getDispositivo(String casaId, String dispositivoId) {
+        return this.gestorCasas.getDispositivo(casaId, dispositivoId);
     }
 
     /**

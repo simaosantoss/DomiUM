@@ -10,7 +10,9 @@ import domus.domain.DomiUM;
 import domus.domain.commands.ComandoDesligar;
 import domus.domain.commands.ComandoLigar;
 import domus.domain.core.Casa;
+import domus.domain.core.Divisao;
 import domus.domain.core.Utilizador;
+import domus.domain.devices.Dispositivo;
 import domus.ui.ConsoleView;
 import java.util.Iterator;
 
@@ -120,6 +122,18 @@ public class DomiUMController {
                 break;
             case 18:
                 criarEstadoDemonstracao();
+                break;
+            case 19:
+                consultarCasa();
+                break;
+            case 20:
+                consultarDivisao();
+                break;
+            case 21:
+                consultarDispositivo();
+                break;
+            case 22:
+                listarTodosDispositivosDaCasa();
                 break;
             case 0:
                 sair();
@@ -342,6 +356,87 @@ public class DomiUMController {
             );
         } catch (domus.domain.exceptions.DomusException e) {
             this.view.mostrarErro(e.getMessage());
+        }
+    }
+
+    /**
+     * Consulta as informações de uma casa e lista as suas divisões.
+     */
+    private void consultarCasa() {
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        Casa casa = this.model.getCasa(casaId);
+        if (casa == null) {
+            this.view.mostrarErro("Casa \"" + casaId + "\" não existe.");
+            return;
+        }
+        this.view.mostrarMensagem("Casa: " + casa.getId() + " — " + casa.getNome());
+        Iterator<Divisao> iterador = casa.getIteradorDivisoes();
+        if (!iterador.hasNext()) {
+            this.view.mostrarMensagem("  (sem divisões)");
+        }
+        while (iterador.hasNext()) {
+            this.view.mostrarMensagem("  • " + iterador.next().getNome());
+        }
+    }
+
+    /**
+     * Consulta as informações de uma divisão e lista os seus dispositivos.
+     */
+    private void consultarDivisao() {
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String divisaoNome = this.view.lerTexto("Nome da divisão: ");
+        Divisao divisao = this.model.getDivisao(casaId, divisaoNome);
+        if (divisao == null) {
+            this.view.mostrarErro("Divisão \"" + divisaoNome + "\" não existe na casa \"" + casaId + "\".");
+            return;
+        }
+        this.view.mostrarMensagem("Divisão: " + divisao.getNome());
+        this.view.mostrarMensagem("Ambiente: " + divisao.getAmbienteInterior());
+        Iterator<Dispositivo> iterador = divisao.getIteradorDispositivos();
+        if (!iterador.hasNext()) {
+            this.view.mostrarMensagem("  (sem dispositivos)");
+        }
+        while (iterador.hasNext()) {
+            this.view.mostrarMensagem("  • " + iterador.next());
+        }
+    }
+
+    /**
+     * Consulta as informações e o estado de um dispositivo.
+     */
+    private void consultarDispositivo() {
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
+        Dispositivo dispositivo = this.model.getDispositivo(casaId, dispositivoId);
+        if (dispositivo == null) {
+            this.view.mostrarErro("Dispositivo \"" + dispositivoId + "\" não existe na casa \"" + casaId + "\".");
+            return;
+        }
+        this.view.mostrarMensagem(dispositivo.toString());
+    }
+
+    /**
+     * Lista todos os dispositivos de uma casa, independentemente da divisão.
+     */
+    private void listarTodosDispositivosDaCasa() {
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        Casa casa = this.model.getCasa(casaId);
+        if (casa == null) {
+            this.view.mostrarErro("Casa \"" + casaId + "\" não existe.");
+            return;
+        }
+        boolean encontrou = false;
+        Iterator<Divisao> iteradorDivisoes = casa.getIteradorDivisoes();
+        while (iteradorDivisoes.hasNext()) {
+            Divisao divisao = iteradorDivisoes.next();
+            Iterator<Dispositivo> iteradorDispositivos = divisao.getIteradorDispositivos();
+            while (iteradorDispositivos.hasNext()) {
+                encontrou = true;
+                this.view.mostrarMensagem("[" + divisao.getNome() + "] " + iteradorDispositivos.next());
+            }
+        }
+        if (!encontrou) {
+            this.view.mostrarMensagem("Não existem dispositivos na casa \"" + casaId + "\".");
         }
     }
 

@@ -43,6 +43,10 @@ public class ConsoleView {
         System.out.println("16. Menu de estatísticas");
         System.out.println("17. Menu de sugestões");
         System.out.println("18. Criar estado de demonstração");
+        System.out.println("19. Consultar casa");
+        System.out.println("20. Consultar divisão");
+        System.out.println("21. Consultar dispositivo");
+        System.out.println("22. Listar todos os dispositivos de uma casa");
         System.out.println("0. Sair");
     }
 
