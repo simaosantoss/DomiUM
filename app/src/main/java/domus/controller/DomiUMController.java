@@ -151,9 +151,14 @@ public class DomiUMController {
         String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
         String casaId = this.view.lerTexto("Identificador da casa: ");
         String nome = this.view.lerTexto("Nome da casa: ");
-
-        this.model.criarCasa(utilizadorId, casaId, nome);
-        this.view.mostrarMensagem("Casa criada.");
+        try {
+            this.model.criarCasa(utilizadorId, casaId, nome);
+            this.view.mostrarMensagem("Casa criada.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaJaExisteException e) {
+            this.view.mostrarErro("Já existe uma casa com o identificador \"" + e.getCasaId() + "\".");
+        }
     }
 
     /**
@@ -163,9 +168,18 @@ public class DomiUMController {
         String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
         String casaId = this.view.lerTexto("Identificador da casa: ");
         String divisaoNome = this.view.lerTexto("Nome da divisão: ");
-
-        this.model.adicionarDivisao(utilizadorId, casaId, divisaoNome);
-        this.view.mostrarMensagem("Divisão adicionada.");
+        try {
+            this.model.adicionarDivisao(utilizadorId, casaId, divisaoNome);
+            this.view.mostrarMensagem("Divisão adicionada.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão de administração na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.DivisaoJaExisteException e) {
+            this.view.mostrarErro("Já existe uma divisão \"" + e.getDivisaoNome() + "\" nesta casa.");
+        }
     }
 
     /**
@@ -181,11 +195,25 @@ public class DomiUMController {
         String modelo = this.view.lerTexto("Modelo: ");
         double consumoPorHora = this.view.lerDouble("Consumo por hora: ");
 
-        this.model.adicionarDispositivo(
-                utilizadorId, casaId, divisao, tipo, dispositivoId, marca,
-                modelo, consumoPorHora
-        );
-        this.view.mostrarMensagem("Dispositivo adicionado.");
+        try {
+            this.model.adicionarDispositivo(
+                    utilizadorId, casaId, divisao, tipo, dispositivoId, marca,
+                    modelo, consumoPorHora
+            );
+            this.view.mostrarMensagem("Dispositivo adicionado.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão de administração na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.DivisaoNaoExisteException e) {
+            this.view.mostrarErro("Divisão \"" + e.getDivisaoNome() + "\" não existe.");
+        } catch (domus.domain.exceptions.DispositivoJaExisteException e) {
+            this.view.mostrarErro("Já existe um dispositivo com o identificador \"" + e.getDispositivoId() + "\".");
+        } catch (domus.domain.exceptions.TipoDispositivoInvalidoException e) {
+            this.view.mostrarErro("Tipo de dispositivo desconhecido: \"" + e.getTipo() + "\".");
+        }
     }
 
     /**

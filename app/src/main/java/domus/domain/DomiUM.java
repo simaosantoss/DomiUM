@@ -21,7 +21,15 @@ import domus.domain.core.Utilizador;
 import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.environment.AmbienteInterior;
 import domus.domain.history.RegistoInteracao;
+import domus.domain.exceptions.CasaJaExisteException;
+import domus.domain.exceptions.CasaNaoExisteException;
+import domus.domain.exceptions.DivisaoJaExisteException;
+import domus.domain.exceptions.DivisaoNaoExisteException;
+import domus.domain.exceptions.DispositivoJaExisteException;
+import domus.domain.exceptions.SemPermissaoException;
+import domus.domain.exceptions.TipoDispositivoInvalidoException;
 import domus.domain.exceptions.UtilizadorJaExisteException;
+import domus.domain.exceptions.UtilizadorNaoExisteException;
 import domus.domain.managers.GestorCasas;
 import domus.domain.managers.GestorUtilizadores;
 import domus.domain.scenarios.Cenario;
@@ -168,14 +176,16 @@ public class DomiUM implements Serializable {
      * @param casaId identificador da casa
      * @param nome nome da casa
      */
-    public void criarCasa(String utilizadorId, String casaId, String nome) {
+    public void criarCasa(String utilizadorId, String casaId, String nome) throws UtilizadorNaoExisteException, CasaJaExisteException {
         if (utilizadorId == null || casaId == null || nome == null) {
             return;
         }
 
-        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)
-                || this.gestorCasas.existeCasa(casaId)) {
-            return;
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaJaExisteException(casaId);
         }
 
         this.gestorCasas.criarCasa(casaId, nome);
@@ -387,9 +397,15 @@ public class DomiUM implements Serializable {
      * @param casaId identificador da casa
      * @param divisaoNome nome da nova divisão
      */
-    public void adicionarDivisao(String utilizadorId, String casaId, String divisaoNome) {
+    public void adicionarDivisao(String utilizadorId, String casaId, String divisaoNome) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, DivisaoJaExisteException {
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
         if (!temPermissaoAdmin(utilizadorId, casaId)) {
-            return;
+            throw new SemPermissaoException(utilizadorId, casaId);
         }
 
         this.gestorCasas.adicionarDivisao(casaId, divisaoNome);
@@ -409,9 +425,15 @@ public class DomiUM implements Serializable {
      */
     public void adicionarDispositivo(String utilizadorId, String casaId, String divisao,
                                      String tipo, String dispositivoId, String marca,
-                                     String modelo, double consumoPorHora) {
+                                     String modelo, double consumoPorHora) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, DivisaoNaoExisteException, DispositivoJaExisteException, TipoDispositivoInvalidoException {
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
         if (!temPermissaoAdmin(utilizadorId, casaId)) {
-            return;
+            throw new SemPermissaoException(utilizadorId, casaId);
         }
 
         this.gestorCasas.adicionarDispositivo(

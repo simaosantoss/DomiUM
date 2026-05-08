@@ -8,6 +8,11 @@ import domus.domain.core.Divisao;
 import domus.domain.devices.Dispositivo;
 import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.environment.AmbienteInterior;
+import domus.domain.exceptions.CasaNaoExisteException;
+import domus.domain.exceptions.DivisaoJaExisteException;
+import domus.domain.exceptions.DivisaoNaoExisteException;
+import domus.domain.exceptions.DispositivoJaExisteException;
+import domus.domain.exceptions.TipoDispositivoInvalidoException;
 import domus.domain.factories.DispositivoRegistry;
 import domus.domain.scheduling.Escalonamento;
 import domus.domain.scenarios.Cenario;
@@ -295,24 +300,23 @@ public class GestorCasas implements Serializable {
      * @param divisaoNome nome da divisão
      * @return {@code true} se a divisão tiver sido adicionada
      */
-    public boolean adicionarDivisao(String casaId, String divisaoNome) {
+    public void adicionarDivisao(String casaId, String divisaoNome) throws CasaNaoExisteException, DivisaoJaExisteException {
         if (casaId == null || divisaoNome == null) {
-            return false;
+            return;
         }
 
         Casa casa = this.casas.get(casaId);
         if (casa == null) {
-            return false;
+            throw new CasaNaoExisteException(casaId);
         }
 
         Casa casaAtualizada = casa.clone();
         if (casaAtualizada.contemDivisao(divisaoNome)) {
-            return false;
+            throw new DivisaoJaExisteException(casaId, divisaoNome);
         }
 
         casaAtualizada.adicionarDivisao(new Divisao(divisaoNome));
         this.casas.put(casaId, casaAtualizada);
-        return true;
     }
 
     /**
@@ -327,38 +331,36 @@ public class GestorCasas implements Serializable {
      * @param consumoPorHora consumo base por hora
      * @return {@code true} se o dispositivo tiver sido adicionado
      */
-    public boolean adicionarDispositivo(String casaId, String divisaoNome, String tipo,
-                                        String dispositivoId, String marca, String modelo,
-                                        double consumoPorHora) {
+    public void adicionarDispositivo(String casaId, String divisaoNome, String tipo,
+                                     String dispositivoId, String marca, String modelo,
+                                     double consumoPorHora) throws CasaNaoExisteException, DivisaoNaoExisteException, DispositivoJaExisteException, TipoDispositivoInvalidoException {
         if (casaId == null || divisaoNome == null || tipo == null || dispositivoId == null
                 || marca == null || modelo == null) {
-            return false;
+            return;
         }
 
         Casa casa = this.casas.get(casaId);
         if (casa == null) {
-            return false;
+            throw new CasaNaoExisteException(casaId);
         }
 
         Casa casaAtualizada = casa.clone();
-        if (!casaAtualizada.contemDivisao(divisaoNome) || casaAtualizada.contemDispositivo(dispositivoId)) {
-            return false;
+        if (!casaAtualizada.contemDivisao(divisaoNome)) {
+            throw new DivisaoNaoExisteException(casaId, divisaoNome);
+        }
+        if (casaAtualizada.contemDispositivo(dispositivoId)) {
+            throw new DispositivoJaExisteException(casaId, divisaoNome, dispositivoId);
         }
 
         Dispositivo dispositivo = this.dispositivoRegistry.criar(
                 tipo, dispositivoId, marca, modelo, consumoPorHora
         );
-
         if (dispositivo == null) {
-            return false;
+            throw new TipoDispositivoInvalidoException(tipo);
         }
 
-        if (casaAtualizada.adicionarDispositivoADivisao(divisaoNome, dispositivo)) {
-            this.casas.put(casaId, casaAtualizada);
-            return true;
-        }
-
-        return false;
+        casaAtualizada.adicionarDispositivoADivisao(divisaoNome, dispositivo);
+        this.casas.put(casaId, casaAtualizada);
     }
 
     /**
