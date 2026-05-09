@@ -47,7 +47,31 @@ public class ConsoleView {
         System.out.println("20. Consultar divisão");
         System.out.println("21. Consultar dispositivo");
         System.out.println("22. Listar todos os dispositivos de uma casa");
+        System.out.println("23. Operações de dispositivos");
         System.out.println("0. Sair");
+    }
+
+    /**
+     * Mostra o submenu de operações sobre dispositivos.
+     */
+    public void mostrarMenuDispositivos() {
+        System.out.println();
+        System.out.println("=== Operações de dispositivos ===");
+        System.out.println("1. Ligar dispositivo");
+        System.out.println("2. Desligar dispositivo");
+        System.out.println("3. Definir intensidade da lâmpada");
+        System.out.println("4. Definir cor da lâmpada");
+        System.out.println("5. Definir volume da coluna");
+        System.out.println("6. Definir playlist da coluna");
+        System.out.println("7. Definir abertura da cortina");
+        System.out.println("8. Definir temperatura do ar condicionado");
+        System.out.println("9. Definir modo do ar condicionado");
+        System.out.println("10. Definir humidade alvo do desumidificador");
+        System.out.println("11. Abrir portão");
+        System.out.println("12. Fechar portão");
+        System.out.println("13. Trancar fechadura");
+        System.out.println("14. Destrancar fechadura");
+        System.out.println("0. Voltar");
     }
 
     /**

@@ -2,18 +2,16 @@ package domus.controller;
 
 import domus.controller.menus.AutomacoesMenuController;
 import domus.controller.menus.CenariosMenuController;
+import domus.controller.menus.DispositivosMenuController;
 import domus.controller.menus.EscalonamentosMenuController;
 import domus.controller.menus.EstatisticasMenuController;
 import domus.controller.menus.SugestoesMenuController;
 import domus.demo.EstadoDemonstracao;
 import domus.domain.DomiUM;
-import domus.domain.commands.ComandoDesligar;
-import domus.domain.commands.ComandoLigar;
 import domus.domain.core.Casa;
 import domus.domain.core.Divisao;
 import domus.domain.core.Utilizador;
 import domus.domain.devices.Dispositivo;
-import domus.domain.exceptions.DomusException;
 import domus.ui.ConsoleView;
 import java.util.Iterator;
 
@@ -83,10 +81,10 @@ public class DomiUMController {
                 adicionarDispositivo();
                 break;
             case 5:
-                ligarDispositivo();
+                new DispositivosMenuController(this.model, this.view).ligarDispositivo();
                 break;
             case 6:
-                desligarDispositivo();
+                new DispositivosMenuController(this.model, this.view).desligarDispositivo();
                 break;
             case 7:
                 listarCasas();
@@ -135,6 +133,9 @@ public class DomiUMController {
                 break;
             case 22:
                 listarTodosDispositivosDaCasa();
+                break;
+            case 23:
+                new DispositivosMenuController(this.model, this.view).executar();
                 break;
             case 0:
                 sair();
@@ -228,38 +229,6 @@ public class DomiUMController {
             this.view.mostrarErro("Já existe um dispositivo com o identificador \"" + e.getDispositivoId() + "\".");
         } catch (domus.domain.exceptions.TipoDispositivoInvalidoException e) {
             this.view.mostrarErro("Tipo de dispositivo desconhecido: \"" + e.getTipo() + "\".");
-        }
-    }
-
-    /**
-     * Liga um dispositivo através de um comando.
-     */
-    private void ligarDispositivo() {
-        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
-        String casaId = this.view.lerTexto("Identificador da casa: ");
-        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
-
-        try {
-            this.model.executarComandoValidado(new ComandoLigar(utilizadorId, casaId, dispositivoId));
-            this.view.mostrarMensagem("Comando de ligar executado.");
-        } catch (DomusException e) {
-            this.view.mostrarErro(e.getMessage());
-        }
-    }
-
-    /**
-     * Desliga um dispositivo através de um comando.
-     */
-    private void desligarDispositivo() {
-        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
-        String casaId = this.view.lerTexto("Identificador da casa: ");
-        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
-
-        try {
-            this.model.executarComandoValidado(new ComandoDesligar(utilizadorId, casaId, dispositivoId));
-            this.view.mostrarMensagem("Comando de desligar executado.");
-        } catch (DomusException e) {
-            this.view.mostrarErro(e.getMessage());
         }
     }
 
