@@ -338,7 +338,7 @@ public class GestorCasas implements Serializable {
                     .append(" - ")
                     .append(casa.getNome())
                     .append(": ")
-                    .append(casa.getConsumoTotal())
+                    .append(String.format("%.2f", casa.getConsumoTotal()))
                     .append(System.lineSeparator());
         }
 
