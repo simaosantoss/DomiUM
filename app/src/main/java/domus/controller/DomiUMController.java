@@ -13,6 +13,8 @@ import domus.domain.core.Divisao;
 import domus.domain.core.Utilizador;
 import domus.domain.devices.Dispositivo;
 import domus.ui.ConsoleView;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 
 /**
@@ -22,6 +24,12 @@ import java.util.Iterator;
  * controllers auxiliares compostos com o mesmo model e a mesma view.
  */
 public class DomiUMController {
+
+    /**
+     * Formato usado para apresentar a data e hora simuladas na consola.
+     */
+    private static final DateTimeFormatter FORMATO_DATA_HORA =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     /**
      * Fachada pública do domínio.
@@ -293,7 +301,7 @@ public class DomiUMController {
      * Consulta a data e hora atuais do relógio simulado.
      */
     private void consultarDataHoraAtual() {
-        this.view.mostrarMensagem("Data/hora atual: " + this.model.getDataHoraAtual());
+        this.view.mostrarMensagem("Data/hora atual: " + formatarDataHoraAtual());
     }
 
     /**
@@ -303,7 +311,29 @@ public class DomiUMController {
         int minutos = this.view.lerInteiro("Minutos a avançar: ");
 
         this.model.avancarTempo(minutos);
-        this.view.mostrarMensagem("Tempo avançado. Data/hora atual: " + this.model.getDataHoraAtual());
+        this.view.mostrarMensagem("Tempo avançado. Data/hora atual: " + formatarDataHoraAtual());
+    }
+
+    /**
+     * Formata a data e hora atuais do relógio simulado para apresentação.
+     *
+     * @return data e hora formatadas
+     */
+    private String formatarDataHoraAtual() {
+        return formatarDataHora(this.model.getDataHoraAtual());
+    }
+
+    /**
+     * Formata uma data e hora para apresentação na consola.
+     *
+     * @param dataHora data e hora a formatar
+     * @return texto formatado
+     */
+    private String formatarDataHora(LocalDateTime dataHora) {
+        if (dataHora == null) {
+            return "";
+        }
+        return dataHora.format(FORMATO_DATA_HORA);
     }
 
     /**
