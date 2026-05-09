@@ -1,6 +1,7 @@
 package domus.domain.commands;
 
 import domus.domain.DomiUM;
+import domus.domain.devices.Dispositivo;
 import domus.domain.devices.PortaoGaragemInteligente;
 
 /**
@@ -45,6 +46,17 @@ public class ComandoFecharPortao extends ComandoDispositivo {
                 return true;
             }, "Fechou o portão");
         }
+    }
+
+    /**
+     * Verifica se o comando pode ser aplicado ao dispositivo indicado.
+     *
+     * @param dispositivo dispositivo a validar
+     * @return {@code true} se o dispositivo for um portão de garagem inteligente
+     */
+    @Override
+    public boolean suportaDispositivo(Dispositivo dispositivo) {
+        return dispositivo instanceof PortaoGaragemInteligente;
     }
 
     /**

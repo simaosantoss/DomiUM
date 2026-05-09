@@ -2,6 +2,7 @@ package domus.domain.commands;
 
 import domus.domain.DomiUM;
 import domus.domain.devices.DesumidificadorInteligente;
+import domus.domain.devices.Dispositivo;
 import java.util.Objects;
 
 /**
@@ -55,6 +56,17 @@ public class ComandoDefinirHumidadeDesumidificador extends ComandoDispositivo {
                 return true;
             }, "Definiu humidade alvo do desumidificador para " + this.humidade);
         }
+    }
+
+    /**
+     * Verifica se o comando pode ser aplicado ao dispositivo indicado.
+     *
+     * @param dispositivo dispositivo a validar
+     * @return {@code true} se o dispositivo for um desumidificador inteligente
+     */
+    @Override
+    public boolean suportaDispositivo(Dispositivo dispositivo) {
+        return dispositivo instanceof DesumidificadorInteligente;
     }
 
     /**

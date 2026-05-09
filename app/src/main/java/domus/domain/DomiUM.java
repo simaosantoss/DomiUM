@@ -469,8 +469,14 @@ public class DomiUM implements Serializable {
             if (!temPermissaoUtilizacao(utilizadorId, casaId)) {
                 throw new SemPermissaoException(utilizadorId, casaId);
             }
-            if (this.gestorCasas.getDispositivo(casaId, dispositivoId) == null) {
+            Dispositivo dispositivo = this.gestorCasas.getDispositivo(casaId, dispositivoId);
+            if (dispositivo == null) {
                 throw new DispositivoNaoExisteException(casaId, dispositivoId);
+            }
+            if (!comando.suportaDispositivo(dispositivo)) {
+                throw new OperacaoInvalidaException(
+                        "Comando incompatível com o tipo do dispositivo: " + dispositivoId
+                );
             }
         }
 

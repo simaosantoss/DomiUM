@@ -2,6 +2,7 @@ package domus.domain.commands;
 
 import domus.domain.DomiUM;
 import domus.domain.devices.ArCondicionadoInteligente;
+import domus.domain.devices.Dispositivo;
 import java.util.Objects;
 
 /**
@@ -55,6 +56,17 @@ public class ComandoDefinirTemperaturaArCondicionado extends ComandoDispositivo 
                 return true;
             }, "Definiu temperatura do ar condicionado para " + this.temperatura);
         }
+    }
+
+    /**
+     * Verifica se o comando pode ser aplicado ao dispositivo indicado.
+     *
+     * @param dispositivo dispositivo a validar
+     * @return {@code true} se o dispositivo for um ar condicionado inteligente
+     */
+    @Override
+    public boolean suportaDispositivo(Dispositivo dispositivo) {
+        return dispositivo instanceof ArCondicionadoInteligente;
     }
 
     /**

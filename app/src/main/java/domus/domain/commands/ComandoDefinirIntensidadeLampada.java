@@ -1,6 +1,7 @@
 package domus.domain.commands;
 
 import domus.domain.DomiUM;
+import domus.domain.devices.Dispositivo;
 import domus.domain.devices.LampadaInteligente;
 import java.util.Objects;
 
@@ -55,6 +56,17 @@ public class ComandoDefinirIntensidadeLampada extends ComandoDispositivo {
                 return true;
             }, "Definiu intensidade da lâmpada para " + this.intensidade);
         }
+    }
+
+    /**
+     * Verifica se o comando pode ser aplicado ao dispositivo indicado.
+     *
+     * @param dispositivo dispositivo a validar
+     * @return {@code true} se o dispositivo for uma lâmpada inteligente
+     */
+    @Override
+    public boolean suportaDispositivo(Dispositivo dispositivo) {
+        return dispositivo instanceof LampadaInteligente;
     }
 
     /**

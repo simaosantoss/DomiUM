@@ -2,6 +2,7 @@ package domus.domain.commands;
 
 import domus.domain.DomiUM;
 import domus.domain.devices.ColunaInteligente;
+import domus.domain.devices.Dispositivo;
 import java.util.Objects;
 
 /**
@@ -55,6 +56,17 @@ public class ComandoDefinirPlaylistColuna extends ComandoDispositivo {
                 return true;
             }, "Definiu playlist da coluna para " + this.playlist);
         }
+    }
+
+    /**
+     * Verifica se o comando pode ser aplicado ao dispositivo indicado.
+     *
+     * @param dispositivo dispositivo a validar
+     * @return {@code true} se o dispositivo for uma coluna inteligente
+     */
+    @Override
+    public boolean suportaDispositivo(Dispositivo dispositivo) {
+        return dispositivo instanceof ColunaInteligente;
     }
 
     /**

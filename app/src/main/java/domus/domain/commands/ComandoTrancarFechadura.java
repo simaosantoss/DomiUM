@@ -1,6 +1,7 @@
 package domus.domain.commands;
 
 import domus.domain.DomiUM;
+import domus.domain.devices.Dispositivo;
 import domus.domain.devices.FechaduraInteligente;
 
 /**
@@ -45,6 +46,17 @@ public class ComandoTrancarFechadura extends ComandoDispositivo {
                 return true;
             }, "Trancou a fechadura");
         }
+    }
+
+    /**
+     * Verifica se o comando pode ser aplicado ao dispositivo indicado.
+     *
+     * @param dispositivo dispositivo a validar
+     * @return {@code true} se o dispositivo for uma fechadura inteligente
+     */
+    @Override
+    public boolean suportaDispositivo(Dispositivo dispositivo) {
+        return dispositivo instanceof FechaduraInteligente;
     }
 
     /**

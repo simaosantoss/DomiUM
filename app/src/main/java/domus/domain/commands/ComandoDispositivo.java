@@ -1,5 +1,6 @@
 package domus.domain.commands;
 
+import domus.domain.devices.Dispositivo;
 import java.util.Objects;
 
 /**
@@ -72,6 +73,21 @@ public abstract class ComandoDispositivo implements Command {
      */
     public String getDispositivoId() {
         return this.dispositivoId;
+    }
+
+    /**
+     * Verifica se este comando pode ser aplicado ao dispositivo indicado.
+     *
+     * Por defeito, comandos genéricos sobre dispositivos, como ligar ou
+     * desligar, suportam qualquer dispositivo válido. Comandos específicos de
+     * um tipo concreto podem redefinir este método para restringir a
+     * compatibilidade.
+     *
+     * @param dispositivo dispositivo a validar
+     * @return {@code true} se o comando suportar o dispositivo indicado
+     */
+    public boolean suportaDispositivo(Dispositivo dispositivo) {
+        return dispositivo != null;
     }
 
     /**

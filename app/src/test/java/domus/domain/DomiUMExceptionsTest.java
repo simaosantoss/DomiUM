@@ -1,6 +1,7 @@
 package domus.domain;
 
 import domus.domain.commands.ComandoLigar;
+import domus.domain.commands.ComandoDefinirVolumeColuna;
 import domus.domain.conditions.CondicaoLuminosidade;
 import domus.domain.core.Utilizador;
 import domus.domain.exceptions.CasaJaExisteException;
@@ -11,6 +12,7 @@ import domus.domain.exceptions.DomusException;
 import domus.domain.exceptions.DivisaoJaExisteException;
 import domus.domain.exceptions.DivisaoNaoExisteException;
 import domus.domain.exceptions.EscalonamentoJaExisteException;
+import domus.domain.exceptions.OperacaoInvalidaException;
 import domus.domain.exceptions.SemPermissaoException;
 import domus.domain.exceptions.TipoDispositivoInvalidoException;
 import domus.domain.exceptions.UtilizadorJaExisteException;
@@ -21,6 +23,7 @@ import java.util.Iterator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -167,6 +170,19 @@ class DomiUMExceptionsTest {
         assertThrows(SemPermissaoException.class, () ->
                 domium.executarComandoValidado(new ComandoLigar("u2", "c1", "l1"))
         );
+    }
+
+    @Test
+    void executarComandoValidadoComTipoIncompativelLancaExcecao() throws DomusException {
+        DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
+
+        assertThrows(OperacaoInvalidaException.class, () ->
+                domium.executarComandoValidado(new ComandoDefinirVolumeColuna("u1", "c1", "l1", 30))
+        );
+
+        Utilizador utilizador = domium.getUtilizador("u1");
+        assertNotNull(utilizador);
+        assertFalse(historicoContemAcao(utilizador, "Definiu volume da coluna para 30"));
     }
 
     @Test

@@ -2,6 +2,7 @@ package domus.domain.commands;
 
 import domus.domain.DomiUM;
 import domus.domain.devices.CortinaInteligente;
+import domus.domain.devices.Dispositivo;
 import java.util.Objects;
 
 /**
@@ -55,6 +56,17 @@ public class ComandoDefinirAberturaCortina extends ComandoDispositivo {
                 return true;
             }, "Definiu abertura da cortina para " + this.percentagemAbertura + "%");
         }
+    }
+
+    /**
+     * Verifica se o comando pode ser aplicado ao dispositivo indicado.
+     *
+     * @param dispositivo dispositivo a validar
+     * @return {@code true} se o dispositivo for uma cortina inteligente
+     */
+    @Override
+    public boolean suportaDispositivo(Dispositivo dispositivo) {
+        return dispositivo instanceof CortinaInteligente;
     }
 
     /**
