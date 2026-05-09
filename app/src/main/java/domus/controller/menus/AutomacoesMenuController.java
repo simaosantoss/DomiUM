@@ -1,5 +1,6 @@
 package domus.controller.menus;
 
+import domus.domain.automation.Automacao;
 import domus.domain.DomiUM;
 import domus.domain.commands.ComandoDesligar;
 import domus.domain.commands.ComandoLigar;
@@ -7,6 +8,7 @@ import domus.domain.conditions.CondicaoHumidade;
 import domus.domain.conditions.CondicaoLuminosidade;
 import domus.domain.conditions.CondicaoTemperatura;
 import domus.ui.ConsoleView;
+import java.util.Iterator;
 
 /**
  * Controller do submenu de automações da aplicação de consola.
@@ -57,6 +59,9 @@ public class AutomacoesMenuController {
                     break;
                 case 5:
                     adicionarAcaoDesligarAAutomacao();
+                    break;
+                case 6:
+                    listarAutomacoes();
                     break;
                 case 0:
                     voltar = true;
@@ -210,6 +215,24 @@ public class AutomacoesMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.AutomacaoNaoExisteException e) {
             this.view.mostrarErro("Automação \"" + e.getAutomacaoId() + "\" não existe.");
+        }
+    }
+
+    /**
+     * Lista as automações registadas numa casa.
+     */
+    private void listarAutomacoes() {
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        Iterator<Automacao> iterador = this.model.getIteradorAutomacoes(casaId);
+        boolean encontrou = false;
+
+        while (iterador.hasNext()) {
+            encontrou = true;
+            this.view.mostrarMensagem(iterador.next().toString());
+        }
+
+        if (!encontrou) {
+            this.view.mostrarMensagem("Não existem automações registadas na casa indicada.");
         }
     }
 

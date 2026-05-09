@@ -597,6 +597,21 @@ public class GestorCasas implements Serializable {
     }
 
     /**
+     * Disponibiliza um iterador sobre uma cópia protegida dos cenários de uma
+     * casa.
+     *
+     * @param casaId identificador da casa
+     * @return iterador sobre uma cópia dos cenários da casa
+     */
+    public Iterator<Cenario> getIteradorCenarios(String casaId) {
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return Collections.<Cenario>unmodifiableList(new ArrayList<Cenario>()).iterator();
+        }
+        return casa.getIteradorCenarios();
+    }
+
+    /**
      * Disponibiliza um iterador sobre uma cópia protegida das automações de uma
      * casa.
      *
@@ -609,6 +624,21 @@ public class GestorCasas implements Serializable {
             return Collections.<Automacao>unmodifiableList(new ArrayList<Automacao>()).iterator();
         }
         return casa.getIteradorAutomacoes();
+    }
+
+    /**
+     * Disponibiliza um iterador sobre uma cópia protegida dos escalonamentos de
+     * uma casa.
+     *
+     * @param casaId identificador da casa
+     * @return iterador sobre uma cópia dos escalonamentos da casa
+     */
+    public Iterator<Escalonamento> getIteradorEscalonamentos(String casaId) {
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            return Collections.<Escalonamento>unmodifiableList(new ArrayList<Escalonamento>()).iterator();
+        }
+        return casa.getIteradorEscalonamentos();
     }
 
     /**

@@ -231,6 +231,39 @@ public class DomiUM implements Serializable {
     }
 
     /**
+     * Disponibiliza um iterador sobre uma cópia protegida dos cenários de uma
+     * casa.
+     *
+     * @param casaId identificador da casa
+     * @return iterador sobre uma cópia dos cenários da casa
+     */
+    public Iterator<Cenario> getIteradorCenarios(String casaId) {
+        return this.gestorCasas.getIteradorCenarios(casaId);
+    }
+
+    /**
+     * Disponibiliza um iterador sobre uma cópia protegida dos escalonamentos de
+     * uma casa.
+     *
+     * @param casaId identificador da casa
+     * @return iterador sobre uma cópia dos escalonamentos da casa
+     */
+    public Iterator<Escalonamento> getIteradorEscalonamentos(String casaId) {
+        return this.gestorCasas.getIteradorEscalonamentos(casaId);
+    }
+
+    /**
+     * Disponibiliza um iterador sobre uma cópia protegida das automações de uma
+     * casa.
+     *
+     * @param casaId identificador da casa
+     * @return iterador sobre uma cópia das automações da casa
+     */
+    public Iterator<Automacao> getIteradorAutomacoes(String casaId) {
+        return this.gestorCasas.getIteradorAutomacoes(casaId);
+    }
+
+    /**
      * Obtém uma divisão de uma casa a partir do seu nome.
      *
      * @param casaId identificador da casa

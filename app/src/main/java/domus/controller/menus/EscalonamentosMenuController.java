@@ -3,9 +3,11 @@ package domus.controller.menus;
 import domus.domain.DomiUM;
 import domus.domain.commands.ComandoDesligar;
 import domus.domain.commands.ComandoLigar;
+import domus.domain.scheduling.Escalonamento;
 import domus.ui.ConsoleView;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.Iterator;
 
 /**
  * Controller do submenu de escalonamentos da aplicação de consola.
@@ -56,6 +58,9 @@ public class EscalonamentosMenuController {
                     break;
                 case 5:
                     adicionarAcaoFimDesligarAEscalonamento();
+                    break;
+                case 6:
+                    listarEscalonamentos();
                     break;
                 case 0:
                     voltar = true;
@@ -193,6 +198,24 @@ public class EscalonamentosMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
             this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
+        }
+    }
+
+    /**
+     * Lista os escalonamentos registados numa casa.
+     */
+    private void listarEscalonamentos() {
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        Iterator<Escalonamento> iterador = this.model.getIteradorEscalonamentos(casaId);
+        boolean encontrou = false;
+
+        while (iterador.hasNext()) {
+            encontrou = true;
+            this.view.mostrarMensagem(iterador.next().toString());
+        }
+
+        if (!encontrou) {
+            this.view.mostrarMensagem("Não existem escalonamentos registados na casa indicada.");
         }
     }
 

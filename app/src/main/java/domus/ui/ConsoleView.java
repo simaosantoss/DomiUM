@@ -85,6 +85,7 @@ public class ConsoleView {
         System.out.println("2. Adicionar comando ligar a cenário");
         System.out.println("3. Adicionar comando desligar a cenário");
         System.out.println("4. Executar cenário");
+        System.out.println("5. Listar cenários da casa");
         System.out.println("0. Voltar");
     }
 
@@ -99,6 +100,7 @@ public class ConsoleView {
         System.out.println("3. Adicionar ação de início: desligar dispositivo");
         System.out.println("4. Adicionar ação de fim: ligar dispositivo");
         System.out.println("5. Adicionar ação de fim: desligar dispositivo");
+        System.out.println("6. Listar escalonamentos da casa");
         System.out.println("0. Voltar");
     }
 
@@ -113,6 +115,7 @@ public class ConsoleView {
         System.out.println("3. Criar automação por luminosidade");
         System.out.println("4. Adicionar ação ligar a automação");
         System.out.println("5. Adicionar ação desligar a automação");
+        System.out.println("6. Listar automações da casa");
         System.out.println("0. Voltar");
     }
 

@@ -3,7 +3,9 @@ package domus.controller.menus;
 import domus.domain.DomiUM;
 import domus.domain.commands.ComandoDesligar;
 import domus.domain.commands.ComandoLigar;
+import domus.domain.scenarios.Cenario;
 import domus.ui.ConsoleView;
+import java.util.Iterator;
 
 /**
  * Controller do submenu de cenários da aplicação de consola.
@@ -51,6 +53,9 @@ public class CenariosMenuController {
                     break;
                 case 4:
                     executarCenario();
+                    break;
+                case 5:
+                    listarCenarios();
                     break;
                 case 0:
                     voltar = true;
@@ -156,6 +161,24 @@ public class CenariosMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.CenarioNaoExisteException e) {
             this.view.mostrarErro("Cenário \"" + e.getCenarioId() + "\" não existe.");
+        }
+    }
+
+    /**
+     * Lista os cenários registados numa casa.
+     */
+    private void listarCenarios() {
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        Iterator<Cenario> iterador = this.model.getIteradorCenarios(casaId);
+        boolean encontrou = false;
+
+        while (iterador.hasNext()) {
+            encontrou = true;
+            this.view.mostrarMensagem(iterador.next().toString());
+        }
+
+        if (!encontrou) {
+            this.view.mostrarMensagem("Não existem cenários registados na casa indicada.");
         }
     }
 }
