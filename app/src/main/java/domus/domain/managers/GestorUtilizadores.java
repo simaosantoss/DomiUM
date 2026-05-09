@@ -7,13 +7,13 @@ import domus.domain.history.RegistoInteracao;
 import domus.domain.suggestions.GeradorSugestoesHistorico;
 import domus.domain.suggestions.SugestaoEscalonamento;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Gere os utilizadores registados no domínio DomusControl.
@@ -75,10 +75,9 @@ public class GestorUtilizadores implements Serializable {
      * @return iterador sobre uma cópia dos utilizadores registados
      */
     public Iterator<Utilizador> getIteradorUtilizadores() {
-        List<Utilizador> copia = new ArrayList<Utilizador>();
-        for (Utilizador utilizador : this.utilizadores.values()) {
-            copia.add(utilizador.clone());
-        }
+        List<Utilizador> copia = this.utilizadores.values().stream()
+                .map(Utilizador::clone)
+                .collect(Collectors.toList());
         return Collections.unmodifiableList(copia).iterator();
     }
 

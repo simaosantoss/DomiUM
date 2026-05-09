@@ -3,7 +3,6 @@ package domus.domain.suggestions;
 import domus.domain.history.RegistoInteracao;
 import java.io.Serializable;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Gera sugestões de escalonamento a partir do histórico de interações.
@@ -53,51 +53,43 @@ public class GeradorSugestoesHistorico implements Serializable {
             }
         }
 
-        List<SugestaoEscalonamento> sugestoes = new ArrayList<SugestaoEscalonamento>();
-        for (Map.Entry<ChaveSugestao, Integer> entry : contagens.entrySet()) {
-            if (entry.getValue() >= minimoOcorrencias) {
-                ChaveSugestao chave = entry.getKey();
-                sugestoes.add(new SugestaoEscalonamento(
-                        utilizadorId,
-                        chave.casaId,
-                        chave.dispositivoId,
-                        chave.acao,
-                        chave.horaSugerida,
-                        entry.getValue(),
-                        criarMensagem(chave)
-                ));
-            }
-        }
+        Comparator<SugestaoEscalonamento> comparador = Comparator
+                .comparingInt(SugestaoEscalonamento::getOcorrencias)
+                .reversed()
+                .thenComparing(SugestaoEscalonamento::getCasaId)
+                .thenComparing(SugestaoEscalonamento::getDispositivoId)
+                .thenComparing(SugestaoEscalonamento::getAcao)
+                .thenComparing(SugestaoEscalonamento::getHoraSugerida);
 
-        Collections.sort(sugestoes, new Comparator<SugestaoEscalonamento>() {
-            @Override
-            public int compare(SugestaoEscalonamento s1, SugestaoEscalonamento s2) {
-                int comparacao = Integer.compare(s2.getOcorrencias(), s1.getOcorrencias());
-                if (comparacao != 0) {
-                    return comparacao;
-                }
-                comparacao = s1.getCasaId().compareTo(s2.getCasaId());
-                if (comparacao != 0) {
-                    return comparacao;
-                }
-                comparacao = s1.getDispositivoId().compareTo(s2.getDispositivoId());
-                if (comparacao != 0) {
-                    return comparacao;
-                }
-                comparacao = s1.getAcao().compareTo(s2.getAcao());
-                if (comparacao != 0) {
-                    return comparacao;
-                }
-                return s1.getHoraSugerida().compareTo(s2.getHoraSugerida());
-            }
-        });
-
-        List<SugestaoEscalonamento> resultado = new ArrayList<SugestaoEscalonamento>();
-        for (int i = 0; i < sugestoes.size() && i < limite; i++) {
-            resultado.add(sugestoes.get(i).clone());
-        }
+        List<SugestaoEscalonamento> resultado = contagens.entrySet().stream()
+                .filter(entry -> entry.getValue() >= minimoOcorrencias)
+                .map(entry -> criarSugestao(utilizadorId, entry))
+                .sorted(comparador)
+                .limit(limite)
+                .map(SugestaoEscalonamento::clone)
+                .collect(Collectors.toList());
 
         return Collections.unmodifiableList(resultado).iterator();
+    }
+
+    /**
+     * Cria uma sugestão a partir de uma entrada de contagem.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param entry entrada com a chave de sugestão e o número de ocorrências
+     * @return sugestão correspondente à entrada
+     */
+    private SugestaoEscalonamento criarSugestao(String utilizadorId, Map.Entry<ChaveSugestao, Integer> entry) {
+        ChaveSugestao chave = entry.getKey();
+        return new SugestaoEscalonamento(
+                utilizadorId,
+                chave.casaId,
+                chave.dispositivoId,
+                chave.acao,
+                chave.horaSugerida,
+                entry.getValue(),
+                criarMensagem(chave)
+        );
     }
 
     /**

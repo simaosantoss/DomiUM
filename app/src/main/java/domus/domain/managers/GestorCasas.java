@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Gere as casas registadas no domínio DomusControl.
@@ -161,10 +162,9 @@ public class GestorCasas implements Serializable {
      * @return iterador sobre uma cópia das casas registadas
      */
     public Iterator<Casa> getIteradorCasas() {
-        List<Casa> copia = new ArrayList<Casa>();
-        for (Casa casa : this.casas.values()) {
-            copia.add(casa.clone());
-        }
+        List<Casa> copia = this.casas.values().stream()
+                .map(Casa::clone)
+                .collect(Collectors.toList());
         return Collections.unmodifiableList(copia).iterator();
     }
 
@@ -175,19 +175,12 @@ public class GestorCasas implements Serializable {
      *         casas registadas
      */
     public ResumoCasaConsumo getCasaMaiorConsumo() {
-        ResumoCasaConsumo maiorConsumo = null;
-
-        for (Casa casa : this.casas.values()) {
-            double consumoTotal = casa.getConsumoTotal();
-            if (maiorConsumo == null || consumoTotal > maiorConsumo.getConsumoTotal()) {
-                maiorConsumo = new ResumoCasaConsumo(casa.getId(), casa.getNome(), consumoTotal);
-            }
-        }
-
-        if (maiorConsumo == null) {
-            return null;
-        }
-        return maiorConsumo.clone();
+        return this.casas.values().stream()
+                .max(Comparator.comparingDouble(Casa::getConsumoTotal))
+                .map(casa -> new ResumoCasaConsumo(
+                        casa.getId(), casa.getNome(), casa.getConsumoTotal()
+                ))
+                .orElse(null);
     }
 
     /**
@@ -211,8 +204,7 @@ public class GestorCasas implements Serializable {
             ).iterator();
         }
 
-        List<ResumoDispositivoUso> resumos = criarResumosDispositivos(casa);
-        Collections.sort(resumos, new Comparator<ResumoDispositivoUso>() {
+        Comparator<ResumoDispositivoUso> comparador = new Comparator<ResumoDispositivoUso>() {
             @Override
             public int compare(ResumoDispositivoUso r1, ResumoDispositivoUso r2) {
                 int comparacao = Long.compare(r2.getTempoTotalLigado(), r1.getTempoTotalLigado());
@@ -221,12 +213,13 @@ public class GestorCasas implements Serializable {
                 }
                 return r1.getDispositivoId().compareTo(r2.getDispositivoId());
             }
-        });
+        };
 
-        List<ResumoDispositivoUso> resultado = new ArrayList<ResumoDispositivoUso>();
-        for (int i = 0; i < resumos.size() && i < limite; i++) {
-            resultado.add(resumos.get(i).clone());
-        }
+        List<ResumoDispositivoUso> resultado = criarResumosDispositivos(casa).stream()
+                .sorted(comparador)
+                .limit(limite)
+                .map(ResumoDispositivoUso::clone)
+                .collect(Collectors.toList());
 
         return Collections.unmodifiableList(resultado).iterator();
     }
@@ -252,8 +245,7 @@ public class GestorCasas implements Serializable {
             ).iterator();
         }
 
-        List<ResumoDispositivoUso> resumos = criarResumosDispositivos(casa);
-        Collections.sort(resumos, new Comparator<ResumoDispositivoUso>() {
+        Comparator<ResumoDispositivoUso> comparador = new Comparator<ResumoDispositivoUso>() {
             @Override
             public int compare(ResumoDispositivoUso r1, ResumoDispositivoUso r2) {
                 int comparacao = Integer.compare(r2.getNumeroAtivacoes(), r1.getNumeroAtivacoes());
@@ -262,12 +254,13 @@ public class GestorCasas implements Serializable {
                 }
                 return r1.getDispositivoId().compareTo(r2.getDispositivoId());
             }
-        });
+        };
 
-        List<ResumoDispositivoUso> resultado = new ArrayList<ResumoDispositivoUso>();
-        for (int i = 0; i < resumos.size() && i < limite; i++) {
-            resultado.add(resumos.get(i).clone());
-        }
+        List<ResumoDispositivoUso> resultado = criarResumosDispositivos(casa).stream()
+                .sorted(comparador)
+                .limit(limite)
+                .map(ResumoDispositivoUso::clone)
+                .collect(Collectors.toList());
 
         return Collections.unmodifiableList(resultado).iterator();
     }
@@ -336,18 +329,10 @@ public class GestorCasas implements Serializable {
             return "Não existem casas registadas.";
         }
 
-        StringBuilder sb = new StringBuilder();
-        for (Casa casa : this.casas.values()) {
-            sb.append("Casa ")
-                    .append(casa.getId())
-                    .append(" - ")
-                    .append(casa.getNome())
-                    .append(": ")
-                    .append(casa.getConsumoTotal())
-                    .append(System.lineSeparator());
-        }
-
-        return sb.toString();
+        return this.casas.values().stream()
+                .map(casa -> "Casa " + casa.getId() + " - " + casa.getNome()
+                        + ": " + casa.getConsumoTotal())
+                .collect(Collectors.joining(System.lineSeparator(), "", System.lineSeparator()));
     }
 
     /**
