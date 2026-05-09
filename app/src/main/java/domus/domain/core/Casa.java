@@ -7,13 +7,13 @@ import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.scheduling.Escalonamento;
 import domus.domain.scenarios.Cenario;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Representa uma casa no sistema DomusControl.
@@ -112,10 +112,9 @@ public class Casa implements Serializable {
      * @return iterador sobre uma cópia das divisões da casa
      */
     public Iterator<Divisao> getIteradorDivisoes() {
-        List<Divisao> copia = new ArrayList<Divisao>();
-        for (Divisao divisao : this.divisoes.values()) {
-            copia.add(divisao.clone());
-        }
+        List<Divisao> copia = this.divisoes.values().stream()
+                .map(Divisao::clone)
+                .collect(Collectors.toList());
         return Collections.unmodifiableList(copia).iterator();
     }
 
@@ -145,10 +144,9 @@ public class Casa implements Serializable {
      * @return iterador sobre uma cópia dos cenários da casa
      */
     public Iterator<Cenario> getIteradorCenarios() {
-        List<Cenario> copia = new ArrayList<Cenario>();
-        for (Cenario cenario : this.cenarios.values()) {
-            copia.add(cenario.clone());
-        }
+        List<Cenario> copia = this.cenarios.values().stream()
+                .map(Cenario::clone)
+                .collect(Collectors.toList());
         return Collections.unmodifiableList(copia).iterator();
     }
 
@@ -178,10 +176,9 @@ public class Casa implements Serializable {
      * @return iterador sobre uma cópia das automações da casa
      */
     public Iterator<Automacao> getIteradorAutomacoes() {
-        List<Automacao> copia = new ArrayList<Automacao>();
-        for (Automacao automacao : this.automacoes.values()) {
-            copia.add(automacao.clone());
-        }
+        List<Automacao> copia = this.automacoes.values().stream()
+                .map(Automacao::clone)
+                .collect(Collectors.toList());
         return Collections.unmodifiableList(copia).iterator();
     }
 
@@ -211,10 +208,9 @@ public class Casa implements Serializable {
      * @return iterador sobre uma cópia dos escalonamentos da casa
      */
     public Iterator<Escalonamento> getIteradorEscalonamentos() {
-        List<Escalonamento> copia = new ArrayList<Escalonamento>();
-        for (Escalonamento escalonamento : this.escalonamentos.values()) {
-            copia.add(escalonamento.clone());
-        }
+        List<Escalonamento> copia = this.escalonamentos.values().stream()
+                .map(Escalonamento::clone)
+                .collect(Collectors.toList());
         return Collections.unmodifiableList(copia).iterator();
     }
 

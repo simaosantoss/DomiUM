@@ -4,13 +4,13 @@ import domus.domain.devices.Dispositivo;
 import domus.domain.devices.OperacaoDispositivo;
 import domus.domain.environment.AmbienteInterior;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Representa uma divisão de uma casa no sistema DomusControl.
@@ -82,10 +82,9 @@ public class Divisao implements Serializable {
      * @return iterador sobre uma cópia dos dispositivos da divisão
      */
     public Iterator<Dispositivo> getIteradorDispositivos() {
-        List<Dispositivo> copia = new ArrayList<Dispositivo>();
-        for (Dispositivo dispositivo : this.dispositivos.values()) {
-            copia.add(dispositivo.clone());
-        }
+        List<Dispositivo> copia = this.dispositivos.values().stream()
+                .map(Dispositivo::clone)
+                .collect(Collectors.toList());
         return Collections.unmodifiableList(copia).iterator();
     }
 
