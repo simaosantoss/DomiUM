@@ -38,16 +38,17 @@ public class ConsoleView {
         System.out.println("11. Menu de cenários");
         System.out.println("12. Menu de escalonamentos");
         System.out.println("13. Menu de automações");
-        System.out.println("14. Avançar tempo");
-        System.out.println("15. Atualizar ambiente de divisão");
-        System.out.println("16. Menu de estatísticas");
-        System.out.println("17. Menu de sugestões");
-        System.out.println("18. Criar estado de demonstração");
-        System.out.println("19. Consultar casa");
-        System.out.println("20. Consultar divisão");
-        System.out.println("21. Consultar dispositivo");
-        System.out.println("22. Listar todos os dispositivos de uma casa");
-        System.out.println("23. Operações de dispositivos");
+        System.out.println("14. Consultar data/hora atual");
+        System.out.println("15. Avançar tempo");
+        System.out.println("16. Atualizar ambiente de divisão");
+        System.out.println("17. Menu de estatísticas");
+        System.out.println("18. Menu de sugestões");
+        System.out.println("19. Criar estado de demonstração");
+        System.out.println("20. Consultar casa");
+        System.out.println("21. Consultar divisão");
+        System.out.println("22. Consultar dispositivo");
+        System.out.println("23. Listar todos os dispositivos de uma casa");
+        System.out.println("24. Operações de dispositivos");
         System.out.println("0. Sair");
     }
 

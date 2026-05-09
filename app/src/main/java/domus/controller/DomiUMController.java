@@ -108,33 +108,36 @@ public class DomiUMController {
                 new AutomacoesMenuController(this.model, this.view).executar();
                 break;
             case 14:
-                avancarTempo();
+                consultarDataHoraAtual();
                 break;
             case 15:
-                atualizarAmbienteDivisao();
+                avancarTempo();
                 break;
             case 16:
-                new EstatisticasMenuController(this.model, this.view).executar();
+                atualizarAmbienteDivisao();
                 break;
             case 17:
-                new SugestoesMenuController(this.model, this.view).executar();
+                new EstatisticasMenuController(this.model, this.view).executar();
                 break;
             case 18:
-                criarEstadoDemonstracao();
+                new SugestoesMenuController(this.model, this.view).executar();
                 break;
             case 19:
-                consultarCasa();
+                criarEstadoDemonstracao();
                 break;
             case 20:
-                consultarDivisao();
+                consultarCasa();
                 break;
             case 21:
-                consultarDispositivo();
+                consultarDivisao();
                 break;
             case 22:
-                listarTodosDispositivosDaCasa();
+                consultarDispositivo();
                 break;
             case 23:
+                listarTodosDispositivosDaCasa();
+                break;
+            case 24:
                 new DispositivosMenuController(this.model, this.view).executar();
                 break;
             case 0:
@@ -287,13 +290,20 @@ public class DomiUMController {
     }
 
     /**
+     * Consulta a data e hora atuais do relógio simulado.
+     */
+    private void consultarDataHoraAtual() {
+        this.view.mostrarMensagem("Data/hora atual: " + this.model.getDataHoraAtual());
+    }
+
+    /**
      * Avança o tempo simulado do domínio.
      */
     private void avancarTempo() {
         int minutos = this.view.lerInteiro("Minutos a avançar: ");
 
         this.model.avancarTempo(minutos);
-        this.view.mostrarMensagem("Tempo avançado.");
+        this.view.mostrarMensagem("Tempo avançado. Data/hora atual: " + this.model.getDataHoraAtual());
     }
 
     /**
