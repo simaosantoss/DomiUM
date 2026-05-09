@@ -1,22 +1,22 @@
-package domus.app;
+package domus;
 
 import domus.controller.DomiUMController;
 import domus.domain.DomiUM;
 import domus.ui.ConsoleView;
 
 /**
- * Classe principal da aplicação DomusControl em modo consola.
+ * Ponto de entrada da aplicação DomusControl em modo consola.
  */
-public final class DomusControlApp {
+public final class Main {
 
     /**
      * Construtor privado para impedir instanciação da classe principal.
      */
-    private DomusControlApp() {
+    private Main() {
     }
 
     /**
-     * Ponto de entrada da aplicação.
+     * Inicia a aplicação, criando o model, a view e o controller principal.
      *
      * @param args argumentos da linha de comandos
      */

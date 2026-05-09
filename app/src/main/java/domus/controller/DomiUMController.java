@@ -6,7 +6,6 @@ import domus.controller.menus.DispositivosMenuController;
 import domus.controller.menus.EscalonamentosMenuController;
 import domus.controller.menus.EstatisticasMenuController;
 import domus.controller.menus.SugestoesMenuController;
-import domus.demo.EstadoDemonstracao;
 import domus.domain.DomiUM;
 import domus.domain.core.Casa;
 import domus.domain.core.Divisao;
@@ -131,21 +130,18 @@ public class DomiUMController {
                 new SugestoesMenuController(this.model, this.view).executar();
                 break;
             case 19:
-                criarEstadoDemonstracao();
-                break;
-            case 20:
                 consultarCasa();
                 break;
-            case 21:
+            case 20:
                 consultarDivisao();
                 break;
-            case 22:
+            case 21:
                 consultarDispositivo();
                 break;
-            case 23:
+            case 22:
                 listarTodosDispositivosDaCasa();
                 break;
-            case 24:
+            case 23:
                 new DispositivosMenuController(this.model, this.view).executar();
                 break;
             case 0:
@@ -360,20 +356,6 @@ public class DomiUMController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.DivisaoNaoExisteException e) {
             this.view.mostrarErro("Divisão \"" + e.getDivisaoNome() + "\" não existe.");
-        }
-    }
-
-    /**
-     * Cria um pequeno estado de demonstração no model atual.
-     */
-    private void criarEstadoDemonstracao() {
-        try {
-            EstadoDemonstracao.popular(this.model);
-            this.view.mostrarMensagem(
-                    "Estado de demonstração criado. Pode agora consultar estatísticas, sugestões, cenários, automações e escalonamentos."
-            );
-        } catch (domus.domain.exceptions.DomusException e) {
-            this.view.mostrarErro(e.getMessage());
         }
     }
 
