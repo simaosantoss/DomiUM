@@ -329,10 +329,20 @@ public class GestorCasas implements Serializable {
             return "Não existem casas registadas.";
         }
 
-        return this.casas.values().stream()
-                .map(casa -> "Casa " + casa.getId() + " - " + casa.getNome()
-                        + ": " + casa.getConsumoTotal())
-                .collect(Collectors.joining(System.lineSeparator(), "", System.lineSeparator()));
+        StringBuilder sb = new StringBuilder();
+        Iterator<Casa> iterador = this.casas.values().iterator();
+        while (iterador.hasNext()) {
+            Casa casa = iterador.next();
+            sb.append("Casa ")
+                    .append(casa.getId())
+                    .append(" - ")
+                    .append(casa.getNome())
+                    .append(": ")
+                    .append(casa.getConsumoTotal())
+                    .append(System.lineSeparator());
+        }
+
+        return sb.toString();
     }
 
     /**
