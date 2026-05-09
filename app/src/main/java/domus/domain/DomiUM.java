@@ -480,6 +480,19 @@ public class DomiUM implements Serializable {
      *         executado no contexto indicado
      */
     public void executarComandoValidado(Command cmd) throws DomusException {
+        validarComando(cmd);
+        cmd.execute(this);
+    }
+
+    /**
+     * Valida um comando antes de este ser executado ou guardado numa estrutura
+     * agregada do domínio.
+     *
+     * @param cmd comando a validar
+     * @throws DomusException se o comando for inválido ou incompatível com o
+     *         contexto indicado
+     */
+    private void validarComando(Command cmd) throws DomusException {
         if (cmd == null) {
             throw new OperacaoInvalidaException("Comando inválido.");
         }
@@ -512,8 +525,6 @@ public class DomiUM implements Serializable {
                 );
             }
         }
-
-        cmd.execute(this);
     }
 
     /**
@@ -661,9 +672,11 @@ public class DomiUM implements Serializable {
      * @throws SemPermissaoException se o utilizador não tiver permissão de
      *         utilização sobre a casa
      * @throws CenarioNaoExisteException se o cenário não existir na casa
+     * @throws DomusException se o comando for inválido ou incompatível com o
+     *         dispositivo indicado
      */
-    public void adicionarComandoACenario(String utilizadorId, String casaId, String cenarioId, Command cmd) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, CenarioNaoExisteException {
-        if (cenarioId == null || cmd == null) {
+    public void adicionarComandoACenario(String utilizadorId, String casaId, String cenarioId, Command cmd) throws DomusException {
+        if (cenarioId == null) {
             return;
         }
         if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
@@ -676,8 +689,9 @@ public class DomiUM implements Serializable {
             throw new SemPermissaoException(utilizadorId, casaId);
         }
         if (!comandoPertenceAoContexto(utilizadorId, casaId, cmd)) {
-            return;
+            throw new OperacaoInvalidaException("O comando não pertence ao contexto indicado.");
         }
+        validarComando(cmd);
 
         this.gestorCasas.adicionarComandoACenario(casaId, cenarioId, cmd);
     }
@@ -810,10 +824,12 @@ public class DomiUM implements Serializable {
      * @throws SemPermissaoException se o utilizador não tiver permissão de
      *         utilização sobre a casa
      * @throws AutomacaoNaoExisteException se a automação não existir na casa
+     * @throws DomusException se o comando for inválido ou incompatível com o
+     *         dispositivo indicado
      */
     public void adicionarAcaoAAutomacao(String utilizadorId, String casaId,
-                                        String automacaoId, Command cmd) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, AutomacaoNaoExisteException {
-        if (automacaoId == null || cmd == null) {
+                                        String automacaoId, Command cmd) throws DomusException {
+        if (automacaoId == null) {
             return;
         }
         if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
@@ -826,8 +842,9 @@ public class DomiUM implements Serializable {
             throw new SemPermissaoException(utilizadorId, casaId);
         }
         if (!comandoPertenceAoContexto(utilizadorId, casaId, cmd)) {
-            return;
+            throw new OperacaoInvalidaException("O comando não pertence ao contexto indicado.");
         }
+        validarComando(cmd);
 
         this.gestorCasas.adicionarAcaoAAutomacao(casaId, automacaoId, cmd);
     }
@@ -876,10 +893,12 @@ public class DomiUM implements Serializable {
      *         utilização sobre a casa
      * @throws EscalonamentoNaoExisteException se o escalonamento não existir na
      *         casa
+     * @throws DomusException se o comando for inválido ou incompatível com o
+     *         dispositivo indicado
      */
     public void adicionarAcaoInicioAEscalonamento(String utilizadorId, String casaId,
-                                                  String escalonamentoId, Command cmd) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, EscalonamentoNaoExisteException {
-        if (escalonamentoId == null || cmd == null) {
+                                                  String escalonamentoId, Command cmd) throws DomusException {
+        if (escalonamentoId == null) {
             return;
         }
         if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
@@ -892,8 +911,9 @@ public class DomiUM implements Serializable {
             throw new SemPermissaoException(utilizadorId, casaId);
         }
         if (!comandoPertenceAoContexto(utilizadorId, casaId, cmd)) {
-            return;
+            throw new OperacaoInvalidaException("O comando não pertence ao contexto indicado.");
         }
+        validarComando(cmd);
 
         this.gestorCasas.adicionarAcaoInicioAEscalonamento(casaId, escalonamentoId, cmd);
     }
@@ -911,10 +931,12 @@ public class DomiUM implements Serializable {
      *         utilização sobre a casa
      * @throws EscalonamentoNaoExisteException se o escalonamento não existir na
      *         casa
+     * @throws DomusException se o comando for inválido ou incompatível com o
+     *         dispositivo indicado
      */
     public void adicionarAcaoFimAEscalonamento(String utilizadorId, String casaId,
-                                               String escalonamentoId, Command cmd) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, EscalonamentoNaoExisteException {
-        if (escalonamentoId == null || cmd == null) {
+                                               String escalonamentoId, Command cmd) throws DomusException {
+        if (escalonamentoId == null) {
             return;
         }
         if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
@@ -927,8 +949,9 @@ public class DomiUM implements Serializable {
             throw new SemPermissaoException(utilizadorId, casaId);
         }
         if (!comandoPertenceAoContexto(utilizadorId, casaId, cmd)) {
-            return;
+            throw new OperacaoInvalidaException("O comando não pertence ao contexto indicado.");
         }
+        validarComando(cmd);
 
         this.gestorCasas.adicionarAcaoFimAEscalonamento(casaId, escalonamentoId, cmd);
     }

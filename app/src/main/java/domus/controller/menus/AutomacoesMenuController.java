@@ -189,6 +189,8 @@ public class AutomacoesMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.AutomacaoNaoExisteException e) {
             this.view.mostrarErro("Automação \"" + e.getAutomacaoId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
         }
     }
 
@@ -215,6 +217,8 @@ public class AutomacoesMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.AutomacaoNaoExisteException e) {
             this.view.mostrarErro("Automação \"" + e.getAutomacaoId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
         }
     }
 

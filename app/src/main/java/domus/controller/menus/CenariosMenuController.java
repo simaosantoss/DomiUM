@@ -113,6 +113,8 @@ public class CenariosMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.CenarioNaoExisteException e) {
             this.view.mostrarErro("Cenário \"" + e.getCenarioId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
         }
     }
 
@@ -139,6 +141,8 @@ public class CenariosMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.CenarioNaoExisteException e) {
             this.view.mostrarErro("Cenário \"" + e.getCenarioId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
         }
     }
 

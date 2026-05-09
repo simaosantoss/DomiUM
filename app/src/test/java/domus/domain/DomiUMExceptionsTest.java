@@ -1,9 +1,12 @@
 package domus.domain;
 
 import domus.domain.commands.ComandoLigar;
+import domus.domain.commands.ComandoDefinirIntensidadeLampada;
 import domus.domain.commands.ComandoDefinirVolumeColuna;
 import domus.domain.conditions.CondicaoLuminosidade;
 import domus.domain.core.Utilizador;
+import domus.domain.devices.ColunaInteligente;
+import domus.domain.devices.LampadaInteligente;
 import domus.domain.exceptions.CasaJaExisteException;
 import domus.domain.exceptions.CenarioJaExisteException;
 import domus.domain.exceptions.CenarioNaoExisteException;
@@ -22,6 +25,7 @@ import java.time.LocalTime;
 import java.util.Iterator;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -196,6 +200,72 @@ class DomiUMExceptionsTest {
         assertTrue(historicoContemAcao(utilizador, "Ligou o dispositivo"));
     }
 
+    @Test
+    void adicionarComandoEspecificoValidoACenarioEExecutarAlteraDispositivo() throws DomusException {
+        DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
+        domium.criarCenario("u1", "c1", "noite", "Modo Noite");
+
+        domium.adicionarComandoACenario(
+                "u1", "c1", "noite",
+                new ComandoDefinirIntensidadeLampada("u1", "c1", "l1", 75)
+        );
+        domium.executarCenario("u1", "c1", "noite");
+
+        LampadaInteligente lampada = (LampadaInteligente) domium.getDispositivo("c1", "l1");
+        assertNotNull(lampada);
+        assertEquals(75, lampada.getIntensidade());
+    }
+
+    @Test
+    void adicionarComandoIncompativelACenarioLancaExcecao() throws DomusException {
+        DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
+        domium.criarCenario("u1", "c1", "noite", "Modo Noite");
+
+        assertThrows(OperacaoInvalidaException.class, () ->
+                domium.adicionarComandoACenario(
+                        "u1", "c1", "noite",
+                        new ComandoDefinirVolumeColuna("u1", "c1", "l1", 30)
+                )
+        );
+    }
+
+    @Test
+    void adicionarAcaoEspecificaValidaAEscalonamentoFunciona() throws DomusException {
+        DomiUM domium = criarDominioComColuna("u1", "c1", "Sala", "col1");
+        LocalTime horaInicio = domium.getDataHoraAtual().toLocalTime().plusMinutes(1);
+        LocalTime horaFim = horaInicio.plusMinutes(1);
+        domium.criarEscalonamento("u1", "c1", "esc1", "Escalonamento", horaInicio, horaFim);
+
+        domium.adicionarAcaoInicioAEscalonamento(
+                "u1", "c1", "esc1",
+                new ComandoDefinirVolumeColuna("u1", "c1", "col1", 35)
+        );
+        domium.avancarTempo(1);
+
+        ColunaInteligente coluna = (ColunaInteligente) domium.getDispositivo("c1", "col1");
+        assertNotNull(coluna);
+        assertEquals(35, coluna.getVolume());
+    }
+
+    @Test
+    void adicionarAcaoEspecificaValidaAAutomacaoFunciona() throws DomusException {
+        DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1");
+        domium.criarAutomacao(
+                "u1", "c1", "auto1", "Luz baixa",
+                "Sala", new CondicaoLuminosidade(30.0, false)
+        );
+
+        domium.adicionarAcaoAAutomacao(
+                "u1", "c1", "auto1",
+                new ComandoDefinirIntensidadeLampada("u1", "c1", "l1", 25)
+        );
+        domium.atualizarAmbienteDivisao("u1", "c1", "Sala", 20.0, 50.0, 10.0);
+
+        LampadaInteligente lampada = (LampadaInteligente) domium.getDispositivo("c1", "l1");
+        assertNotNull(lampada);
+        assertEquals(25, lampada.getIntensidade());
+    }
+
     /**
      * Cria um domínio mínimo com utilizador e casa.
      *
@@ -249,6 +319,30 @@ class DomiUMExceptionsTest {
         domium.adicionarDispositivo(
                 utilizadorId, casaId, divisaoNome, "lampada", dispositivoId,
                 "Philips", "Hue", 10.0
+        );
+        return domium;
+    }
+
+    /**
+     * Cria um domínio mínimo com uma coluna registada.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param divisaoNome nome da divisão
+     * @param dispositivoId identificador do dispositivo
+     * @return fachada preparada para os testes
+     * @throws DomusException se a preparação falhar
+     */
+    private DomiUM criarDominioComColuna(String utilizadorId, String casaId,
+                                         String divisaoNome, String dispositivoId)
+            throws DomusException {
+        DomiUM domium = new DomiUM();
+        domium.criarUtilizador(utilizadorId, "Utilizador");
+        domium.criarCasa(utilizadorId, casaId, "Casa");
+        domium.adicionarDivisao(utilizadorId, casaId, divisaoNome);
+        domium.adicionarDispositivo(
+                utilizadorId, casaId, divisaoNome, "coluna", dispositivoId,
+                "JBL", "Charge", 20.0
         );
         return domium;
     }

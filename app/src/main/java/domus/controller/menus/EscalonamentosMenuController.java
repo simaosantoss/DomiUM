@@ -120,6 +120,8 @@ public class EscalonamentosMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
             this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
         }
     }
 
@@ -146,6 +148,8 @@ public class EscalonamentosMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
             this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
         }
     }
 
@@ -172,6 +176,8 @@ public class EscalonamentosMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
             this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
         }
     }
 
@@ -198,6 +204,8 @@ public class EscalonamentosMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
             this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
         }
     }
 
