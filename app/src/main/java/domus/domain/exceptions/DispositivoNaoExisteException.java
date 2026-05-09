@@ -1,8 +1,23 @@
 package domus.domain.exceptions;
 
+/**
+ * Representa uma exceção lançada quando um dispositivo não existe numa casa.
+ */
 public class DispositivoNaoExisteException extends EntidadeNaoEncontradaException {
+
+    /**
+     * Identificador da casa.
+     */
     private final String casaId;
+
+    /**
+     * Nome da divisão, quando conhecido.
+     */
     private final String divisaoNome;
+
+    /**
+     * Identificador do dispositivo.
+     */
     private final String dispositivoId;
 
     /**
@@ -23,10 +38,18 @@ public class DispositivoNaoExisteException extends EntidadeNaoEncontradaExceptio
      * @param dispositivoId identificador do dispositivo
      */
     public DispositivoNaoExisteException(String casaId, String divisaoNome, String dispositivoId) {
-        super("Dispositivo não existe: " + dispositivoId + " (divisão: " + divisaoNome + ", casa: " + casaId + ")");
+        super(criarMensagem(casaId, divisaoNome, dispositivoId));
         this.casaId = casaId;
         this.divisaoNome = divisaoNome;
         this.dispositivoId = dispositivoId;
+    }
+
+    private static String criarMensagem(String casaId, String divisaoNome, String dispositivoId) {
+        if (divisaoNome == null) {
+            return "Dispositivo não existe: " + dispositivoId + " (casa: " + casaId + ")";
+        }
+        return "Dispositivo não existe: " + dispositivoId
+                + " (divisão: " + divisaoNome + ", casa: " + casaId + ")";
     }
 
     /**

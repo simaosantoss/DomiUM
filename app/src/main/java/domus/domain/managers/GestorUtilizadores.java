@@ -38,11 +38,12 @@ public class GestorUtilizadores implements Serializable {
     /**
      * Cria e regista um novo utilizador.
      *
-     * Se o identificador ou o nome forem inválidos, ou se já existir um
-     * utilizador com o mesmo identificador, a operação é ignorada.
+     * Se o identificador ou o nome forem inválidos, a operação é ignorada.
      *
      * @param id identificador do utilizador
      * @param nome nome do utilizador
+     * @throws UtilizadorJaExisteException se já existir um utilizador com o
+     *         identificador indicado
      */
     public void criarUtilizador(String id, String nome) throws UtilizadorJaExisteException {
         if (id == null || nome == null) {

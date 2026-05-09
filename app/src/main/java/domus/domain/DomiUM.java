@@ -90,6 +90,8 @@ public class DomiUM implements Serializable {
      *
      * @param id identificador do utilizador
      * @param nome nome do utilizador
+     * @throws UtilizadorJaExisteException se já existir um utilizador com o
+     *         identificador indicado
      */
     public void criarUtilizador(String id, String nome) throws UtilizadorJaExisteException {
         this.gestorUtilizadores.criarUtilizador(id, nome);
@@ -189,6 +191,9 @@ public class DomiUM implements Serializable {
      * @param utilizadorId identificador do utilizador criador
      * @param casaId identificador da casa
      * @param nome nome da casa
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaJaExisteException se já existir uma casa com o identificador
+     *         indicado
      */
     public void criarCasa(String utilizadorId, String casaId, String nome) throws UtilizadorNaoExisteException, CasaJaExisteException {
         if (utilizadorId == null || casaId == null || nome == null) {
@@ -478,6 +483,12 @@ public class DomiUM implements Serializable {
      * @param utilizadorId identificador do utilizador
      * @param casaId identificador da casa
      * @param divisaoNome nome da nova divisão
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws SemPermissaoException se o utilizador não tiver permissão de
+     *         administração sobre a casa
+     * @throws DivisaoJaExisteException se já existir uma divisão com o nome
+     *         indicado
      */
     public void adicionarDivisao(String utilizadorId, String casaId, String divisaoNome) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, DivisaoJaExisteException {
         if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
@@ -504,6 +515,15 @@ public class DomiUM implements Serializable {
      * @param marca marca do dispositivo
      * @param modelo modelo do dispositivo
      * @param consumoPorHora consumo base por hora
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws SemPermissaoException se o utilizador não tiver permissão de
+     *         administração sobre a casa
+     * @throws DivisaoNaoExisteException se a divisão não existir na casa
+     * @throws DispositivoJaExisteException se já existir um dispositivo com o
+     *         identificador indicado
+     * @throws TipoDispositivoInvalidoException se o tipo textual de dispositivo
+     *         não for suportado
      */
     public void adicionarDispositivo(String utilizadorId, String casaId, String divisao,
                                      String tipo, String dispositivoId, String marca,
@@ -554,6 +574,12 @@ public class DomiUM implements Serializable {
      * @param casaId identificador da casa
      * @param cenarioId identificador do cenário
      * @param nome nome do cenário
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws SemPermissaoException se o utilizador não tiver permissão de
+     *         utilização sobre a casa
+     * @throws CenarioJaExisteException se já existir um cenário com o
+     *         identificador indicado
      */
     public void criarCenario(String utilizadorId, String casaId, String cenarioId, String nome) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, CenarioJaExisteException {
         if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
@@ -576,6 +602,11 @@ public class DomiUM implements Serializable {
      * @param casaId identificador da casa
      * @param cenarioId identificador do cenário
      * @param cmd comando a acrescentar
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws SemPermissaoException se o utilizador não tiver permissão de
+     *         utilização sobre a casa
+     * @throws CenarioNaoExisteException se o cenário não existir na casa
      */
     public void adicionarComandoACenario(String utilizadorId, String casaId, String cenarioId, Command cmd) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, CenarioNaoExisteException {
         if (cenarioId == null || cmd == null) {
@@ -606,6 +637,11 @@ public class DomiUM implements Serializable {
      * @param utilizadorId identificador do utilizador
      * @param casaId identificador da casa
      * @param cenarioId identificador do cenário
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws SemPermissaoException se o utilizador não tiver permissão de
+     *         utilização sobre a casa
+     * @throws CenarioNaoExisteException se o cenário não existir na casa
      */
     public void executarCenario(String utilizadorId, String casaId, String cenarioId) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, CenarioNaoExisteException {
         if (cenarioId == null) {
@@ -638,6 +674,11 @@ public class DomiUM implements Serializable {
      * @param temperatura nova temperatura interior
      * @param humidade nova humidade interior
      * @param luminosidade nova luminosidade interior
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws SemPermissaoException se o utilizador não tiver permissão de
+     *         utilização sobre a casa
+     * @throws DivisaoNaoExisteException se a divisão não existir na casa
      */
     public void atualizarAmbienteDivisao(String utilizadorId, String casaId, String divisaoNome,
                                          double temperatura, double humidade, double luminosidade) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, DivisaoNaoExisteException {
@@ -679,6 +720,14 @@ public class DomiUM implements Serializable {
      * @param nome nome da automação
      * @param divisaoNome nome da divisão associada
      * @param condicao condição que ativa a automação
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws SemPermissaoException se o utilizador não tiver permissão de
+     *         utilização sobre a casa
+     * @throws DivisaoNaoExisteException se a divisão associada não existir na
+     *         casa
+     * @throws AutomacaoJaExisteException se já existir uma automação com o
+     *         identificador indicado
      */
     public void criarAutomacao(String utilizadorId, String casaId, String automacaoId,
                                String nome, String divisaoNome, Condicao condicao) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, DivisaoNaoExisteException, AutomacaoJaExisteException {
@@ -702,6 +751,11 @@ public class DomiUM implements Serializable {
      * @param casaId identificador da casa
      * @param automacaoId identificador da automação
      * @param cmd comando a acrescentar como ação
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws SemPermissaoException se o utilizador não tiver permissão de
+     *         utilização sobre a casa
+     * @throws AutomacaoNaoExisteException se a automação não existir na casa
      */
     public void adicionarAcaoAAutomacao(String utilizadorId, String casaId,
                                         String automacaoId, Command cmd) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, AutomacaoNaoExisteException {
@@ -733,6 +787,12 @@ public class DomiUM implements Serializable {
      * @param nome nome do escalonamento
      * @param horaInicio hora de início
      * @param horaFim hora de fim
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws SemPermissaoException se o utilizador não tiver permissão de
+     *         utilização sobre a casa
+     * @throws EscalonamentoJaExisteException se já existir um escalonamento com
+     *         o identificador indicado
      */
     public void criarEscalonamento(String utilizadorId, String casaId, String escalonamentoId,
                                    String nome, LocalTime horaInicio, LocalTime horaFim) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, EscalonamentoJaExisteException {
@@ -756,6 +816,12 @@ public class DomiUM implements Serializable {
      * @param casaId identificador da casa
      * @param escalonamentoId identificador do escalonamento
      * @param cmd comando a acrescentar como ação de início
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws SemPermissaoException se o utilizador não tiver permissão de
+     *         utilização sobre a casa
+     * @throws EscalonamentoNaoExisteException se o escalonamento não existir na
+     *         casa
      */
     public void adicionarAcaoInicioAEscalonamento(String utilizadorId, String casaId,
                                                   String escalonamentoId, Command cmd) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, EscalonamentoNaoExisteException {
@@ -785,6 +851,12 @@ public class DomiUM implements Serializable {
      * @param casaId identificador da casa
      * @param escalonamentoId identificador do escalonamento
      * @param cmd comando a acrescentar como ação de fim
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws SemPermissaoException se o utilizador não tiver permissão de
+     *         utilização sobre a casa
+     * @throws EscalonamentoNaoExisteException se o escalonamento não existir na
+     *         casa
      */
     public void adicionarAcaoFimAEscalonamento(String utilizadorId, String casaId,
                                                String escalonamentoId, Command cmd) throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException, EscalonamentoNaoExisteException {

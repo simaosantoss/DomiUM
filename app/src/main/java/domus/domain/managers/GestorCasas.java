@@ -355,7 +355,9 @@ public class GestorCasas implements Serializable {
      *
      * @param casaId identificador da casa
      * @param divisaoNome nome da divisão
-     * @return {@code true} se a divisão tiver sido adicionada
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws DivisaoJaExisteException se já existir uma divisão com o nome
+     *         indicado
      */
     public void adicionarDivisao(String casaId, String divisaoNome) throws CasaNaoExisteException, DivisaoJaExisteException {
         if (casaId == null || divisaoNome == null) {
@@ -386,7 +388,12 @@ public class GestorCasas implements Serializable {
      * @param marca marca do dispositivo
      * @param modelo modelo do dispositivo
      * @param consumoPorHora consumo base por hora
-     * @return {@code true} se o dispositivo tiver sido adicionado
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws DivisaoNaoExisteException se a divisão não existir na casa
+     * @throws DispositivoJaExisteException se já existir um dispositivo com o
+     *         identificador indicado
+     * @throws TipoDispositivoInvalidoException se o tipo textual de dispositivo
+     *         não for suportado
      */
     public void adicionarDispositivo(String casaId, String divisaoNome, String tipo,
                                      String dispositivoId, String marca, String modelo,
@@ -457,7 +464,9 @@ public class GestorCasas implements Serializable {
      * @param casaId identificador da casa
      * @param cenarioId identificador do cenário
      * @param nome nome do cenário
-     * @return {@code true} se o cenário tiver sido criado
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws CenarioJaExisteException se já existir um cenário com o
+     *         identificador indicado
      */
     public void criarCenario(String casaId, String cenarioId, String nome) throws CasaNaoExisteException, CenarioJaExisteException {
         if (casaId == null || cenarioId == null || nome == null) {
@@ -484,7 +493,8 @@ public class GestorCasas implements Serializable {
      * @param casaId identificador da casa
      * @param cenarioId identificador do cenário
      * @param cmd comando a acrescentar
-     * @return {@code true} se o comando tiver sido acrescentado
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws CenarioNaoExisteException se o cenário não existir na casa
      */
     public void adicionarComandoACenario(String casaId, String cenarioId, Command cmd) throws CasaNaoExisteException, CenarioNaoExisteException {
         if (casaId == null || cenarioId == null || cmd == null) {
@@ -527,7 +537,8 @@ public class GestorCasas implements Serializable {
      * @param temperatura nova temperatura interior
      * @param humidade nova humidade interior
      * @param luminosidade nova luminosidade interior
-     * @return {@code true} se o ambiente tiver sido atualizado
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws DivisaoNaoExisteException se a divisão não existir na casa
      */
     public void atualizarAmbienteDivisao(String casaId, String divisaoNome,
                                          double temperatura, double humidade,
@@ -596,7 +607,11 @@ public class GestorCasas implements Serializable {
      * @param nome nome da automação
      * @param divisaoNome nome da divisão associada
      * @param condicao condição que ativa a automação
-     * @return {@code true} se a automação tiver sido criada
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws DivisaoNaoExisteException se a divisão associada não existir na
+     *         casa
+     * @throws AutomacaoJaExisteException se já existir uma automação com o
+     *         identificador indicado
      */
     public void criarAutomacao(String casaId, String automacaoId, String nome,
                                String divisaoNome, Condicao condicao) throws CasaNaoExisteException, DivisaoNaoExisteException, AutomacaoJaExisteException {
@@ -628,7 +643,8 @@ public class GestorCasas implements Serializable {
      * @param casaId identificador da casa
      * @param automacaoId identificador da automação
      * @param cmd comando a acrescentar
-     * @return {@code true} se a ação tiver sido acrescentada
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws AutomacaoNaoExisteException se a automação não existir na casa
      */
     public void adicionarAcaoAAutomacao(String casaId, String automacaoId, Command cmd) throws CasaNaoExisteException, AutomacaoNaoExisteException {
         if (casaId == null || automacaoId == null || cmd == null) {
@@ -656,7 +672,9 @@ public class GestorCasas implements Serializable {
      * @param nome nome do escalonamento
      * @param horaInicio hora de início
      * @param horaFim hora de fim
-     * @return {@code true} se o escalonamento tiver sido criado
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws EscalonamentoJaExisteException se já existir um escalonamento com
+     *         o identificador indicado
      */
     public void criarEscalonamento(String casaId, String escalonamentoId, String nome,
                                    LocalTime horaInicio, LocalTime horaFim) throws CasaNaoExisteException, EscalonamentoJaExisteException {
@@ -687,7 +705,9 @@ public class GestorCasas implements Serializable {
      * @param casaId identificador da casa
      * @param escalonamentoId identificador do escalonamento
      * @param cmd comando a acrescentar
-     * @return {@code true} se a ação tiver sido acrescentada
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws EscalonamentoNaoExisteException se o escalonamento não existir na
+     *         casa
      */
     public void adicionarAcaoInicioAEscalonamento(String casaId, String escalonamentoId,
                                                   Command cmd) throws CasaNaoExisteException, EscalonamentoNaoExisteException {
@@ -714,7 +734,9 @@ public class GestorCasas implements Serializable {
      * @param casaId identificador da casa
      * @param escalonamentoId identificador do escalonamento
      * @param cmd comando a acrescentar
-     * @return {@code true} se a ação tiver sido acrescentada
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws EscalonamentoNaoExisteException se o escalonamento não existir na
+     *         casa
      */
     public void adicionarAcaoFimAEscalonamento(String casaId, String escalonamentoId,
                                                Command cmd) throws CasaNaoExisteException, EscalonamentoNaoExisteException {
