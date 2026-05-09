@@ -186,15 +186,39 @@ public abstract class Dispositivo implements Serializable {
     /**
      * Desliga o dispositivo.
      *
-     * Nesta fase, o tempo total ligado ainda não é atualizado no momento do
-     * desligar.
+     * O tempo total ligado é acumulado quando o relógio simulado avança, não no
+     * momento do desligar.
      */
     public void desligar() {
         this.ligado = false;
     }
 
     /**
-     * Calcula o consumo do dispositivo segundo a lógica da subclasse concreta.
+     * Acumula tempo de utilização caso o dispositivo esteja ligado.
+     *
+     * Se o número de minutos não for positivo ou se o dispositivo estiver
+     * desligado, o estado mantém-se inalterado.
+     *
+     * @param minutos minutos a acumular
+     */
+    public void acumularTempoLigado(long minutos) {
+        if (minutos > 0 && this.ligado) {
+            this.tempoTotalLigado += minutos;
+        }
+    }
+
+    /**
+     * Calcula o consumo acumulado estimado com base no tempo total ligado.
+     *
+     * @return consumo acumulado estimado
+     */
+    protected double calcularConsumoAcumulado() {
+        return this.consumoPorHora * this.tempoTotalLigado / 60.0;
+    }
+
+    /**
+     * Calcula o consumo acumulado do dispositivo segundo a lógica da subclasse
+     * concreta.
      *
      * @return consumo calculado
      */

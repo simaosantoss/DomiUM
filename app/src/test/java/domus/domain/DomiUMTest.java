@@ -104,6 +104,8 @@ class DomiUMTest {
         domium.criarCasa("u1", "c2", "Casa Alto Consumo");
         domium.adicionarDivisao("u1", "c2", "Sala");
         domium.adicionarDispositivo("u1", "c2", "Sala", "lampada", "l2", "Philips", "Hue", 20.0);
+        domium.executarComandoValidado(new ComandoLigar("u1", "c2", "l2"));
+        domium.avancarTempo(60);
 
         ResumoCasaConsumo resumo = domium.getCasaMaiorConsumo();
 

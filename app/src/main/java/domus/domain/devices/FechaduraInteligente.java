@@ -70,14 +70,14 @@ public class FechaduraInteligente extends Dispositivo {
     /**
      * Calcula o consumo atual da fechadura.
      *
-     * Nesta fase do projeto, o consumo corresponde diretamente ao consumo base
-     * por hora herdado da superclasse.
+     * O consumo corresponde ao consumo acumulado estimado com base no tempo
+     * total ligado e no consumo por hora herdado da superclasse.
      *
      * @return consumo atual da fechadura
      */
     @Override
     public double getConsumo() {
-        return getConsumoPorHora();
+        return calcularConsumoAcumulado();
     }
 
     /**

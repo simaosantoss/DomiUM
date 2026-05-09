@@ -454,6 +454,23 @@ public class GestorCasas implements Serializable {
     }
 
     /**
+     * Acumula tempo de utilização nos dispositivos ligados de todas as casas.
+     *
+     * @param minutos minutos a acumular
+     */
+    public void acumularTempoDispositivosLigados(long minutos) {
+        if (minutos <= 0) {
+            return;
+        }
+
+        for (Map.Entry<String, Casa> entry : this.casas.entrySet()) {
+            Casa casaAtualizada = entry.getValue().clone();
+            casaAtualizada.acumularTempoDispositivosLigados(minutos);
+            entry.setValue(casaAtualizada);
+        }
+    }
+
+    /**
      * Cria um cenário numa casa.
      *
      * @param casaId identificador da casa

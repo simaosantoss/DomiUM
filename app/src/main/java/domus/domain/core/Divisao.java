@@ -186,6 +186,21 @@ public class Divisao implements Serializable {
     }
 
     /**
+     * Acumula tempo de utilização nos dispositivos ligados da divisão.
+     *
+     * @param minutos minutos a acumular
+     */
+    public void acumularTempoDispositivosLigados(long minutos) {
+        if (minutos <= 0) {
+            return;
+        }
+
+        for (Dispositivo dispositivo : this.dispositivos.values()) {
+            dispositivo.acumularTempoLigado(minutos);
+        }
+    }
+
+    /**
      * Atualiza o ambiente interior da divisão.
      *
      * @param temperatura nova temperatura interior

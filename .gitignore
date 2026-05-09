@@ -9,3 +9,6 @@ build
 
 # Ignore macOS Finder metadata files
 .DS_Store
+
+# Ignore .bin directory, which may contain compiled binaries or scripts
+.bin

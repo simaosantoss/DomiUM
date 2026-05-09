@@ -394,6 +394,21 @@ public class Casa implements Serializable {
     }
 
     /**
+     * Acumula tempo de utilização nos dispositivos ligados das divisões da casa.
+     *
+     * @param minutos minutos a acumular
+     */
+    public void acumularTempoDispositivosLigados(long minutos) {
+        if (minutos <= 0) {
+            return;
+        }
+
+        for (Divisao divisao : this.divisoes.values()) {
+            divisao.acumularTempoDispositivosLigados(minutos);
+        }
+    }
+
+    /**
      * Acrescenta um comando a um cenário existente.
      *
      * A operação é delegada ao cenário interno, que guarda o comando por cópia.

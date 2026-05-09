@@ -552,6 +552,9 @@ public class DomiUM implements Serializable {
     /**
      * Avança o relógio simulado e verifica os escalonamentos das casas.
      *
+     * O avanço é processado internamente em passos de um minuto para que as
+     * ações temporais intermédias possam afetar a acumulação de tempo ligado.
+     *
      * @param minutos minutos a avançar
      */
     public void avancarTempo(int minutos) {
@@ -559,10 +562,22 @@ public class DomiUM implements Serializable {
             return;
         }
 
-        LocalTime horaAnterior = this.relogio.getHoraAtual();
-        this.relogio.avancarTempo(minutos);
-        LocalTime horaAtual = this.relogio.getHoraAtual();
+        for (int i = 0; i < minutos; i++) {
+            LocalTime horaAnterior = this.relogio.getHoraAtual();
+            this.gestorCasas.acumularTempoDispositivosLigados(1);
+            this.relogio.avancarTempo(1);
+            LocalTime horaAtual = this.relogio.getHoraAtual();
+            verificarEscalonamentos(horaAnterior, horaAtual);
+        }
+    }
 
+    /**
+     * Verifica os escalonamentos das casas para o intervalo temporal indicado.
+     *
+     * @param horaAnterior hora antes do avanço
+     * @param horaAtual hora depois do avanço
+     */
+    private void verificarEscalonamentos(LocalTime horaAnterior, LocalTime horaAtual) {
         Iterator<Casa> iteradorCasas = this.gestorCasas.getIteradorCasas();
         while (iteradorCasas.hasNext()) {
             Casa casa = iteradorCasas.next();
