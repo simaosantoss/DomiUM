@@ -53,6 +53,9 @@ public class CenariosMenuController {
                 case 4:
                     listarCenarios();
                     break;
+                case 5:
+                    removerCenario();
+                    break;
                 case 0:
                     voltar = true;
                     break;
@@ -158,6 +161,30 @@ public class CenariosMenuController {
 
         if (!encontrou) {
             this.view.mostrarMensagem("Não existem cenários registados na casa indicada.");
+        }
+    }
+
+    /**
+     * Remove um cenário de uma casa.
+     */
+    private void removerCenario() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String cenarioId = this.view.lerTexto("Identificador do cenário: ");
+
+        try {
+            this.model.removerCenario(utilizadorId, casaId, cenarioId);
+            this.view.mostrarMensagem("Cenário removido.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão de administração na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.CenarioNaoExisteException e) {
+            this.view.mostrarErro("Cenário \"" + e.getCenarioId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
         }
     }
 }

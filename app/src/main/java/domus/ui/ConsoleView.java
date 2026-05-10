@@ -49,6 +49,7 @@ public class ConsoleView {
         System.out.println("22. Listar todos os dispositivos de uma casa");
         System.out.println("23. Operações de dispositivos");
         System.out.println("24. Gerir permissões");
+        System.out.println("25. Remover dispositivo");
         System.out.println("0. Sair");
     }
 
@@ -85,6 +86,7 @@ public class ConsoleView {
         System.out.println("2. Adicionar comando a cenário");
         System.out.println("3. Executar cenário");
         System.out.println("4. Listar cenários da casa");
+        System.out.println("5. Remover cenário");
         System.out.println("0. Voltar");
     }
 
@@ -98,6 +100,7 @@ public class ConsoleView {
         System.out.println("2. Adicionar ação de início");
         System.out.println("3. Adicionar ação de fim");
         System.out.println("4. Listar escalonamentos da casa");
+        System.out.println("5. Remover escalonamento");
         System.out.println("0. Voltar");
     }
 
@@ -112,6 +115,7 @@ public class ConsoleView {
         System.out.println("3. Criar automação por luminosidade");
         System.out.println("4. Adicionar ação à automação");
         System.out.println("5. Listar automações da casa");
+        System.out.println("6. Remover automação");
         System.out.println("0. Voltar");
     }
 

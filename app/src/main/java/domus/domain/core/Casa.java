@@ -304,6 +304,68 @@ public class Casa implements Serializable {
     }
 
     /**
+     * Remove um dispositivo da divisão onde se encontra.
+     *
+     * @param dispositivoId identificador do dispositivo
+     * @return {@code true} se o dispositivo existia e foi removido
+     */
+    public boolean removerDispositivo(String dispositivoId) {
+        if (dispositivoId == null) {
+            return false;
+        }
+
+        for (Divisao divisao : this.divisoes.values()) {
+            if (divisao.removerDispositivo(dispositivoId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Remove um cenário da casa.
+     *
+     * @param cenarioId identificador do cenário
+     * @return {@code true} se o cenário existia e foi removido
+     */
+    public boolean removerCenario(String cenarioId) {
+        if (cenarioId == null) {
+            return false;
+        }
+
+        return this.cenarios.remove(cenarioId) != null;
+    }
+
+    /**
+     * Remove uma automação da casa.
+     *
+     * @param automacaoId identificador da automação
+     * @return {@code true} se a automação existia e foi removida
+     */
+    public boolean removerAutomacao(String automacaoId) {
+        if (automacaoId == null) {
+            return false;
+        }
+
+        return this.automacoes.remove(automacaoId) != null;
+    }
+
+    /**
+     * Remove um escalonamento da casa.
+     *
+     * @param escalonamentoId identificador do escalonamento
+     * @return {@code true} se o escalonamento existia e foi removido
+     */
+    public boolean removerEscalonamento(String escalonamentoId) {
+        if (escalonamentoId == null) {
+            return false;
+        }
+
+        return this.escalonamentos.remove(escalonamentoId) != null;
+    }
+
+    /**
      * Verifica se existe um dispositivo com o identificador indicado em alguma
      * divisão da casa.
      *

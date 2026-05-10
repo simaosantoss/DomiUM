@@ -149,6 +149,9 @@ public class DomiUMController {
             case 24:
                 atribuirPermissaoCasa();
                 break;
+            case 25:
+                removerDispositivo();
+                break;
             case 0:
                 sair();
                 break;
@@ -267,6 +270,31 @@ public class DomiUMController {
             this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
         } catch (domus.domain.exceptions.SemPermissaoException e) {
             this.view.mostrarErro("Sem permissão de administração na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
+        }
+    }
+
+    /**
+     * Remove um dispositivo de uma casa.
+     */
+    private void removerDispositivo() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
+
+        try {
+            this.model.removerDispositivo(utilizadorId, casaId, dispositivoId);
+            this.view.mostrarMensagem("Dispositivo removido.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão de administração na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.DispositivoNaoExisteException e) {
+            this.view.mostrarErro("Dispositivo \"" + e.getDispositivoId()
+                    + "\" não existe na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.DomusException e) {
             this.view.mostrarErro(e.getMessage());
         }

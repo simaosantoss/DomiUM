@@ -55,6 +55,9 @@ public class EscalonamentosMenuController {
                 case 4:
                     listarEscalonamentos();
                     break;
+                case 5:
+                    removerEscalonamento();
+                    break;
                 case 0:
                     voltar = true;
                     break;
@@ -179,6 +182,30 @@ public class EscalonamentosMenuController {
 
         if (!encontrou) {
             this.view.mostrarMensagem("Não existem escalonamentos registados na casa indicada.");
+        }
+    }
+
+    /**
+     * Remove um escalonamento de uma casa.
+     */
+    private void removerEscalonamento() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
+
+        try {
+            this.model.removerEscalonamento(utilizadorId, casaId, escalonamentoId);
+            this.view.mostrarMensagem("Escalonamento removido.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão de administração na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
+            this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
         }
     }
 

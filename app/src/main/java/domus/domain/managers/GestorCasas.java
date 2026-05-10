@@ -16,6 +16,7 @@ import domus.domain.exceptions.CenarioNaoExisteException;
 import domus.domain.exceptions.DivisaoJaExisteException;
 import domus.domain.exceptions.DivisaoNaoExisteException;
 import domus.domain.exceptions.DispositivoJaExisteException;
+import domus.domain.exceptions.DispositivoNaoExisteException;
 import domus.domain.exceptions.EscalonamentoJaExisteException;
 import domus.domain.exceptions.EscalonamentoNaoExisteException;
 import domus.domain.exceptions.TipoDispositivoInvalidoException;
@@ -423,6 +424,29 @@ public class GestorCasas implements Serializable {
     }
 
     /**
+     * Remove um dispositivo de uma casa.
+     *
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws DispositivoNaoExisteException se o dispositivo não existir na casa
+     */
+    public void removerDispositivo(String casaId, String dispositivoId)
+            throws CasaNaoExisteException, DispositivoNaoExisteException {
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            throw new CasaNaoExisteException(casaId);
+        }
+
+        Casa casaAtualizada = casa.clone();
+        if (!casaAtualizada.removerDispositivo(dispositivoId)) {
+            throw new DispositivoNaoExisteException(casaId, dispositivoId);
+        }
+
+        this.casas.put(casaId, casaAtualizada);
+    }
+
+    /**
      * Executa uma operação genérica sobre um dispositivo de uma casa.
      *
      * A casa é alterada sobre uma cópia e só volta a ser guardada se a operação
@@ -520,6 +544,29 @@ public class GestorCasas implements Serializable {
 
         Casa casaAtualizada = casa.clone();
         if (!casaAtualizada.adicionarComandoACenario(cenarioId, cmd)) {
+            throw new CenarioNaoExisteException(casaId, cenarioId);
+        }
+
+        this.casas.put(casaId, casaAtualizada);
+    }
+
+    /**
+     * Remove um cenário de uma casa.
+     *
+     * @param casaId identificador da casa
+     * @param cenarioId identificador do cenário
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws CenarioNaoExisteException se o cenário não existir na casa
+     */
+    public void removerCenario(String casaId, String cenarioId)
+            throws CasaNaoExisteException, CenarioNaoExisteException {
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            throw new CasaNaoExisteException(casaId);
+        }
+
+        Casa casaAtualizada = casa.clone();
+        if (!casaAtualizada.removerCenario(cenarioId)) {
             throw new CenarioNaoExisteException(casaId, cenarioId);
         }
 
@@ -707,6 +754,29 @@ public class GestorCasas implements Serializable {
     }
 
     /**
+     * Remove uma automação de uma casa.
+     *
+     * @param casaId identificador da casa
+     * @param automacaoId identificador da automação
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws AutomacaoNaoExisteException se a automação não existir na casa
+     */
+    public void removerAutomacao(String casaId, String automacaoId)
+            throws CasaNaoExisteException, AutomacaoNaoExisteException {
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            throw new CasaNaoExisteException(casaId);
+        }
+
+        Casa casaAtualizada = casa.clone();
+        if (!casaAtualizada.removerAutomacao(automacaoId)) {
+            throw new AutomacaoNaoExisteException(casaId, automacaoId);
+        }
+
+        this.casas.put(casaId, casaAtualizada);
+    }
+
+    /**
      * Cria um escalonamento numa casa.
      *
      * @param casaId identificador da casa
@@ -793,6 +863,30 @@ public class GestorCasas implements Serializable {
 
         Casa casaAtualizada = casa.clone();
         if (!casaAtualizada.adicionarAcaoFimAEscalonamento(escalonamentoId, cmd)) {
+            throw new EscalonamentoNaoExisteException(casaId, escalonamentoId);
+        }
+
+        this.casas.put(casaId, casaAtualizada);
+    }
+
+    /**
+     * Remove um escalonamento de uma casa.
+     *
+     * @param casaId identificador da casa
+     * @param escalonamentoId identificador do escalonamento
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws EscalonamentoNaoExisteException se o escalonamento não existir na
+     *         casa
+     */
+    public void removerEscalonamento(String casaId, String escalonamentoId)
+            throws CasaNaoExisteException, EscalonamentoNaoExisteException {
+        Casa casa = this.casas.get(casaId);
+        if (casa == null) {
+            throw new CasaNaoExisteException(casaId);
+        }
+
+        Casa casaAtualizada = casa.clone();
+        if (!casaAtualizada.removerEscalonamento(escalonamentoId)) {
             throw new EscalonamentoNaoExisteException(casaId, escalonamentoId);
         }
 

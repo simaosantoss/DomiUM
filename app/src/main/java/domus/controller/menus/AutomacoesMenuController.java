@@ -59,6 +59,9 @@ public class AutomacoesMenuController {
                 case 5:
                     listarAutomacoes();
                     break;
+                case 6:
+                    removerAutomacao();
+                    break;
                 case 0:
                     voltar = true;
                     break;
@@ -212,6 +215,30 @@ public class AutomacoesMenuController {
 
         if (!encontrou) {
             this.view.mostrarMensagem("Não existem automações registadas na casa indicada.");
+        }
+    }
+
+    /**
+     * Remove uma automação de uma casa.
+     */
+    private void removerAutomacao() {
+        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String automacaoId = this.view.lerTexto("Identificador da automação: ");
+
+        try {
+            this.model.removerAutomacao(utilizadorId, casaId, automacaoId);
+            this.view.mostrarMensagem("Automação removida.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão de administração na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.AutomacaoNaoExisteException e) {
+            this.view.mostrarErro("Automação \"" + e.getAutomacaoId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
         }
     }
 

@@ -628,6 +628,23 @@ public class DomiUM implements Serializable {
     }
 
     /**
+     * Remove um dispositivo de uma casa.
+     *
+     * A remoção exige permissão de administração e não altera cenários,
+     * automações ou escalonamentos que possam referenciar o dispositivo.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param dispositivoId identificador do dispositivo
+     * @throws DomusException se alguma validação de domínio falhar
+     */
+    public void removerDispositivo(String utilizadorId, String casaId, String dispositivoId)
+            throws DomusException {
+        validarAdministracaoCasa(utilizadorId, casaId);
+        this.gestorCasas.removerDispositivo(casaId, dispositivoId);
+    }
+
+    /**
      * Avança o relógio simulado e verifica os escalonamentos das casas.
      *
      * O avanço é processado internamente em passos de um minuto para que as
@@ -728,6 +745,20 @@ public class DomiUM implements Serializable {
         validarComando(cmd);
 
         this.gestorCasas.adicionarComandoACenario(casaId, cenarioId, cmd);
+    }
+
+    /**
+     * Remove um cenário de uma casa.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param cenarioId identificador do cenário
+     * @throws DomusException se alguma validação de domínio falhar
+     */
+    public void removerCenario(String utilizadorId, String casaId, String cenarioId)
+            throws DomusException {
+        validarAdministracaoCasa(utilizadorId, casaId);
+        this.gestorCasas.removerCenario(casaId, cenarioId);
     }
 
     /**
@@ -884,6 +915,20 @@ public class DomiUM implements Serializable {
     }
 
     /**
+     * Remove uma automação de uma casa.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param automacaoId identificador da automação
+     * @throws DomusException se alguma validação de domínio falhar
+     */
+    public void removerAutomacao(String utilizadorId, String casaId, String automacaoId)
+            throws DomusException {
+        validarAdministracaoCasa(utilizadorId, casaId);
+        this.gestorCasas.removerAutomacao(casaId, automacaoId);
+    }
+
+    /**
      * Cria um novo escalonamento numa casa.
      *
      * @param utilizadorId identificador do utilizador
@@ -991,6 +1036,20 @@ public class DomiUM implements Serializable {
     }
 
     /**
+     * Remove um escalonamento de uma casa.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @param escalonamentoId identificador do escalonamento
+     * @throws DomusException se alguma validação de domínio falhar
+     */
+    public void removerEscalonamento(String utilizadorId, String casaId,
+                                     String escalonamentoId) throws DomusException {
+        validarAdministracaoCasa(utilizadorId, casaId);
+        this.gestorCasas.removerEscalonamento(casaId, escalonamentoId);
+    }
+
+    /**
      * Verifica se um utilizador tem permissão de administração sobre uma casa.
      *
      * @param utilizadorId identificador do utilizador
@@ -999,6 +1058,29 @@ public class DomiUM implements Serializable {
      */
     private boolean temPermissaoAdmin(String utilizadorId, String casaId) {
         return this.gestorUtilizadores.temPermissaoAdmin(utilizadorId, casaId);
+    }
+
+    /**
+     * Valida se um utilizador pode administrar uma casa.
+     *
+     * @param utilizadorId identificador do utilizador
+     * @param casaId identificador da casa
+     * @throws UtilizadorNaoExisteException se o utilizador não existir
+     * @throws CasaNaoExisteException se a casa não existir
+     * @throws SemPermissaoException se o utilizador não tiver permissão de
+     *         administração
+     */
+    private void validarAdministracaoCasa(String utilizadorId, String casaId)
+            throws UtilizadorNaoExisteException, CasaNaoExisteException, SemPermissaoException {
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorId)) {
+            throw new UtilizadorNaoExisteException(utilizadorId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
+        if (!temPermissaoAdmin(utilizadorId, casaId)) {
+            throw new SemPermissaoException(utilizadorId, casaId);
+        }
     }
 
     /**

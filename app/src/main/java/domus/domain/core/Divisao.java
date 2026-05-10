@@ -114,6 +114,20 @@ public class Divisao implements Serializable {
     }
 
     /**
+     * Remove um dispositivo desta divisão.
+     *
+     * @param dispositivoId identificador do dispositivo
+     * @return {@code true} se o dispositivo existia e foi removido
+     */
+    public boolean removerDispositivo(String dispositivoId) {
+        if (dispositivoId == null) {
+            return false;
+        }
+
+        return this.dispositivos.remove(dispositivoId) != null;
+    }
+
+    /**
      * Verifica se a divisão contém um dispositivo com o identificador indicado.
      *
      * @param dispositivoId identificador do dispositivo
