@@ -13,4 +13,5 @@ public class DomusException extends Exception {
     public DomusException(String message) {
         super(message);
     }
+
 }

@@ -37,6 +37,7 @@ import domus.domain.exceptions.DomusException;
 import domus.domain.exceptions.EscalonamentoJaExisteException;
 import domus.domain.exceptions.EscalonamentoNaoExisteException;
 import domus.domain.exceptions.OperacaoInvalidaException;
+import domus.domain.exceptions.PersistenciaException;
 import domus.domain.exceptions.SemPermissaoException;
 import domus.domain.exceptions.TipoDispositivoInvalidoException;
 import domus.domain.exceptions.UtilizadorJaExisteException;
@@ -389,36 +390,33 @@ public class DomiUM implements Serializable {
     /**
      * Grava o estado completo desta fachada num ficheiro binário.
      *
-     * Se o caminho for inválido ou ocorrer uma falha de escrita, a operação é
-     * ignorada, mantendo o comportamento silencioso do domínio.
-     *
      * @param filepath caminho do ficheiro onde gravar o estado
+     * @throws PersistenciaException se o caminho for inválido ou se ocorrer uma
+     *         falha de escrita
      */
-    public void gravarEstado(String filepath) {
-        if (filepath == null) {
-            return;
+    public void gravarEstado(String filepath) throws PersistenciaException {
+        if (filepath == null || filepath.trim().isEmpty()) {
+            throw new PersistenciaException("Não foi possível guardar o estado em: " + filepath);
         }
 
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filepath))) {
             out.writeObject(this);
         } catch (IOException e) {
-            return;
+            throw new PersistenciaException("Não foi possível guardar o estado em: " + filepath);
         }
     }
 
     /**
      * Carrega o estado completo da fachada a partir de um ficheiro binário.
      *
-     * Se o caminho for inválido ou se o ficheiro não contiver uma instância
-     * válida de {@code DomiUM}, é devolvida uma nova fachada vazia.
-     *
      * @param filepath caminho do ficheiro de onde carregar o estado
-     * @return DomiUM carregada, ou uma nova instância vazia se o carregamento
-     *         falhar
+     * @return DomiUM carregada a partir do ficheiro indicado
+     * @throws PersistenciaException se o caminho for inválido, se o ficheiro não
+     *         puder ser lido ou se o seu conteúdo não for um estado válido
      */
-    public static DomiUM carregarEstado(String filepath) {
-        if (filepath == null) {
-            return new DomiUM();
+    public static DomiUM carregarEstado(String filepath) throws PersistenciaException {
+        if (filepath == null || filepath.trim().isEmpty()) {
+            throw new PersistenciaException("Não foi possível carregar o estado de: " + filepath);
         }
 
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filepath))) {
@@ -426,15 +424,12 @@ public class DomiUM implements Serializable {
             if (objeto instanceof DomiUM) {
                 return (DomiUM) objeto;
             }
+            throw new PersistenciaException("Não foi possível carregar o estado de: " + filepath);
         } catch (IOException e) {
-            return new DomiUM();
+            throw new PersistenciaException("Não foi possível carregar o estado de: " + filepath);
         } catch (ClassNotFoundException e) {
-            return new DomiUM();
-        } catch (ClassCastException e) {
-            return new DomiUM();
+            throw new PersistenciaException("Não foi possível carregar o estado de: " + filepath);
         }
-
-        return new DomiUM();
     }
 
     /**

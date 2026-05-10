@@ -4,6 +4,7 @@ import domus.domain.commands.ComandoLigar;
 import domus.domain.core.Casa;
 import domus.domain.core.Utilizador;
 import domus.domain.exceptions.DomusException;
+import domus.domain.exceptions.PersistenciaException;
 import domus.domain.history.RegistoInteracao;
 import domus.domain.statistics.ResumoCasaConsumo;
 import domus.domain.statistics.ResumoDivisaoDispositivos;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -81,7 +83,7 @@ class DomiUMTest {
     }
 
     @Test
-    void persistenciaGuardaECarregaEstadoBasico() throws IOException, DomusException {
+    void gravarECarregarEstadoValidoPreservaDados() throws IOException, DomusException {
         DomiUM domium = criarDominioComLampada("u1", "c1", "Sala", "l1", 10.0);
         Path ficheiro = this.tempDir.resolve("estado.dat");
 
@@ -92,6 +94,25 @@ class DomiUMTest {
         assertNotNull(carregado.getUtilizador("u1"));
 
         Files.deleteIfExists(ficheiro);
+    }
+
+    @Test
+    void carregarEstadoDeFicheiroInexistenteLancaPersistenciaException() {
+        Path ficheiro = this.tempDir.resolve("ficheiro-que-nao-existe.bin");
+
+        assertThrows(PersistenciaException.class, () ->
+                DomiUM.carregarEstado(ficheiro.toString())
+        );
+    }
+
+    @Test
+    void gravarEstadoComCaminhoInvalidoLancaPersistenciaException() {
+        DomiUM domium = new DomiUM();
+        Path ficheiro = this.tempDir.resolve("diretorio-inexistente").resolve("estado.bin");
+
+        assertThrows(PersistenciaException.class, () ->
+                domium.gravarEstado(ficheiro.toString())
+        );
     }
 
     @Test

@@ -12,6 +12,7 @@ import domus.domain.core.Divisao;
 import domus.domain.core.TipoPermissao;
 import domus.domain.core.Utilizador;
 import domus.domain.devices.Dispositivo;
+import domus.domain.exceptions.PersistenciaException;
 import domus.ui.ConsoleView;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -327,8 +328,12 @@ public class DomiUMController {
     private void guardarEstado() {
         String caminho = this.view.lerTexto("Caminho do ficheiro: ");
 
-        this.model.gravarEstado(caminho);
-        this.view.mostrarMensagem("Estado guardado.");
+        try {
+            this.model.gravarEstado(caminho);
+            this.view.mostrarMensagem("Estado guardado.");
+        } catch (PersistenciaException e) {
+            this.view.mostrarErro("Não foi possível guardar o estado. " + e.getMessage());
+        }
     }
 
     /**
@@ -337,8 +342,13 @@ public class DomiUMController {
     private void carregarEstado() {
         String caminho = this.view.lerTexto("Caminho do ficheiro: ");
 
-        this.model = DomiUM.carregarEstado(caminho);
-        this.view.mostrarMensagem("Estado carregado.");
+        try {
+            DomiUM estadoCarregado = DomiUM.carregarEstado(caminho);
+            this.model = estadoCarregado;
+            this.view.mostrarMensagem("Estado carregado.");
+        } catch (PersistenciaException e) {
+            this.view.mostrarErro("Não foi possível carregar o estado. " + e.getMessage());
+        }
     }
 
     /**
