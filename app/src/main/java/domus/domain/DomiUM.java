@@ -212,6 +212,45 @@ public class DomiUM implements Serializable {
     }
 
     /**
+     * Atribui uma permissão de acesso a uma casa a outro utilizador.
+     *
+     * Apenas um utilizador com permissão de administração na casa pode atribuir
+     * permissões. A alteração concreta da permissão é delegada ao gestor de
+     * utilizadores, mantendo a fachada responsável pela validação das regras de
+     * domínio.
+     *
+     * @param administradorId identificador do utilizador administrador
+     * @param casaId identificador da casa
+     * @param utilizadorAlvoId identificador do utilizador que recebe a permissão
+     * @param permissao permissão a atribuir
+     * @throws DomusException se algum dado for inválido, se alguma entidade não
+     *         existir ou se o administrador não tiver permissão suficiente
+     */
+    public void atribuirPermissaoCasa(String administradorId, String casaId,
+                                      String utilizadorAlvoId, TipoPermissao permissao)
+            throws DomusException {
+        if (administradorId == null || casaId == null || utilizadorAlvoId == null
+                || permissao == null) {
+            throw new OperacaoInvalidaException("Dados inválidos para atribuição de permissão.");
+        }
+
+        if (!this.gestorUtilizadores.existeUtilizador(administradorId)) {
+            throw new UtilizadorNaoExisteException(administradorId);
+        }
+        if (!this.gestorUtilizadores.existeUtilizador(utilizadorAlvoId)) {
+            throw new UtilizadorNaoExisteException(utilizadorAlvoId);
+        }
+        if (!this.gestorCasas.existeCasa(casaId)) {
+            throw new CasaNaoExisteException(casaId);
+        }
+        if (!temPermissaoAdmin(administradorId, casaId)) {
+            throw new SemPermissaoException(administradorId, casaId);
+        }
+
+        this.gestorUtilizadores.adicionarPermissao(utilizadorAlvoId, casaId, permissao);
+    }
+
+    /**
      * Obtém uma casa a partir do seu identificador.
      *
      * @param id identificador da casa

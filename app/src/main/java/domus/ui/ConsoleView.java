@@ -48,6 +48,7 @@ public class ConsoleView {
         System.out.println("21. Consultar dispositivo");
         System.out.println("22. Listar todos os dispositivos de uma casa");
         System.out.println("23. Operações de dispositivos");
+        System.out.println("24. Gerir permissões");
         System.out.println("0. Sair");
     }
 

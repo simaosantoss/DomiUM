@@ -9,6 +9,7 @@ import domus.controller.menus.SugestoesMenuController;
 import domus.domain.DomiUM;
 import domus.domain.core.Casa;
 import domus.domain.core.Divisao;
+import domus.domain.core.TipoPermissao;
 import domus.domain.core.Utilizador;
 import domus.domain.devices.Dispositivo;
 import domus.ui.ConsoleView;
@@ -144,6 +145,9 @@ public class DomiUMController {
             case 23:
                 new DispositivosMenuController(this.model, this.view).executar();
                 break;
+            case 24:
+                atribuirPermissaoCasa();
+                break;
             case 0:
                 sair();
                 break;
@@ -237,6 +241,50 @@ public class DomiUMController {
         } catch (domus.domain.exceptions.TipoDispositivoInvalidoException e) {
             this.view.mostrarErro("Tipo de dispositivo desconhecido: \"" + e.getTipo() + "\".");
         }
+    }
+
+    /**
+     * Atribui uma permissão de acesso a uma casa a um utilizador.
+     */
+    private void atribuirPermissaoCasa() {
+        String administradorId = this.view.lerTexto("Identificador do administrador: ");
+        String casaId = this.view.lerTexto("Identificador da casa: ");
+        String utilizadorAlvoId = this.view.lerTexto("Identificador do utilizador alvo: ");
+        TipoPermissao permissao = lerTipoPermissao();
+
+        if (permissao == null) {
+            this.view.mostrarErro("Tipo de permissão inválido.");
+            return;
+        }
+
+        try {
+            this.model.atribuirPermissaoCasa(administradorId, casaId, utilizadorAlvoId, permissao);
+            this.view.mostrarMensagem("Permissão atribuída.");
+        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
+            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
+        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
+            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
+        } catch (domus.domain.exceptions.SemPermissaoException e) {
+            this.view.mostrarErro("Sem permissão de administração na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.DomusException e) {
+            this.view.mostrarErro(e.getMessage());
+        }
+    }
+
+    /**
+     * Lê e interpreta o tipo de permissão a atribuir.
+     *
+     * @return tipo de permissão escolhido, ou {@code null} se o valor for inválido
+     */
+    private TipoPermissao lerTipoPermissao() {
+        String texto = this.view.lerTexto("Tipo de permissão (1/ADMIN, 2/NORMAL): ");
+        if ("1".equals(texto) || "admin".equalsIgnoreCase(texto)) {
+            return TipoPermissao.ADMIN;
+        }
+        if ("2".equals(texto) || "normal".equalsIgnoreCase(texto)) {
+            return TipoPermissao.NORMAL;
+        }
+        return null;
     }
 
     /**
