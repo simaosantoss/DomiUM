@@ -1,16 +1,21 @@
 POVOAMENTO FINAL - DomusControl
 
-Ficheiro de estado:
-- povoamento-final.bin
+Ficheiro de estado binário:
+- estados/povoamento-final.bin
 
-1. Utilizadores criados
+Modo de criação:
+- Estado criado exclusivamente pela aplicação de consola, através de menus.
+- Ficheiro binário criado pela opção "Guardar estado".
+- Validação posterior feita abrindo novamente a aplicação e usando "Carregar estado".
+
+1. Utilizadores
 
 - u1 - Alice Silva
 - u2 - Bruno Costa
 - u3 - Carla Mendes
 - u4 - Duarte Rocha
 
-2. Casas criadas
+2. Casas
 
 - c1 - Casa Principal
   - Criador/administrador: u1
@@ -21,14 +26,31 @@ Ficheiro de estado:
 - c3 - Casa Praia
   - Criador/administrador: u3
 
-3. Divisoes por casa
+3. Permissões por casa
+
+- c1 - Casa Principal
+  - u1: ADMIN
+  - u2: NORMAL
+  - u4: NORMAL
+
+- c2 - Apartamento Cidade
+  - u2: ADMIN
+  - u1: NORMAL
+  - u3: NORMAL
+
+- c3 - Casa Praia
+  - u3: ADMIN
+  - u4: ADMIN
+  - u1: NORMAL
+
+4. Divisões por casa
 
 - c1 - Casa Principal
   - Sala
   - Cozinha
   - Quarto
   - Garagem
-  - Escritorio
+  - Escritório
 
 - c2 - Apartamento Cidade
   - Sala
@@ -41,304 +63,408 @@ Ficheiro de estado:
   - Exterior
   - Garagem
 
-4. Dispositivos por casa e divisao
+5. Dispositivos por casa e divisão
 
 Casa c1 - Casa Principal
 
 - Sala
-  - l1, lampada, Philips Hue, consumoPorHora 10.0
-    - ligado=true
-    - tempoTotalLigado=79
-    - numeroAtivacoes=3
-    - intensidade=75
-    - corK=3000
-  - col1, coluna, JBL Charge, consumoPorHora 20.0
-    - ligado=true
-    - tempoTotalLigado=74
-    - numeroAtivacoes=3
-    - volume=35
-    - playlistAtual=Relax
-  - cort1, cortina, IKEA SmartBlind, consumoPorHora 5.0
-    - ligado=false
-    - percentagemAbertura=60
+  - l1, lampada, Philips Hue, consumoPorHora 10
+  - col1, coluna, JBL Charge, consumoPorHora 20
+  - cort1, cortina, IKEA SmartBlind, consumoPorHora 5
 
 - Cozinha
-  - l2, lampada, Xiaomi SmartBulb, consumoPorHora 8.0
-    - ligado=false
-    - tempoTotalLigado=0
-    - intensidade=50
-    - corK=3000
-  - des1, desumidificador, Xiaomi Dry, consumoPorHora 30.0
-    - ligado=true
-    - tempoTotalLigado=5
-    - numeroAtivacoes=1
-    - humidadeAlvo=45.0
+  - l2, lampada, Xiaomi SmartBulb, consumoPorHora 8
+  - des1, desumidificador, Xiaomi Dry, consumoPorHora 30
 
 - Quarto
-  - ac1, arcondicionado, Daikin Cool, consumoPorHora 60.0
-    - ligado=false
-    - tempoTotalLigado=41
-    - numeroAtivacoes=1
-    - temperaturaAlvo=22.0
-    - modo=AUTO
-  - l3, lampada, Philips Warm, consumoPorHora 7.0
-    - ligado=false
-    - tempoTotalLigado=0
-    - intensidade=50
-    - corK=3000
+  - ac1, arcondicionado, Daikin Cool, consumoPorHora 60
+  - l3, lampada, Philips Warm, consumoPorHora 7
 
 - Garagem
-  - p1, portao, Nice Garage, consumoPorHora 40.0
-    - aberto=false
-  - f1, fechadura, Yale SmartLock, consumoPorHora 5.0
-    - trancada=true
+  - p1, portao, Nice Garage, consumoPorHora 40
+  - f1, fechadura, Yale SmartLock, consumoPorHora 5
 
-- Escritorio
-  - l4, lampada, Philips Desk, consumoPorHora 6.0
-    - ligado=true
-    - tempoTotalLigado=86
-    - numeroAtivacoes=1
-    - intensidade=55
-    - corK=3000
-  - col2, coluna, Sony Mini, consumoPorHora 15.0
-    - ligado=false
-    - volume=20
-    - playlistAtual=null
+- Escritório
+  - l4, lampada, Philips Desk, consumoPorHora 6
+  - col2, coluna, Sony Mini, consumoPorHora 15
 
 Casa c2 - Apartamento Cidade
 
 - Sala
-  - l5, lampada, IKEA Tradfri, consumoPorHora 7.0
-    - ligado=true
-    - tempoTotalLigado=86
-    - numeroAtivacoes=1
-    - intensidade=60
-    - corK=3200
-  - col3, coluna, Bose Home, consumoPorHora 18.0
-    - ligado=false
-    - volume=25
-    - playlistAtual=Cidade
+  - l5, lampada, IKEA Tradfri, consumoPorHora 7
+  - col3, coluna, Bose Home, consumoPorHora 18
 
 - Quarto
-  - ac2, arcondicionado, LG DualCool, consumoPorHora 55.0
-    - ligado=true
-    - tempoTotalLigado=38
-    - numeroAtivacoes=2
-    - temperaturaAlvo=21.0
-    - modo=ECO
+  - ac2, arcondicionado, LG DualCool, consumoPorHora 55
 
 - Varanda
-  - cort2, cortina, IKEA OutdoorBlind, consumoPorHora 4.0
-    - ligado=false
-    - percentagemAbertura=40
+  - cort2, cortina, IKEA OutdoorBlind, consumoPorHora 4
 
 Casa c3 - Casa Praia
 
 - Sala
-  - l6, lampada, Philips Beach, consumoPorHora 9.0
-    - ligado=true
-    - tempoTotalLigado=86
-    - numeroAtivacoes=1
-    - intensidade=80
-    - corK=2800
-  - col4, coluna, JBL BeachSound, consumoPorHora 22.0
-    - ligado=true
-    - tempoTotalLigado=33
-    - numeroAtivacoes=1
-    - volume=45
-    - playlistAtual=Praia
+  - l6, lampada, Philips Beach, consumoPorHora 9
+  - col4, coluna, JBL BeachSound, consumoPorHora 22
 
 - Suite
-  - ac3, arcondicionado, Mitsubishi Silent, consumoPorHora 65.0
-    - ligado=false
-    - temperaturaAlvo=23.0
-    - modo=COOL
-  - des2, desumidificador, Meaco BeachDry, consumoPorHora 28.0
-    - ligado=false
-    - humidadeAlvo=50.0
+  - ac3, arcondicionado, Mitsubishi Silent, consumoPorHora 65
+  - des2, desumidificador, Meaco BeachDry, consumoPorHora 28
 
 - Exterior
-  - l7, lampada, Osram Outdoor, consumoPorHora 12.0
-    - ligado=true
-    - tempoTotalLigado=84
-    - numeroAtivacoes=2
-    - intensidade=50
-    - corK=3000
+  - l7, lampada, Osram Outdoor, consumoPorHora 12
 
 - Garagem
-  - p2, portao, Nice PraiaGate, consumoPorHora 38.0
-    - aberto=false
-  - f2, fechadura, Yale PraiaLock, consumoPorHora 5.0
-    - trancada=true
+  - p2, portao, Nice PraiaGate, consumoPorHora 38
+  - f2, fechadura, Yale PraiaLock, consumoPorHora 5
 
-5. Cenarios criados
+6. Estados finais relevantes dos dispositivos
 
-- Casa c1
-  - cenario-noite - Modo Noite
-    - ligar l1
-    - desligar col1
-    - desligar l4
-  - cenario-sair - Sair de Casa
-    - desligar l1
-    - desligar col1
-    - desligar ac1
+Estados observados após carregamento do ficheiro final:
 
-- Casa c2
-  - cenario-cidade-noite - Noite no Apartamento
-    - ligar l5
-    - desligar col3
+- c1 / Sala / l1
+  - ligado=true
+  - tempoTotalLigado=24
+  - numeroAtivacoes=2
+  - intensidade=75
+  - corK=3000
 
-- Casa c3
-  - cenario-praia - Fim de Dia Praia
-    - ligar l6
-    - ligar col4
-    - desligar ac3
+- c1 / Sala / col1
+  - ligado=true
+  - tempoTotalLigado=25
+  - numeroAtivacoes=2
+  - volume=35
+  - playlistAtual=Relax
 
-6. Escalonamentos criados
+- c1 / Sala / cort1
+  - percentagemAbertura=60
 
-- Casa c1
-  - esc-sala-manha - Sala de Manha
-    - horaInicio=02:09
-    - horaFim=02:12
-    - inicio: ligar l1
-    - fim: desligar l1
-  - esc-coluna - Musica Programada
-    - horaInicio=02:10
-    - horaFim=02:13
-    - inicio: ligar col1
-    - fim: desligar col1
-  - esc-sug-luz - Sugestao Luz
-    - horaInicio=02:22
-    - horaFim=02:23
-    - inicio: ligar col1
-    - fim: sem acao
+- c1 / Cozinha / des1
+  - ligado=true
+  - tempoTotalLigado=20
+  - numeroAtivacoes=1
+  - humidadeAlvo=45
 
-- Casa c2
-  - esc-ac-cidade - Climatizacao Cidade
-    - horaInicio=02:11
-    - horaFim=02:14
-    - inicio: ligar ac2
-    - fim: desligar ac2
+- c1 / Quarto / ac1
+  - temperaturaAlvo=22
+  - modo=AUTO
 
-- Casa c3
-  - esc-luz-exterior - Luz Exterior
-    - horaInicio=02:12
-    - horaFim=02:15
-    - inicio: ligar l7
-    - fim: desligar l7
+- c1 / Garagem / p1
+  - fechado
 
-7. Automacoes criadas
+- c1 / Garagem / f1
+  - trancada
 
-- Casa c1
-  - auto-luz-sala - Luz baixa na sala
-    - divisao: Sala
-    - condicao: luminosidade < 30.0
-    - acao: ligar l1
-  - auto-humidade-cozinha - Humidade alta na cozinha
-    - divisao: Cozinha
-    - condicao: humidade > 70.0
-    - acao: ligar des1
+- c1 / Escritório / l4
+  - ligado=true
+  - tempoTotalLigado=30
+  - intensidade=55
 
-- Casa c2
-  - auto-temp-quarto - Temperatura alta no quarto
-    - divisao: Quarto
-    - condicao: temperatura > 25.0
-    - acao: ligar ac2
+- c2 / Sala / l5
+  - ligado=true
+  - intensidade=60
+  - corK=3200
 
-- Casa c3
-  - auto-luz-exterior - Luz baixa no exterior
-    - divisao: Exterior
-    - condicao: luminosidade < 25.0
-    - acao: ligar l7
+- c2 / Sala / col3
+  - volume=25
+  - playlistAtual=Cidade
 
-8. Sugestoes aceites
+- c2 / Quarto / ac2
+  - ligado=true
+  - tempoTotalLigado=23
+  - numeroAtivacoes=2
+  - temperaturaAlvo=21
+  - modo=ECO
 
-- esc-sug-luz - Sugestao Luz
-  - sugestao aceite a partir de acoes repetidas do utilizador u1
-  - acao sugerida observada: ligar col1
-  - casa: c1
+- c2 / Varanda / cort2
+  - percentagemAbertura=40
 
-9. Estatisticas finais observadas
+- c3 / Sala / l6
+  - ligado=true
+  - intensidade=80
+  - corK=2800
+
+- c3 / Sala / col4
+  - ligado=true
+  - volume=45
+  - playlistAtual=Praia
+
+- c3 / Suite / ac3
+  - temperaturaAlvo=23
+  - modo=COOL
+
+- c3 / Suite / des2
+  - humidadeAlvo=50
+
+- c3 / Exterior / l7
+  - ligado=true
+  - tempoTotalLigado=27
+  - numeroAtivacoes=2
+
+- c3 / Garagem / p2
+  - aberto e depois fechado durante o povoamento
+
+- c3 / Garagem / f2
+  - trancada
+
+7. Cenários criados
+
+Casa c1:
+
+- cenario-sair - Sair de casa
+  - desligar l1
+  - desligar col1
+  - desligar ac1
+  - desligar l4
+
+- cenario-jantar - Jantar com amigos
+  - ligar l1
+  - ligar col1
+  - desligar ac1
+
+- cenario-deitar - Deitar
+  - desligar col1
+  - desligar l1
+  - ligar l3
+
+- cenario-acordar - Acordar
+  - ligar l1
+  - desligar l3
+  - ligar col1
+
+Casa c2:
+
+- cenario-cidade-noite - Noite no Apartamento
+  - ligar l5
+  - desligar col3
+
+Casa c3:
+
+- cenario-praia - Fim de Dia Praia
+  - ligar l6
+  - ligar col4
+  - desligar ac3
+
+8. Escalonamentos criados
+
+Casa c1:
+
+- esc-sala-manha - Sala de Manhã
+  - início: 11:42
+  - fim: 11:45
+  - ação de início: ligar l1
+  - ação de fim: desligar l1
+
+- esc-coluna - Música Programada
+  - início: 11:43
+  - fim: 11:46
+  - ação de início: ligar col1
+  - ação de fim: desligar col1
+
+- esc-sug-coluna - Sugestão Coluna
+  - início: 12:11
+  - fim: 12:12
+  - ação de início: ligar col1
+  - criado ao aceitar uma sugestão
+
+Casa c2:
+
+- esc-ac-cidade - Climatização Cidade
+  - início: 11:44
+  - fim: 11:47
+  - ação de início: ligar ac2
+  - ação de fim: desligar ac2
+
+Casa c3:
+
+- esc-luz-exterior - Luz Exterior
+  - início: 11:45
+  - fim: 11:48
+  - ação de início: ligar l7
+  - ação de fim: desligar l7
+
+9. Automações criadas
+
+Casa c1:
+
+- auto-luz-sala - Luz baixa na sala
+  - divisão: Sala
+  - condição: luminosidade < 30
+  - ação: ligar l1
+  - disparada com luminosidade 10
+
+- auto-humidade-cozinha - Humidade alta na cozinha
+  - divisão: Cozinha
+  - condição: humidade > 70
+  - ação: ligar des1
+  - disparada com humidade 80
+
+Casa c2:
+
+- auto-temp-quarto - Temperatura alta no quarto
+  - divisão: Quarto
+  - condição: temperatura > 25
+  - ação: ligar ac2
+  - disparada com temperatura 28
+
+Casa c3:
+
+- auto-luz-exterior - Luz baixa no exterior
+  - divisão: Exterior
+  - condição: luminosidade < 25
+  - ação: ligar l7
+  - disparada com luminosidade 5
+
+10. Sugestões aceites
+
+- Utilizador: u1
+- Casa: c1
+- Histórico gerado:
+  - ligar l1 repetido pelo menos 3 vezes
+  - ligar col1 repetido pelo menos 3 vezes
+- Sugestões listadas:
+  - sugestão para col1
+  - sugestão para l1
+- Sugestão aceite:
+  - esc-sug-coluna - Sugestão Coluna
+  - ação sugerida: ligar col1
+
+11. Estatísticas finais
+
+Observadas depois de carregar o ficheiro final:
 
 - Casa com maior consumo:
-  - ResumoCasaConsumo{casaId='c1', nomeCasa='Casa Principal', consumoTotal=89.93333333333334}
+  - ResumoCasaConsumo{casaId='c1', nomeCasa='Casa Principal', consumoTotal=25.333333333333336}
 
 - Resumo de consumo das casas:
-  - Casa c3 - Casa Praia: 41.80
-  - Casa c1 - Casa Principal: 89.93
-  - Casa c2 - Apartamento Cidade: 44.87
+  - Casa c3 - Casa Praia: 20.90
+  - Casa c1 - Casa Principal: 25.33
+  - Casa c2 - Apartamento Cidade: 24.58
 
-- Top dispositivos por tempo ligado em c1:
-  - l4, tempoTotalLigado=86, consumoAtual=8.6
-  - l1, tempoTotalLigado=79, consumoAtual=13.166666666666666
-  - col1, tempoTotalLigado=74, consumoAtual=24.666666666666668
+- Top 3 dispositivos por tempo ligado em c1:
+  - l4, tempoTotalLigado=30
+  - col1, tempoTotalLigado=25
+  - l1, tempoTotalLigado=24
 
-- Top dispositivos por ativacoes em c1:
-  - col1, numeroAtivacoes=3
-  - l1, numeroAtivacoes=3
-  - ac1, numeroAtivacoes=1
+- Top 3 dispositivos por ativações em c1:
+  - col1, numeroAtivacoes=2
+  - l1, numeroAtivacoes=2
+  - des1, numeroAtivacoes=1
 
-- Top divisoes com mais dispositivos:
+- Top 3 divisões com mais dispositivos:
   - c1 / Sala: 3 dispositivos
   - c1 / Cozinha: 2 dispositivos
-  - c1 / Escritorio: 2 dispositivos
+  - c1 / Escritório: 2 dispositivos
 
-10. Testes de erro feitos
+12. Testes de erro realizados
 
-- Opcao de menu textual em vez de inteiro
-  - Resultado: Valor invalido. Introduza um numero inteiro.
-- Opcao de menu inexistente
-  - Resultado: Opcao desconhecida.
-- Criar utilizador u1 duplicado
-  - Resultado: erro de utilizador duplicado.
-- Criar casa c1 duplicada
-  - Resultado: erro de casa duplicada.
-- Adicionar divisao Sala duplicada em c1
-  - Resultado: erro de divisao duplicada.
-- Adicionar dispositivo com tipo invalido
-  - Resultado: Tipo de dispositivo desconhecido.
-- Adicionar dispositivo em divisao inexistente
-  - Resultado: divisao inexistente.
-- Utilizador u2 a tentar alterar c1
-  - Resultado: erro de permissao.
-- Utilizador u1 a tentar alterar c2
-  - Resultado: erro de permissao.
-- Texto quando era esperado double
-  - Resultado: Valor invalido. Introduza um numero decimal.
-- Hora invalida em escalonamento
-  - Resultado: Hora invalida. Use o formato HH:mm.
-- Criar cenario duplicado
-  - Resultado: erro de cenario duplicado.
-- Executar cenario inexistente
-  - Resultado: erro de cenario inexistente.
-- Criar escalonamento duplicado
-  - Resultado: erro de escalonamento duplicado.
-- Criar automacao em divisao inexistente
-  - Resultado: erro de divisao inexistente.
-- Adicionar acao a automacao inexistente
-  - Resultado: erro de automacao inexistente.
-- Operar dispositivo inexistente
-  - Resultado: dispositivo inexistente.
-- Aplicar comando incompatível com o tipo de dispositivo
-  - Resultado: comando incompatível com o tipo do dispositivo.
+- Texto onde era esperado inteiro:
+  - input "abc" no menu principal
+  - resultado: "Valor inválido. Introduza um número inteiro."
 
-11. Persistencia
+- Opção de menu inválida:
+  - input "99"
+  - resultado: "Opção desconhecida."
 
-- O estado foi guardado pela opcao "Guardar estado" da aplicacao.
-- Ficheiro criado: povoamento-final.bin
-- O ficheiro foi carregado novamente pela opcao "Carregar estado".
-- Foram confirmados depois do carregamento:
+- Criar utilizador duplicado:
+  - u1 repetido
+  - resultado: erro de utilizador duplicado
+
+- Criar casa duplicada:
+  - c1 repetida
+  - resultado: erro de casa duplicada
+
+- Adicionar divisão duplicada:
+  - Sala em c1 repetida
+  - resultado: erro de divisão duplicada
+
+- Texto onde era esperado double:
+  - consumo "texto-double" ao criar l1
+  - resultado: "Valor inválido. Introduza um número decimal."
+
+- Hora inválida:
+  - hora "hora-invalida" ao criar esc-sala-manha
+  - resultado: "Hora inválida. Use o formato HH:mm."
+
+- Adicionar dispositivo com tipo inválido:
+  - tipo-invalido
+  - resultado: tipo de dispositivo desconhecido
+
+- Adicionar dispositivo em divisão inexistente:
+  - DivisaoInexistente
+  - resultado: divisão inexistente
+
+- Utilizador NORMAL tentar administrar:
+  - u2 tentou adicionar divisão/dispositivo em c1
+  - resultado: sem permissão de administração
+
+- Utilizador sem permissão tentar mexer numa casa:
+  - u4 tentou administrar c2
+  - resultado: sem permissão
+
+- Atribuir permissão a utilizador inexistente:
+  - alvo ux
+  - resultado: utilizador inexistente
+
+- Atribuir permissão por utilizador sem ADMIN:
+  - u2 tentou atribuir permissões em c1 sendo NORMAL
+  - resultado: sem permissão de administração
+
+- Operar dispositivo inexistente:
+  - dispositivo-inexistente
+  - resultado: dispositivo inexistente
+
+- Comando incompatível com tipo de dispositivo:
+  - definir volume em l1, que é lâmpada
+  - resultado: comando incompatível
+
+- Cenário duplicado:
+  - cenario-sair repetido
+  - resultado: cenário duplicado
+
+- Cenário inexistente:
+  - executar cenario-inexistente
+  - resultado: cenário inexistente
+
+- Escalonamento duplicado:
+  - esc-sala-manha repetido
+  - resultado: escalonamento duplicado
+
+- Escalonamento inexistente:
+  - adicionar ação a esc-inexistente
+  - resultado: escalonamento inexistente
+
+- Automação em divisão inexistente:
+  - auto-divisao-inexistente
+  - resultado: divisão inexistente
+
+- Automação inexistente:
+  - adicionar ação a auto-inexistente
+  - resultado: automação inexistente
+
+- Carregar ficheiro inexistente:
+  - ficheiro-inexistente.bin
+  - resultado: erro de persistência e aplicação continuou
+
+- Guardar em pasta inexistente:
+  - pasta-inexistente/teste.bin
+  - resultado: erro de persistência e não foi apresentada mensagem de sucesso
+
+13. Testes de persistência
+
+- O estado final foi guardado pelo menu "Guardar estado".
+- Caminho usado na aplicação: ../estados/povoamento-final.bin
+- A aplicação foi encerrada.
+- A aplicação foi aberta novamente.
+- O estado foi carregado pelo menu "Carregar estado".
+- Foram confirmados após carregamento:
   - utilizadores
   - casas
-  - divisoes
+  - permissões
+  - divisões
   - dispositivos
-  - estados finais dos dispositivos
+  - estados relevantes dos dispositivos
   - tempoTotalLigado
-  - cenarios
+  - cenários obrigatórios
   - escalonamentos
-  - automacoes
-  - estatisticas
-
-Notas de apresentacao:
-- A ordem do resumo textual de consumo das casas segue a ordem interna da estrutura de dados e nao e ordenada por consumo.
-- As consultas detalhadas usam toString(), por isso sao bastante completas e tecnicas.
+  - automações
+  - estatísticas
