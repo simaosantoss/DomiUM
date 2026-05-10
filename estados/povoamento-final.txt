@@ -7,6 +7,8 @@ Modo de criação:
 - Estado criado exclusivamente pela aplicação de consola, através de menus.
 - Ficheiro binário criado pela opção "Guardar estado".
 - Validação posterior feita abrindo novamente a aplicação e usando "Carregar estado".
+- Atualização final acrescentou exemplos de comandos específicos em cenários,
+  escalonamentos e automações, para além dos comandos simples de ligar/desligar.
 
 1. Utilizadores
 
@@ -123,17 +125,17 @@ Estados observados após carregamento do ficheiro final:
 
 - c1 / Sala / l1
   - ligado=true
-  - tempoTotalLigado=24
+  - tempoTotalLigado=30
   - numeroAtivacoes=2
-  - intensidade=75
-  - corK=3000
+  - intensidade=65
+  - corK=2700
 
 - c1 / Sala / col1
-  - ligado=true
-  - tempoTotalLigado=25
+  - ligado=false
+  - tempoTotalLigado=30
   - numeroAtivacoes=2
-  - volume=35
-  - playlistAtual=Relax
+  - volume=30
+  - playlistAtual=Jantar
 
 - c1 / Sala / cort1
   - percentagemAbertura=60
@@ -170,9 +172,9 @@ Estados observados após carregamento do ficheiro final:
 
 - c2 / Quarto / ac2
   - ligado=true
-  - tempoTotalLigado=23
+  - tempoTotalLigado=29
   - numeroAtivacoes=2
-  - temperaturaAlvo=21
+  - temperaturaAlvo=19
   - modo=ECO
 
 - c2 / Varanda / cort2
@@ -220,11 +222,18 @@ Casa c1:
   - ligar l1
   - ligar col1
   - desligar ac1
+  - definir intensidade da lâmpada l1 para 80
+  - definir cor da lâmpada l1 para 3000K
+  - definir volume da coluna col1 para 40
+  - definir playlist da coluna col1 para "Jantar"
 
 - cenario-deitar - Deitar
   - desligar col1
   - desligar l1
   - ligar l3
+  - definir intensidade da lâmpada l1 para 20
+  - definir cor da lâmpada l1 para 2200K
+  - definir abertura da cortina cort1 para 0%
 
 - cenario-acordar - Acordar
   - ligar l1
@@ -266,6 +275,18 @@ Casa c1:
   - ação de início: ligar col1
   - criado ao aceitar uma sugestão
 
+- esc-ambiente-jantar - Ambiente de Jantar
+  - início: 12:13
+  - fim: 12:16
+  - ações de início:
+    - definir volume da coluna col1 para 35
+    - definir playlist da coluna col1 para "Jantar"
+    - definir intensidade da lâmpada l1 para 70
+  - ações de fim:
+    - definir volume da coluna col1 para 15
+    - desligar col1
+  - testado avançando o relógio simulado até 12:17
+
 Casa c2:
 
 - esc-ac-cidade - Climatização Cidade
@@ -298,13 +319,24 @@ Casa c1:
   - ação: ligar des1
   - disparada com humidade 80
 
+- auto-ambiente-jantar - Ambiente automático de jantar
+  - divisão: Sala
+  - condição: luminosidade < 30
+  - ações:
+    - ligar l1
+    - definir intensidade da lâmpada l1 para 65
+    - definir cor da lâmpada l1 para 2700K
+    - definir volume da coluna col1 para 30
+  - disparada com luminosidade 10
+
 Casa c2:
 
 - auto-temp-quarto - Temperatura alta no quarto
   - divisão: Quarto
   - condição: temperatura > 25
   - ação: ligar ac2
-  - disparada com temperatura 28
+  - ação específica adicional: definir temperatura alvo do ac2 para 19
+  - disparada com temperatura 29
 
 Casa c3:
 
@@ -333,17 +365,17 @@ Casa c3:
 Observadas depois de carregar o ficheiro final:
 
 - Casa com maior consumo:
-  - ResumoCasaConsumo{casaId='c1', nomeCasa='Casa Principal', consumoTotal=25.333333333333336}
+  - ResumoCasaConsumo{casaId='c1', nomeCasa='Casa Principal', consumoTotal=31.6}
 
 - Resumo de consumo das casas:
-  - Casa c3 - Casa Praia: 20.90
-  - Casa c1 - Casa Principal: 25.33
-  - Casa c2 - Apartamento Cidade: 24.58
+  - Casa c3 - Casa Praia: 25.20
+  - Casa c1 - Casa Principal: 31.60
+  - Casa c2 - Apartamento Cidade: 30.78
 
 - Top 3 dispositivos por tempo ligado em c1:
   - l4, tempoTotalLigado=30
-  - col1, tempoTotalLigado=25
-  - l1, tempoTotalLigado=24
+  - col1, tempoTotalLigado=30
+  - l1, tempoTotalLigado=30
 
 - Top 3 dispositivos por ativações em c1:
   - col1, numeroAtivacoes=2
@@ -417,6 +449,12 @@ Observadas depois de carregar o ficheiro final:
   - definir volume em l1, que é lâmpada
   - resultado: comando incompatível
 
+- Comando incompatível dentro de agregado:
+  - tentativa de adicionar ao cenario-jantar o comando "definir volume da coluna"
+    usando l1, que é uma lâmpada
+  - resultado: "Comando incompatível com o tipo do dispositivo: l1"
+  - o comando rejeitado não ficou guardado no cenário
+
 - Cenário duplicado:
   - cenario-sair repetido
   - resultado: cenário duplicado
@@ -452,7 +490,7 @@ Observadas depois de carregar o ficheiro final:
 13. Testes de persistência
 
 - O estado final foi guardado pelo menu "Guardar estado".
-- Caminho usado na aplicação: ../estados/povoamento-final.bin
+- Caminho usado na aplicação: estados/povoamento-final.bin
 - A aplicação foi encerrada.
 - A aplicação foi aberta novamente.
 - O estado foi carregado pelo menu "Carregar estado".
@@ -468,3 +506,19 @@ Observadas depois de carregar o ficheiro final:
   - escalonamentos
   - automações
   - estatísticas
+
+14. Notas úteis para apresentação
+
+- O povoamento demonstra que cenários, escalonamentos e automações já não se
+  limitam a ligar/desligar dispositivos.
+- O cenário cenario-jantar mostra comandos específicos de lâmpada e coluna.
+- O cenário cenario-deitar mostra comandos específicos de lâmpada e cortina.
+- O escalonamento esc-ambiente-jantar mostra comandos específicos programados
+  no início e no fim do intervalo temporal.
+- A automação auto-ambiente-jantar mostra ações específicas disparadas por
+  luminosidade baixa na Sala.
+- A automação auto-temp-quarto, em c2, mostra uma ação específica de ar
+  condicionado: definição da temperatura alvo.
+- Foi testada a rejeição de comando incompatível em agregado: definir volume
+  numa lâmpada dentro de um cenário.
+- O estado atualizado foi guardado e carregado novamente com sucesso.
