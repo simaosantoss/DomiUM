@@ -81,76 +81,76 @@ public class DomiUMController {
                 criarUtilizador();
                 break;
             case 2:
-                criarCasa();
-                break;
-            case 3:
-                adicionarDivisao();
-                break;
-            case 4:
-                adicionarDispositivo();
-                break;
-            case 5:
-                new DispositivosMenuController(this.model, this.view).ligarDispositivo();
-                break;
-            case 6:
-                new DispositivosMenuController(this.model, this.view).desligarDispositivo();
-                break;
-            case 7:
-                listarCasas();
-                break;
-            case 8:
                 listarUtilizadores();
                 break;
-            case 9:
-                guardarEstado();
-                break;
-            case 10:
-                carregarEstado();
-                break;
-            case 11:
-                new CenariosMenuController(this.model, this.view).executar();
-                break;
-            case 12:
-                new EscalonamentosMenuController(this.model, this.view).executar();
-                break;
-            case 13:
-                new AutomacoesMenuController(this.model, this.view).executar();
-                break;
-            case 14:
-                consultarDataHoraAtual();
-                break;
-            case 15:
-                avancarTempo();
-                break;
-            case 16:
-                atualizarAmbienteDivisao();
-                break;
-            case 17:
-                new EstatisticasMenuController(this.model, this.view).executar();
-                break;
-            case 18:
-                new SugestoesMenuController(this.model, this.view).executar();
-                break;
-            case 19:
-                consultarCasa();
-                break;
-            case 20:
-                consultarDivisao();
-                break;
-            case 21:
-                consultarDispositivo();
-                break;
-            case 22:
-                listarTodosDispositivosDaCasa();
-                break;
-            case 23:
-                new DispositivosMenuController(this.model, this.view).executar();
-                break;
-            case 24:
+            case 3:
                 atribuirPermissaoCasa();
                 break;
-            case 25:
+            case 4:
+                criarCasa();
+                break;
+            case 5:
+                listarCasas();
+                break;
+            case 6:
+                consultarCasa();
+                break;
+            case 7:
+                adicionarDivisao();
+                break;
+            case 8:
+                consultarDivisao();
+                break;
+            case 9:
+                atualizarAmbienteDivisao();
+                break;
+            case 10:
+                adicionarDispositivo();
+                break;
+            case 11:
                 removerDispositivo();
+                break;
+            case 12:
+                new DispositivosMenuController(this.model, this.view).ligarDispositivo();
+                break;
+            case 13:
+                new DispositivosMenuController(this.model, this.view).desligarDispositivo();
+                break;
+            case 14:
+                consultarDispositivo();
+                break;
+            case 15:
+                listarTodosDispositivosDaCasa();
+                break;
+            case 16:
+                new DispositivosMenuController(this.model, this.view).executar();
+                break;
+            case 17:
+                new CenariosMenuController(this.model, this.view).executar();
+                break;
+            case 18:
+                new AutomacoesMenuController(this.model, this.view).executar();
+                break;
+            case 19:
+                new EscalonamentosMenuController(this.model, this.view).executar();
+                break;
+            case 20:
+                new EstatisticasMenuController(this.model, this.view).executar();
+                break;
+            case 21:
+                new SugestoesMenuController(this.model, this.view).executar();
+                break;
+            case 22:
+                guardarEstado();
+                break;
+            case 23:
+                carregarEstado();
+                break;
+            case 24:
+                consultarDataHoraAtual();
+                break;
+            case 25:
+                avancarTempo();
                 break;
             case 0:
                 sair();
