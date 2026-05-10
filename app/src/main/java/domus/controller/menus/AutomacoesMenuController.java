@@ -2,8 +2,7 @@ package domus.controller.menus;
 
 import domus.domain.automation.Automacao;
 import domus.domain.DomiUM;
-import domus.domain.commands.ComandoDesligar;
-import domus.domain.commands.ComandoLigar;
+import domus.domain.commands.Command;
 import domus.domain.conditions.CondicaoHumidade;
 import domus.domain.conditions.CondicaoLuminosidade;
 import domus.domain.conditions.CondicaoTemperatura;
@@ -55,12 +54,9 @@ public class AutomacoesMenuController {
                     criarAutomacaoLuminosidade();
                     break;
                 case 4:
-                    adicionarAcaoLigarAAutomacao();
+                    adicionarAcaoAAutomacao();
                     break;
                 case 5:
-                    adicionarAcaoDesligarAAutomacao();
-                    break;
-                case 6:
                     listarAutomacoes();
                     break;
                 case 0:
@@ -167,47 +163,21 @@ public class AutomacoesMenuController {
     }
 
     /**
-     * Adiciona uma ação de ligar a uma automação.
+     * Adiciona uma ação de dispositivo a uma automação.
      */
-    private void adicionarAcaoLigarAAutomacao() {
+    private void adicionarAcaoAAutomacao() {
         String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
         String casaId = this.view.lerTexto("Identificador da casa: ");
         String automacaoId = this.view.lerTexto("Identificador da automação: ");
-        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
-
-        try {
-            this.model.adicionarAcaoAAutomacao(
-                    utilizadorId, casaId, automacaoId,
-                    new ComandoLigar(utilizadorId, casaId, dispositivoId)
-            );
-            this.view.mostrarMensagem("Ação adicionada à automação.");
-        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
-            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
-        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
-            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
-        } catch (domus.domain.exceptions.SemPermissaoException e) {
-            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
-        } catch (domus.domain.exceptions.AutomacaoNaoExisteException e) {
-            this.view.mostrarErro("Automação \"" + e.getAutomacaoId() + "\" não existe.");
-        } catch (domus.domain.exceptions.DomusException e) {
-            this.view.mostrarErro(e.getMessage());
+        Command comando = new ComandoDispositivoMenuHelper(this.view)
+                .lerComandoDispositivo(utilizadorId, casaId);
+        if (comando == null) {
+            this.view.mostrarMensagem("Operação cancelada.");
+            return;
         }
-    }
-
-    /**
-     * Adiciona uma ação de desligar a uma automação.
-     */
-    private void adicionarAcaoDesligarAAutomacao() {
-        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
-        String casaId = this.view.lerTexto("Identificador da casa: ");
-        String automacaoId = this.view.lerTexto("Identificador da automação: ");
-        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
         try {
-            this.model.adicionarAcaoAAutomacao(
-                    utilizadorId, casaId, automacaoId,
-                    new ComandoDesligar(utilizadorId, casaId, dispositivoId)
-            );
+            this.model.adicionarAcaoAAutomacao(utilizadorId, casaId, automacaoId, comando);
             this.view.mostrarMensagem("Ação adicionada à automação.");
         } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
             this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
@@ -217,6 +187,11 @@ public class AutomacoesMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.AutomacaoNaoExisteException e) {
             this.view.mostrarErro("Automação \"" + e.getAutomacaoId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DispositivoNaoExisteException e) {
+            this.view.mostrarErro("Dispositivo \"" + e.getDispositivoId()
+                    + "\" não existe na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.OperacaoInvalidaException e) {
+            this.view.mostrarErro(e.getMessage());
         } catch (domus.domain.exceptions.DomusException e) {
             this.view.mostrarErro(e.getMessage());
         }

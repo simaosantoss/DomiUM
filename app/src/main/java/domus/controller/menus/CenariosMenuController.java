@@ -1,8 +1,7 @@
 package domus.controller.menus;
 
 import domus.domain.DomiUM;
-import domus.domain.commands.ComandoDesligar;
-import domus.domain.commands.ComandoLigar;
+import domus.domain.commands.Command;
 import domus.domain.scenarios.Cenario;
 import domus.ui.ConsoleView;
 import java.util.Iterator;
@@ -46,15 +45,12 @@ public class CenariosMenuController {
                     criarCenario();
                     break;
                 case 2:
-                    adicionarComandoLigarACenario();
+                    adicionarComandoACenario();
                     break;
                 case 3:
-                    adicionarComandoDesligarACenario();
-                    break;
-                case 4:
                     executarCenario();
                     break;
-                case 5:
+                case 4:
                     listarCenarios();
                     break;
                 case 0:
@@ -91,47 +87,21 @@ public class CenariosMenuController {
     }
 
     /**
-     * Adiciona um comando de ligar a um cenário.
+     * Adiciona um comando de dispositivo a um cenário.
      */
-    private void adicionarComandoLigarACenario() {
+    private void adicionarComandoACenario() {
         String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
         String casaId = this.view.lerTexto("Identificador da casa: ");
         String cenarioId = this.view.lerTexto("Identificador do cenário: ");
-        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
-
-        try {
-            this.model.adicionarComandoACenario(
-                    utilizadorId, casaId, cenarioId,
-                    new ComandoLigar(utilizadorId, casaId, dispositivoId)
-            );
-            this.view.mostrarMensagem("Comando adicionado ao cenário.");
-        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
-            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
-        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
-            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
-        } catch (domus.domain.exceptions.SemPermissaoException e) {
-            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
-        } catch (domus.domain.exceptions.CenarioNaoExisteException e) {
-            this.view.mostrarErro("Cenário \"" + e.getCenarioId() + "\" não existe.");
-        } catch (domus.domain.exceptions.DomusException e) {
-            this.view.mostrarErro(e.getMessage());
+        Command comando = new ComandoDispositivoMenuHelper(this.view)
+                .lerComandoDispositivo(utilizadorId, casaId);
+        if (comando == null) {
+            this.view.mostrarMensagem("Operação cancelada.");
+            return;
         }
-    }
-
-    /**
-     * Adiciona um comando de desligar a um cenário.
-     */
-    private void adicionarComandoDesligarACenario() {
-        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
-        String casaId = this.view.lerTexto("Identificador da casa: ");
-        String cenarioId = this.view.lerTexto("Identificador do cenário: ");
-        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
         try {
-            this.model.adicionarComandoACenario(
-                    utilizadorId, casaId, cenarioId,
-                    new ComandoDesligar(utilizadorId, casaId, dispositivoId)
-            );
+            this.model.adicionarComandoACenario(utilizadorId, casaId, cenarioId, comando);
             this.view.mostrarMensagem("Comando adicionado ao cenário.");
         } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
             this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
@@ -141,6 +111,11 @@ public class CenariosMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.CenarioNaoExisteException e) {
             this.view.mostrarErro("Cenário \"" + e.getCenarioId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DispositivoNaoExisteException e) {
+            this.view.mostrarErro("Dispositivo \"" + e.getDispositivoId()
+                    + "\" não existe na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.OperacaoInvalidaException e) {
+            this.view.mostrarErro(e.getMessage());
         } catch (domus.domain.exceptions.DomusException e) {
             this.view.mostrarErro(e.getMessage());
         }

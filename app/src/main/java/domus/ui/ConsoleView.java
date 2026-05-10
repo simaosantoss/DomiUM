@@ -82,10 +82,9 @@ public class ConsoleView {
         System.out.println();
         System.out.println("=== Cenários ===");
         System.out.println("1. Criar cenário");
-        System.out.println("2. Adicionar comando ligar a cenário");
-        System.out.println("3. Adicionar comando desligar a cenário");
-        System.out.println("4. Executar cenário");
-        System.out.println("5. Listar cenários da casa");
+        System.out.println("2. Adicionar comando a cenário");
+        System.out.println("3. Executar cenário");
+        System.out.println("4. Listar cenários da casa");
         System.out.println("0. Voltar");
     }
 
@@ -96,11 +95,9 @@ public class ConsoleView {
         System.out.println();
         System.out.println("=== Escalonamentos ===");
         System.out.println("1. Criar escalonamento");
-        System.out.println("2. Adicionar ação de início: ligar dispositivo");
-        System.out.println("3. Adicionar ação de início: desligar dispositivo");
-        System.out.println("4. Adicionar ação de fim: ligar dispositivo");
-        System.out.println("5. Adicionar ação de fim: desligar dispositivo");
-        System.out.println("6. Listar escalonamentos da casa");
+        System.out.println("2. Adicionar ação de início");
+        System.out.println("3. Adicionar ação de fim");
+        System.out.println("4. Listar escalonamentos da casa");
         System.out.println("0. Voltar");
     }
 
@@ -113,9 +110,8 @@ public class ConsoleView {
         System.out.println("1. Criar automação por temperatura");
         System.out.println("2. Criar automação por humidade");
         System.out.println("3. Criar automação por luminosidade");
-        System.out.println("4. Adicionar ação ligar a automação");
-        System.out.println("5. Adicionar ação desligar a automação");
-        System.out.println("6. Listar automações da casa");
+        System.out.println("4. Adicionar ação à automação");
+        System.out.println("5. Listar automações da casa");
         System.out.println("0. Voltar");
     }
 

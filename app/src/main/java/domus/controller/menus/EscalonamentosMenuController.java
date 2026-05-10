@@ -1,8 +1,7 @@
 package domus.controller.menus;
 
 import domus.domain.DomiUM;
-import domus.domain.commands.ComandoDesligar;
-import domus.domain.commands.ComandoLigar;
+import domus.domain.commands.Command;
 import domus.domain.scheduling.Escalonamento;
 import domus.ui.ConsoleView;
 import java.time.LocalTime;
@@ -48,18 +47,12 @@ public class EscalonamentosMenuController {
                     criarEscalonamento();
                     break;
                 case 2:
-                    adicionarAcaoInicioLigarAEscalonamento();
+                    adicionarAcaoInicioAEscalonamento();
                     break;
                 case 3:
-                    adicionarAcaoInicioDesligarAEscalonamento();
+                    adicionarAcaoFimAEscalonamento();
                     break;
                 case 4:
-                    adicionarAcaoFimLigarAEscalonamento();
-                    break;
-                case 5:
-                    adicionarAcaoFimDesligarAEscalonamento();
-                    break;
-                case 6:
                     listarEscalonamentos();
                     break;
                 case 0:
@@ -98,18 +91,22 @@ public class EscalonamentosMenuController {
     }
 
     /**
-     * Adiciona uma ação de início para ligar dispositivo.
+     * Adiciona uma ação de início a um escalonamento.
      */
-    private void adicionarAcaoInicioLigarAEscalonamento() {
+    private void adicionarAcaoInicioAEscalonamento() {
         String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
         String casaId = this.view.lerTexto("Identificador da casa: ");
         String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
-        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
+        Command comando = new ComandoDispositivoMenuHelper(this.view)
+                .lerComandoDispositivo(utilizadorId, casaId);
+        if (comando == null) {
+            this.view.mostrarMensagem("Operação cancelada.");
+            return;
+        }
 
         try {
             this.model.adicionarAcaoInicioAEscalonamento(
-                    utilizadorId, casaId, escalonamentoId,
-                    new ComandoLigar(utilizadorId, casaId, dispositivoId)
+                    utilizadorId, casaId, escalonamentoId, comando
             );
             this.view.mostrarMensagem("Ação de início adicionada.");
         } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
@@ -120,52 +117,33 @@ public class EscalonamentosMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
             this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
+        } catch (domus.domain.exceptions.DispositivoNaoExisteException e) {
+            this.view.mostrarErro("Dispositivo \"" + e.getDispositivoId()
+                    + "\" não existe na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.OperacaoInvalidaException e) {
+            this.view.mostrarErro(e.getMessage());
         } catch (domus.domain.exceptions.DomusException e) {
             this.view.mostrarErro(e.getMessage());
         }
     }
 
     /**
-     * Adiciona uma ação de início para desligar dispositivo.
+     * Adiciona uma ação de fim a um escalonamento.
      */
-    private void adicionarAcaoInicioDesligarAEscalonamento() {
+    private void adicionarAcaoFimAEscalonamento() {
         String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
         String casaId = this.view.lerTexto("Identificador da casa: ");
         String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
-        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
-
-        try {
-            this.model.adicionarAcaoInicioAEscalonamento(
-                    utilizadorId, casaId, escalonamentoId,
-                    new ComandoDesligar(utilizadorId, casaId, dispositivoId)
-            );
-            this.view.mostrarMensagem("Ação de início adicionada.");
-        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
-            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
-        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
-            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
-        } catch (domus.domain.exceptions.SemPermissaoException e) {
-            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
-        } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
-            this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
-        } catch (domus.domain.exceptions.DomusException e) {
-            this.view.mostrarErro(e.getMessage());
+        Command comando = new ComandoDispositivoMenuHelper(this.view)
+                .lerComandoDispositivo(utilizadorId, casaId);
+        if (comando == null) {
+            this.view.mostrarMensagem("Operação cancelada.");
+            return;
         }
-    }
-
-    /**
-     * Adiciona uma ação de fim para ligar dispositivo.
-     */
-    private void adicionarAcaoFimLigarAEscalonamento() {
-        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
-        String casaId = this.view.lerTexto("Identificador da casa: ");
-        String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
-        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
 
         try {
             this.model.adicionarAcaoFimAEscalonamento(
-                    utilizadorId, casaId, escalonamentoId,
-                    new ComandoLigar(utilizadorId, casaId, dispositivoId)
+                    utilizadorId, casaId, escalonamentoId, comando
             );
             this.view.mostrarMensagem("Ação de fim adicionada.");
         } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
@@ -176,34 +154,11 @@ public class EscalonamentosMenuController {
             this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
         } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
             this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
-        } catch (domus.domain.exceptions.DomusException e) {
+        } catch (domus.domain.exceptions.DispositivoNaoExisteException e) {
+            this.view.mostrarErro("Dispositivo \"" + e.getDispositivoId()
+                    + "\" não existe na casa \"" + e.getCasaId() + "\".");
+        } catch (domus.domain.exceptions.OperacaoInvalidaException e) {
             this.view.mostrarErro(e.getMessage());
-        }
-    }
-
-    /**
-     * Adiciona uma ação de fim para desligar dispositivo.
-     */
-    private void adicionarAcaoFimDesligarAEscalonamento() {
-        String utilizadorId = this.view.lerTexto("Identificador do utilizador: ");
-        String casaId = this.view.lerTexto("Identificador da casa: ");
-        String escalonamentoId = this.view.lerTexto("Identificador do escalonamento: ");
-        String dispositivoId = this.view.lerTexto("Identificador do dispositivo: ");
-
-        try {
-            this.model.adicionarAcaoFimAEscalonamento(
-                    utilizadorId, casaId, escalonamentoId,
-                    new ComandoDesligar(utilizadorId, casaId, dispositivoId)
-            );
-            this.view.mostrarMensagem("Ação de fim adicionada.");
-        } catch (domus.domain.exceptions.UtilizadorNaoExisteException e) {
-            this.view.mostrarErro("Utilizador \"" + e.getUtilizadorId() + "\" não existe.");
-        } catch (domus.domain.exceptions.CasaNaoExisteException e) {
-            this.view.mostrarErro("Casa \"" + e.getCasaId() + "\" não existe.");
-        } catch (domus.domain.exceptions.SemPermissaoException e) {
-            this.view.mostrarErro("Sem permissão na casa \"" + e.getCasaId() + "\".");
-        } catch (domus.domain.exceptions.EscalonamentoNaoExisteException e) {
-            this.view.mostrarErro("Escalonamento \"" + e.getEscalonamentoId() + "\" não existe.");
         } catch (domus.domain.exceptions.DomusException e) {
             this.view.mostrarErro(e.getMessage());
         }
