@@ -44,6 +44,9 @@ tasks.named('test') {
 }
 
 tasks.named('run') {
+    // Executa a aplicação a partir da raiz do projeto para suportar caminhos relativos como "estados/...".
+    workingDir = rootProject.projectDir
+
     // Encaminha o input da consola para a aplicação interativa.
     standardInput = System.in
 }
