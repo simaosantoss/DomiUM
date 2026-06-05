@@ -1,5 +1,9 @@
 # 🏠 DomiUM - DomusControl
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Final%20Grade-19%2F20-brightgreen?style=for-the-badge" alt="Final Grade: 19/20">
+</p>
+
 > A smart-home automation simulator built in Java for the Object-Oriented Programming course, a 2nd-year, 2nd-semester course in the Software Engineering degree.
 
 **DomiUM** is a console-based smart-home management system inspired by platforms such as Home Assistant. It allows users to create homes, rooms and smart devices, assign permissions, operate devices individually, define scenarios, create automations triggered by environmental conditions, schedule actions over simulated time, collect usage statistics, and persist the full application state to disk.
